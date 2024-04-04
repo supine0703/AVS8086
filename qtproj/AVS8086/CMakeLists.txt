@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(AVS8086 VERSION 0.1.0 LANGUAGES CXX)
+project(AVS8086 VERSION 0.1.2 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -26,22 +26,24 @@ function(recurse_directories var root_dir)
     endif()
 endfunction()
 
-set(INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/widget)
 set(RES_PATH     ${CMAKE_CURRENT_SOURCE_DIR}/res)
-set(SRC_PATH     ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(SRC_PATH     ${CMAKE_CURRENT_SOURCE_DIR}/widget)
 set(UI_PATH      ${CMAKE_CURRENT_SOURCE_DIR}/ui)
+
 set(ASSEMBLY_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/assembly)
+set(BACK_END_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/back_end)
 
 recurse_directories(INCLUDE_ALL_DIR ${INCLUDE_PATH})
 recurse_directories(UI_ALL_DIR      ${UI_PATH})
 
 list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS ${UI_ALL_DIR})
 
-include_directories(${INCLUDE_ALL_DIR} ${ASSEMBLY_MODEL})
+include_directories(${INCLUDE_ALL_DIR} ${BACK_END_MODEL})
 
 file(GLOB_RECURSE PROJECT_SOURCES
-    ${ASSEMBLY_MODEL}/*.h ${ASSEMBLY_MODEL}/*.hpp ${ASSEMBLY_MODEL}/*.cpp
-
+    # ${ASSEMBLY_MODEL}/*.h ${ASSEMBLY_MODEL}/*.hpp ${ASSEMBLY_MODEL}/*.cpp
+    ${BACK_END_MODEL}/*.h ${BACK_END_MODEL}/*.hpp ${BACK_END_MODEL}/*.cpp
     ${INCLUDE_PATH}/*.hpp ${INCLUDE_PATH}/*.h
     ${SRC_PATH}/*.cpp     ${SRC_PATH}/*.c
     ${RES_PATH}/*.qrc     ${RES_PATH}/*.rc
@@ -53,6 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        main.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET power_carrier APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

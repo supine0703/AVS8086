@@ -2,6 +2,7 @@
 #include "ui_texteditwidget.h"
 
 #include "parser/parser.h"
+// #include "lexer/lexer.h"
 // #include "assembler.h"
 #include "settings.h"
 #include <QStatusBar>
@@ -113,11 +114,14 @@ void TextEditWidget::on_pushButton_7_clicked()
     }
 }
 
-
+using namespace avs8086::token;
+using namespace avs8086::lexer;
+using namespace avs8086::parser;
 void TextEditWidget::on_pushButton_2_clicked()
 {
     // Assembler a(ui->lineEdit->text(), this);
     // a.compile();
+
     // Lexer l(ui->lineEdit->text());
     // if (l.isError())
     // {
@@ -139,13 +143,20 @@ void TextEditWidget::on_pushButton_2_clicked()
         qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
     auto lt(l.end());
     qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
+    // qDebug() << "error:";
+    // for (const auto& e : l.errorInfos())
+    //     qDebug() << e;
     Parser p(&l);
-    auto root = p.parse_program();
+    auto root = p.newAST();
 
-    for (const auto& s : root->ergodic())
+    for (const auto& s : root->traversal())
         qDebug() << s;
+    qDebug() << "error:";
     for (const auto& e : p.errorInfos())
         qDebug() << e;
+    qDebug() << "warning:";
+    for (const auto& w : p.warningInfos())
+        qDebug() << w;
 }
 
 

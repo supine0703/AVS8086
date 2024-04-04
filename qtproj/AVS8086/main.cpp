@@ -23,9 +23,9 @@ int main(int argc, char* argv[])
     };
     QString fontName = getFontName({
         ":/font/iconfont/iconfont.ttf",
-        ":/font/d_font/JetBrainsMono-Medium.ttf",
-        ":/font/d_font/JetBrainsMono-MediumItalic.ttf",
-        ":/font/d_font/YouSheYuFeiTeJianKangTi-2.ttf",
+        ":/font/d_font/JetBrainsMonoNL-Medium.ttf",
+        ":/font/d_font/JetBrainsMonoNL-MediumItalic.ttf",
+        ":/font/d_font/YouSheShaYuFeiTeJianKangTi-2.ttf",
     });
 
     CHECK_SETTINGS(
