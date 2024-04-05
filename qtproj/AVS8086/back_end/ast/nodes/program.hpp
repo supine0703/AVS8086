@@ -28,8 +28,19 @@ public:
         return tree;
     }
 
+    QString file() const { return m_file; }
 
-public:
+    QList<QSharedPointer<Statement>> statements() const
+    { return m_statements; }
+
+    void append(const QSharedPointer<Statement>& statement)
+    { m_statements.append(statement); }
+
+    void append(const QList<QSharedPointer<Statement>>& statements)
+    { m_statements.append(statements); }
+
+
+private:
     QString m_file;
     QList<QSharedPointer<Statement>> m_statements;
 };

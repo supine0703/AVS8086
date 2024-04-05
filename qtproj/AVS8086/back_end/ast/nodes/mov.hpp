@@ -27,7 +27,7 @@ public:
     {
         if (isError())
             return {
-                QString("%1| %2: member pointer is null!")
+                QString("%1| %2: member is false!")
                     .arg(QString(depth * 4, '-'), typeName())
             };
         QStringList info;

@@ -21,6 +21,11 @@ void Node::goError()
     m_isError = true;
 }
 
+bool Node::is(Type type) const
+{
+    return m_type == type;
+}
+
 Node::Type Node::type() const
 {
     return m_type;

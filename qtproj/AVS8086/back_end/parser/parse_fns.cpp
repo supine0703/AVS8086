@@ -3,20 +3,27 @@
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
-const QMap<Token::Type, Parser::stmt_parseFn> Parser::sm_statement_parseFns = {
+const QMap<Token::Type, Parser::stmt_parse_fn> Parser::sm_stmt_parse_fns = {
+    { Token::TOKEN_WELL,        &Parser::parse_well },      // #
     { Token::TOKEN_MOV,         &Parser::parse_mov },       // mov
+
 };
 
-const QMap<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
+const QMap<Token::Type, Parser::prefix_parse_fn> Parser::sm_prefix_parse_fns = {
+    { Token::TOKEN_ILLEGAL,     &Parser::parse_illegal },       // illegal
     { Token::TOKEN_EOF,         &Parser::parse_not_end },       // eof
-    // { Token::TOKEN_ANNOTATION,  &Parser::parse_not_end },       // ;
-    { Token::TOKEN_MINUS,       &Parser::parse_nagative },      // -x
+    { Token::TOKEN_ANNOTATION,  &Parser::parse_not_end },       // ;
+    { Token::TOKEN_BIT_NOT,     &Parser::parse_prefix },        // ~x
+    { Token::TOKEN_PLUS,        &Parser::parse_prefix },        // +x
+    { Token::TOKEN_MINUS,       &Parser::parse_prefix },        // -x
+    { Token::TOKEN_FLOAT,       &Parser::parse_float },         // integer
     { Token::TOKEN_INTEGER,     &Parser::parse_integer },       // integer
-    { Token::TOKEN_STRING,      &Parser::parse_string },        // integer
+    { Token::TOKEN_STRING,      &Parser::parse_string },        // string
     { Token::TOKEN_LPAREN,      &Parser::parse_group },         // (
+
 };
 
-const QMap<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
+const QMap<Token::Type, Parser::infix_parse_fn> Parser::sm_infix_parse_fns = {
     { Token::TOKEN_BIT_NOT,         &Parser::parse_infix },     // ~
     { Token::TOKEN_ASTERISK,        &Parser::parse_infix },     // *
     { Token::TOKEN_SLASH,           &Parser::parse_infix },     // /
@@ -36,8 +43,7 @@ const QMap<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
     { Token::TOKEN_NE,              &Parser::parse_infix },     // !=
 
     { Token::TOKEN_COMMA,           &Parser::parse_comma },     // ,
+
+    // { Token::TOKEN_COLON,           &Parser::parse_colon },     // :
 };
 
-const QMap<Token::Type, Parser::postfix_parseFn> Parser::sm_postfix_parseFns = {
-    { Token::TOKEN_COLON,       nullptr },
-};

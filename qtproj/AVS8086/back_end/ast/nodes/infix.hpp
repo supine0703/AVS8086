@@ -9,29 +9,27 @@ namespace avs8086::ast {
 class Infix : public Expression
 {
 public:
-    Infix(
-        const QSharedPointer<Expression>& left,
-        const QSharedPointer<Expression>& right,
-        const token::Token& token = token::Token()
-        )
+    Infix(const QSharedPointer<Expression>& left,
+          const QSharedPointer<Expression>& right,
+          const token::Token& token = token::Token())
         : Expression(NODE_INFIX)
         , m_left(left)
         , m_right(right)
         , m_token_type(token.type())
         , m_op(token.literal())
     {
-        if (m_left.isNull() || m_right.isNull())
+        if (m_left->isError() || m_right->isError())
             goError();
     }
     ~Infix() { }
     
     QStringList traversal(int depth) const override
     {
-        if (isError())
-            return {
-                QString("%1| %2: member pointer is null!")
-                    .arg(QString(depth * 4, '-'), typeName())
-            };
+        // if (isError())
+        //     return {
+        //         QString("%1| %2: member is false!")
+        //             .arg(QString(depth * 4, '-'), typeName())
+        //     };
         QStringList info;
         info.append(QString("%1| %2: %3").arg(
             QString(depth * 4, '-'), typeName(), m_op

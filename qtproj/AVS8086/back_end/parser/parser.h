@@ -46,11 +46,14 @@ private:
     QSharedPointer<ast::Expression>  parse_expression(Precedence precedence);
 
     // statement
+    QSharedPointer<ast::Statement> parse_well();
     QSharedPointer<ast::Statement> parse_mov();
 
     // prefix
+    QSharedPointer<ast::Expression> parse_illegal();
     QSharedPointer<ast::Expression> parse_not_end();
-    QSharedPointer<ast::Expression> parse_nagative();
+    QSharedPointer<ast::Expression> parse_prefix();
+    QSharedPointer<ast::Expression> parse_float();
     QSharedPointer<ast::Expression> parse_integer();
     QSharedPointer<ast::Expression> parse_string();
     QSharedPointer<ast::Expression> parse_group();
@@ -73,6 +76,7 @@ private:
     void addExpectPeekTokenErrorInfo(token::Token::Type type);
     void addExpectPeekTokenErrorInfo(const QList<token::Token::Type>& types);
     void addNoPrefixParseFnErrorInfo();
+    void addNoDealingWithTokenErrorInfo();
 
     // 封装了对需要 token 的操作, 辅助之后的语法分析
     void fristToken();
@@ -80,8 +84,6 @@ private:
     const token::Token& currToken() const;
     const token::Token& peekToken() const;
 
-    bool checkCurrToken(token::Token::Type type) const;
-    bool checkPeekToken(token::Token::Type type) const;
     bool expectPeekToken(token::Token::Type type);
     bool expectPeekToken(const QList<token::Token::Type>& types);
 
@@ -99,22 +101,22 @@ private:
     QStringList m_warningInfos;
     QStringList m_errorInfos;
 
+    QStringList m_wellInstructions;
+    QStringList m_wellInfos;
+
     static const QMap<token::Token::Type, Precedence> sm_precedences;
 
-    // 定义函数原型 - 将所有的 (表达式)语句 分为 前缀 中缀 后缀
-    typedef QSharedPointer<ast::Statement> (Parser::*stmt_parseFn)(void);
-    typedef QSharedPointer<ast::Expression> (Parser::*prefix_parseFn)(void);
+private:
+    // 定义函数原型 - 将所有的 (表达式)语句 分为: 语句, 前缀表达式, 中(后)缀表达式
+    typedef QSharedPointer<ast::Statement> (Parser::*stmt_parse_fn)(void);
+    typedef QSharedPointer<ast::Expression> (Parser::*prefix_parse_fn)(void);
     typedef
         QSharedPointer<ast::Expression>
-        (Parser::*infix_parseFn)(const QSharedPointer<ast::Expression>&);
-    typedef
-        QSharedPointer<ast::Expression>
-        (Parser::*postfix_parseFn)(const QSharedPointer<ast::Expression>&);
+        (Parser::*infix_parse_fn)(const QSharedPointer<ast::Expression>&);
 
-    static const QMap<token::Token::Type, stmt_parseFn> sm_statement_parseFns;
-    static const QMap<token::Token::Type, prefix_parseFn> sm_prefix_parseFns;
-    static const QMap<token::Token::Type, infix_parseFn> sm_infix_parseFns;
-    static const QMap<token::Token::Type, postfix_parseFn> sm_postfix_parseFns;
+    static const QMap<token::Token::Type, stmt_parse_fn> sm_stmt_parse_fns;
+    static const QMap<token::Token::Type, prefix_parse_fn> sm_prefix_parse_fns;
+    static const QMap<token::Token::Type, infix_parse_fn> sm_infix_parse_fns;
 };
 
 } // namespace avs8086::parser

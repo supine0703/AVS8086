@@ -9,5 +9,5 @@ QSharedPointer<Expression> Parser::parse_not_end()
     addErrorInfo(
         t.row() - 1, t.column(), t.literal().length(), "expression is not end"
     );
-    return nullptr;
+    return parse_illegal();
 }

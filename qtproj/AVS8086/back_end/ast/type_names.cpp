@@ -9,8 +9,9 @@ const QMap<Node::Type, QString> Node::sm_typeNames = {
     { NODE_INFIX,                   "Infix" },
     { NODE_STRING,                  "String" },
     { NODE_INTEGER,                 "Integer" },
-    { NODE_NAGATIVE,                "Nagative" },
+    { NODE_PREFIX,                  "Prefix" },
 
     { NODE_REGISTER,                "Register" },
+    { NODE_WELL,                    "#" },
     { NODE_MOV,                     "MOV" },
 };

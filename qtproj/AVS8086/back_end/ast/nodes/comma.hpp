@@ -8,38 +8,22 @@ namespace avs8086::ast {
 class Comma : public Expression
 {
 public:
-    Comma(
-        const QSharedPointer<Expression>& left,
-        const QSharedPointer<Expression>& right
-        )
+    Comma(const QSharedPointer<Expression>& left,
+          const QSharedPointer<Expression>& right)
         : Expression(NODE_COMMA)
     {
-        if (left.isNull() || right.isNull())
-        {
-            goError();
-            return;
-        }
         m_expression.append(left);
-        if (right->type() != NODE_COMMA)
-        {
-            m_expression.append(right);
-        }
-        else
-        {
-            m_expression.append(
-                qSharedPointerDynamicCast<Comma>(right)->m_expression
-            );
-        }
+        m_expression.append(right);
     }
     ~Comma() { }
 
     QStringList traversal(int depth) const override
     {
-        if (isError())
-            return {
-                QString("%1| %2: member pointer is null!")
-                    .arg(QString(depth * 4, '-'), typeName())
-            };
+        // if (isError())
+        //     return {
+        //         QString("%1| %2: member pointer is null!")
+        //             .arg(QString(depth * 4, '-'), typeName())
+        //     };
         QStringList info;
         info.append(
             QString("%1| %2: %3(%4)")
@@ -58,16 +42,23 @@ public:
 
     void append(const QSharedPointer<Expression>& expression)
     {
-        if (expression->type() == NODE_COMMA)
+        if (expression->isError())
+        {
+            goError();
+        }
+        if (expression->is(NODE_COMMA))
         {
             m_expression.append(
                 qSharedPointerDynamicCast<Comma>(expression)->m_expression
             );
         }
-        else m_expression.append(expression);
+        else
+        {
+            m_expression.append(expression);
+        }
     }
 
-public:
+private:
     QList<QSharedPointer<Expression>> m_expression;
 };
 

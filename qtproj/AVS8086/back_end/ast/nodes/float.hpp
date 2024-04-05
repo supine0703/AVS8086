@@ -1,20 +1,20 @@
-#ifndef INTEGER_HPP
-#define INTEGER_HPP
+#ifndef FLOAT_HPP
+#define FLOAT_HPP
 
 #include "ast/node.h"
 #include "token/token.h"
 
 namespace avs8086::ast {
 
-class Integer : public Expression
+class Float : public Expression
 {
 public:
-    Integer(const token::Token& token)
-        : Expression(NODE_INTEGER)
-        , m_value(token::Token::textToInt(token.literal()))
+    Float(const token::Token& token)
+        : Expression(NODE_FLOAT)
+        , m_value(token.literal().toDouble())
     { }
-    ~Integer() { }
-    
+    ~Float() { }
+
     QStringList traversal(int depth) const override
     {
         QStringList info;
@@ -25,9 +25,9 @@ public:
     }
 
 private:
-    int m_value;
+    double m_value;
 };
 
 } // namespace avs8086::ast
 
-#endif // INTEGER_HPP
+#endif // FLOAT_HPP

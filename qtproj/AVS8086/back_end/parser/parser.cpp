@@ -96,8 +96,19 @@ void Parser::addNoPrefixParseFnErrorInfo()
     const auto& token = currToken();
     addErrorInfo(
         token.row(), token.column(), token.literal().length(),
-        "no prefix parse function for " + token.typeName()
-        );
+        QString("no prefix parse function for '%1: %2'")
+            .arg(token.typeName(), token.literal())
+    );
+}
+
+void Parser::addNoDealingWithTokenErrorInfo()
+{
+    const auto& token = currToken();
+    addErrorInfo(
+        token.row(), token.column(), token.literal().length(),
+        QString("at present, can not deal with '%1: %2'")
+            .arg(token.typeName(), token.literal())
+    );
 }
 
 /* ========================================================================== */
@@ -118,7 +129,8 @@ void Parser::fristToken()
 
 void Parser::nextToken()
 {
-    while (m_tokens.at(2).type() == Token::TOKEN_ANNOTATION)
+    // 缓冲区去除注释
+    while (m_tokens.at(2).is(Token::TOKEN_ANNOTATION))
     {
         m_tokens.pop_back();
         m_tokens.append(m_lexer->next());
@@ -154,19 +166,9 @@ const Token& Parser::peekToken() const
     return m_tokens.at(1);
 }
 
-bool Parser::checkCurrToken(Token::Type type) const
-{
-    return currToken().type() == type;
-}
-
-bool Parser::checkPeekToken(Token::Type type) const
-{
-    return peekToken().type() == type;
-}
-
 bool Parser::expectPeekToken(Token::Type type)
 {
-    if (!checkPeekToken(type))
+    if (!peekToken().is(type))
         return false;
     nextToken();
     return true;

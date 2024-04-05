@@ -213,7 +213,7 @@ void Lexer::scan()
                     else if (chType == Token::TOKEN_COLON)
                     { // 标签 label
                         auto& last(m_tokens.last());
-                        if (last.type() == Token::TOKEN_ILLEGAL
+                        if (last.is(Token::TOKEN_ILLEGAL)
                             && last.row() == _r)
                         {
                             if (!QString("0123456789").contains(
@@ -245,7 +245,7 @@ void Lexer::scan()
     // 二次遍历
     for (auto& t : m_tokens)
     {
-        if (t.type() == Token::TOKEN_ILLEGAL)
+        if (t.is(Token::TOKEN_ILLEGAL))
         {
             const auto& tl = t.literal();
             if (m_labels.contains(tl))
@@ -279,7 +279,7 @@ void Lexer::scan()
 int Lexer::textStrLen(const QString& line, int col)
 {
     int len = -1;
-    auto ch = line.at(col);
+    const auto& ch = line.at(col);
     if (ch == '\'' || ch == '"')
     {
         for (int i = col + 1, end = line.length(); i < end; i++)

@@ -20,6 +20,7 @@ public:
         TOKEN_LABEL,            // label
         TOKEN_STRING,           // string
         TOKEN_INTEGER,          // integer
+        TOKEN_FLOAT,            // float
 
 
         TOKEN_NEGATIVE,         // -x
@@ -209,6 +210,7 @@ public:
 
     Token& operator=(const Token& other);
 
+    bool is(Type type) const;
     Type type() const;
     QString literal() const;
     int row() const;
@@ -225,6 +227,7 @@ public:
     static int textToInt(const QString& numStr);
     static int lastTextToInt();
 
+    static bool textIsFloat(const QString& numStr);
 
 private:
     Type m_type;

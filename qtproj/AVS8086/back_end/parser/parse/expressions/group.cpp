@@ -11,10 +11,13 @@ QSharedPointer<Expression> Parser::parse_group()
     nextToken();
     auto e = parse_expression(LOWEST);
     int _r = peekToken().row();
-    if (row != _r || !expectPeekToken(Token::TOKEN_RPAREN))
+    if (row != _r)
     {
         addErrorInfo(row, col, 1, "'(' is not close on this line");
-        return nullptr;
+    }
+    else if (!expectPeekToken(Token::TOKEN_RPAREN))
+    {
+        addExpectPeekTokenErrorInfo(Token::TOKEN_RPAREN);
     }
     return e;
 }

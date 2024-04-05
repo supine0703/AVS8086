@@ -13,22 +13,22 @@ public:
     enum Type {
         NODE_ILLEGAL = 0,
 
+        NODE_FLOAT,     // float
         NODE_INTEGER,   // integer
         NODE_STRING,    // string
-        NODE_NAGATIVE,  // -x
-        NODE_BIT_NOT,   // ~x
+        NODE_PREFIX,    // ~x +x -x
         NODE_REGISTER,  // reg
         NODE_ADDRESS,   // []
-        NODE_INFIX,     // * / % + - & ^ | << >>
+        NODE_INFIX,     // * / % + - & ^ | << >> =
         NODE_COMMA,     // ,
         NODE_LABEL,     // label
         NODE_COLON,     // :
-        // NODE_ASSIGN,    // =
 
         NODE_PROGRAM,
         NODE_EXPRESSION_STATEMENT,
+        NODE_MULTIPLE_STATEMENT,
 
-
+        NODE_WELL,      // #
         NODE_MOV,
     };
 
@@ -39,8 +39,9 @@ public:
     Node(Type type);
     virtual ~Node();
 
-    Type type() const;
     bool isError() const;
+    bool is(Type type) const;
+    Type type() const;
 
     QString typeName() const;
     static QString nodeTypeName(Type type);
@@ -61,12 +62,17 @@ private:
 class Expression : public Node
 {
 public:
-    Expression(Type type) : Node(type) { }
-    virtual ~Expression() { }
-
+    enum ValueType {
+        Error = 0,
+        String,
+        Integer,
+        Float,
+        Bool,
+    };
 
 public:
-    QVariant m_value;
+    Expression(Type type) : Node(type) { }
+    virtual ~Expression() { }
 };
 
 /* ========================================================================== */

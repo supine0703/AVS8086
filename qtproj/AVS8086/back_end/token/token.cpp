@@ -33,6 +33,11 @@ Token& Token::operator=(const Token& other)
     return *this;
 }
 
+bool Token::is(Type type) const
+{
+    return m_type == type;
+}
+
 /* ========================================================================== */
 
 Token::Type Token::type() const
@@ -121,6 +126,10 @@ Token::Type Token::tokenType(const QString& literal)
     {
         return TOKEN_INTEGER;
     }
+    else if (textIsFloat(up))
+    {
+        return TOKEN_FLOAT;
+    }
     else if (sm_registers.contains(up))
     {
         return TOKEN_REGISTER;
@@ -201,6 +210,13 @@ int Token::textToInt(const QString& numStr)
 int Token::lastTextToInt()
 {
     return sm_lastTextToInt;
+}
+
+bool Token::textIsFloat(const QString& numStr)
+{
+    bool ok;
+    numStr.toDouble(&ok);
+    return ok;
 }
 
 /* ========================================================================== */

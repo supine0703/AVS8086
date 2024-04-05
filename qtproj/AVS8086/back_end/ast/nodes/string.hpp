@@ -11,19 +11,21 @@ class String : public Expression
 public:
     String(const token::Token& token)
         : Expression(NODE_STRING)
-    {
-        m_value = token.literal().removeFirst().removeLast();
-    }
+        , m_value(token.literal().removeFirst().removeLast())
+    { }
     ~String() { }
 
     QStringList traversal(int depth) const override
     {
         QStringList info;
         info.append(QString("%1| %2: %3").arg(
-            QString(depth * 4, '-'), typeName(), m_value.toString()
+            QString(depth * 4, '-'), typeName(), m_value
             ));
         return info;
     }
+
+private:
+    QString m_value;
 };
 
 } // namespace avs8086::ast

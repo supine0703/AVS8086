@@ -11,18 +11,18 @@ public:
     ExpressionStatement(const QSharedPointer<Expression>& expression)
         : Statement(NODE_EXPRESSION_STATEMENT), m_expression(expression)
     {
-        if (m_expression.isNull())
+        if (m_expression->isError())
             goError();
     }
     ~ExpressionStatement() { }
     
     QStringList traversal(int depth) const override
     {
-        if (isError())
-            return {
-                QString("%1| %2: member pointer is null!")
-                    .arg(QString(depth * 4, '-'), typeName())
-            };
+        // if (isError())
+        //     return {
+        //         QString("%1| %2: member is false!")
+        //             .arg(QString(depth * 4, '-'), typeName())
+        //     };
         QStringList info;
         info.append(QString("%1| %2").arg(
             QString(depth * 4, '-'), typeName()
