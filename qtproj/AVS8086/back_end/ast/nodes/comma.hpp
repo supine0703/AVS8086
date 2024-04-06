@@ -12,8 +12,8 @@ public:
           const QSharedPointer<Expression>& right)
         : Expression(NODE_COMMA)
     {
-        m_expression.append(left);
-        m_expression.append(right);
+        m_expressions.append(left);
+        m_expressions.append(right);
     }
     ~Comma() { }
 
@@ -28,18 +28,20 @@ public:
         info.append(
             QString("%1| %2: %3(%4)")
                 .arg(QString(depth * 4, '-'), typeName(), ",")
-                .arg(m_expression.length())
+                .arg(m_expressions.length())
         );
         depth++;
-        for (int i = 0; i < m_expression.length(); i++)
+        for (int i = 0; i < m_expressions.length(); i++)
         {
-            auto s = m_expression.at(i)->traversal(depth);
+            auto s = m_expressions.at(i)->traversal(depth);
             s[0].replace("|", QString("| %1 -").arg(i + 1));
             info.append(s);
         }
         return info;
     }
 
+
+private:
     void append(const QSharedPointer<Expression>& expression)
     {
         if (expression->isError())
@@ -48,18 +50,18 @@ public:
         }
         if (expression->is(NODE_COMMA))
         {
-            m_expression.append(
-                qSharedPointerDynamicCast<Comma>(expression)->m_expression
+            m_expressions.append(
+                qSharedPointerDynamicCast<Comma>(expression)->m_expressions
             );
         }
         else
         {
-            m_expression.append(expression);
+            m_expressions.append(expression);
         }
     }
 
 private:
-    QList<QSharedPointer<Expression>> m_expression;
+    QList<QSharedPointer<Expression>> m_expressions;
 };
 
 }; // namespace avs8086::ast

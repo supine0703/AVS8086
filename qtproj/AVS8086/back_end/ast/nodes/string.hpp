@@ -2,30 +2,29 @@
 #define STRING_HPP
 
 #include "ast/node.h"
-#include "token/token.h"
 
 namespace avs8086::ast {
 
 class String : public Expression
 {
 public:
-    String(const token::Token& token)
+    String(const QString& str)
         : Expression(NODE_STRING)
-        , m_value(token.literal().removeFirst().removeLast())
-    { }
+    {
+        m_valueType = STRING;
+        m_value = str;
+    }
     ~String() { }
 
     QStringList traversal(int depth) const override
     {
         QStringList info;
-        info.append(QString("%1| %2: %3").arg(
-            QString(depth * 4, '-'), typeName(), m_value
-            ));
+        info.append(QString("%1| %2: %4(%5)").arg(
+            QString(depth * 4, '-'), typeName(),
+            m_value.toHex(' '), m_value.toString()
+        ));
         return info;
     }
-
-private:
-    QString m_value;
 };
 
 } // namespace avs8086::ast

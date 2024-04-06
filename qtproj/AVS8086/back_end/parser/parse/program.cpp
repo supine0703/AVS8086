@@ -16,14 +16,14 @@ QSharedPointer<Program> Parser::parse_program()
         {
             if (stmt->is(Node::NODE_MULTIPLE_STATEMENT))
             {
-                s->append(
+                s->m_statements.append(
                     qSharedPointerDynamicCast<MultipleStatement>
                     (stmt)->statements()
                 );
             }
             else
             {
-                s->append(stmt);
+                s->m_statements.append(stmt);
             }
         }
         nextToken();

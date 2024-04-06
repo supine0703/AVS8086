@@ -6,5 +6,5 @@ using namespace avs8086::parser;
 
 QSharedPointer<Expression> Parser::parse_integer()
 {
-    return QSharedPointer<Integer>(new Integer(currToken()));
+    return QSharedPointer<Expression>(new Integer(currToken()));
 }

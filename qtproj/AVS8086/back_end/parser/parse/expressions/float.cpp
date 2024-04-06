@@ -6,7 +6,12 @@ using namespace avs8086::parser;
 
 QSharedPointer<Expression> Parser::parse_float()
 {
-    addNoDealingWithTokenErrorInfo();
-    return QSharedPointer<Float>(new Float(currToken()));
+    const auto& token = currToken();
+    addErrorInfo(
+        token.row(), token.column(), token.literal().length(),
+        QString("not supported, unable to process '%1: %2'")
+            .arg(token.typeName(), token.literal())
+    );
+    return QSharedPointer<Expression>(new Float(token));
 }
 

@@ -10,7 +10,7 @@ Parser::parse_comma(const QSharedPointer<ast::Expression>& left)
 {
     auto precedence = currTokenPrecedence();
     nextToken();
-    return QSharedPointer<Comma>(
+    return QSharedPointer<Expression>(
         new Comma(left, parse_expression(precedence))
     );
 }

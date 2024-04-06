@@ -10,14 +10,29 @@ class Prefix : public Expression
 public:
     Prefix(
         const QString& op,
-        const QSharedPointer<Expression>& m_expression = nullptr)
+        const QSharedPointer<Expression>& expression)
         : Expression(NODE_PREFIX)
         , m_operator(op)
-        , m_expression(m_expression)
+        , m_expression(expression)
     {
-        if (m_expression->isError()
-            || !(op == "-" || op == "+" || op == "~"))
+        if (expression->isError())
+        {
+            m_valueType = ERROR;
             goError();
+        }
+        else if (op == "-" || op == "+" || op == "~")
+        {
+            m_valueType = expression->valueType();
+            if (op == "-")
+                m_value = -expression->value();
+            else if (op == "~")
+                m_value = ~expression->value();
+        }
+        else
+        {
+            m_valueType = ERROR;
+            goError();
+        }
     }
     ~Prefix() { }
 
@@ -29,9 +44,10 @@ public:
         //             .arg(QString(depth * 4, '-'), typeName())
         //     };
         QStringList info;
-        info.append(QString("%1| %2: %3").arg(
+        info.append(QString("%1| %2: %3: '%4(%5)'").arg(
             QString(depth * 4, '-'), typeName(),
-            isError() ? m_operator : "error"
+            isError() ? "error" : m_operator,
+            m_value.toHex(' '), m_value.toString()
         ));
         info.append(m_expression->traversal(depth + 1));
         return info;

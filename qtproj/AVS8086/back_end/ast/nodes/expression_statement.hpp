@@ -2,6 +2,7 @@
 #define EXPRESSION_STATEMENT_HPP
 
 #include "ast/node.h"
+#include <QSharedPointer>
 
 namespace avs8086::ast {
 
@@ -18,11 +19,6 @@ public:
     
     QStringList traversal(int depth) const override
     {
-        // if (isError())
-        //     return {
-        //         QString("%1| %2: member is false!")
-        //             .arg(QString(depth * 4, '-'), typeName())
-        //     };
         QStringList info;
         info.append(QString("%1| %2").arg(
             QString(depth * 4, '-'), typeName()
@@ -30,7 +26,6 @@ public:
         info.append(m_expression->traversal(depth + 1));
         return info;
     }
-
 
 private:
     QSharedPointer<Expression> m_expression;

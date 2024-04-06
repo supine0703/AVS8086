@@ -17,7 +17,7 @@ public:
     QStringList traversal(int depth) const override
     {
         return {
-            QString("%1| %2-error: %3-'%4'").arg(
+            QString("%1| %2-error: %3 '%4'").arg(
                 QString(depth * 4, '-'), typeName(),
                 m_token.typeName(), m_token.literal()
             )

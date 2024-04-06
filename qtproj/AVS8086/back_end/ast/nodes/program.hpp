@@ -2,11 +2,17 @@
 #define PROGRAM_HPP
 
 #include "ast/node.h"
+#include <QSharedPointer>
+
+namespace avs8086::parser {
+class Parser;
+} // namespace avs8086::parser
 
 namespace avs8086::ast {
 
 class Program : public Statement
 {
+    friend class avs8086::parser::Parser;
 public:
     Program(const QString& file)
         : Statement(NODE_PROGRAM), m_file(file)
@@ -32,13 +38,6 @@ public:
 
     QList<QSharedPointer<Statement>> statements() const
     { return m_statements; }
-
-    void append(const QSharedPointer<Statement>& statement)
-    { m_statements.append(statement); }
-
-    void append(const QList<QSharedPointer<Statement>>& statements)
-    { m_statements.append(statements); }
-
 
 private:
     QString m_file;

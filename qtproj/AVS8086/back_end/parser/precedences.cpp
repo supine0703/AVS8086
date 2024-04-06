@@ -4,8 +4,6 @@ using namespace avs8086::token;
 using namespace avs8086::parser;
 
 const QMap<Token::Type, Parser::Precedence> Parser::sm_precedences = {
-    { Token::TOKEN_NEGATIVE,        NEGATIVE },     // -x
-    { Token::TOKEN_BIT_NOT,         BITNOT },       // ~
     { Token::TOKEN_ASTERISK,        PRODUCT },      // *
     { Token::TOKEN_SLASH,           PRODUCT },      // /
     { Token::TOKEN_MODULO,          PRODUCT },      // %

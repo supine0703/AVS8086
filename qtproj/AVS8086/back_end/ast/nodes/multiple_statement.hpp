@@ -3,12 +3,17 @@
 
 #include "ast/node.h"
 
+namespace avs8086::parser {
+class Parser;
+} // namespace avs8086::parser
+
 namespace avs8086::ast {
 
 class MultipleStatement : public Statement
 {
+    friend class avs8086::parser::Parser;
 public:
-    MultipleStatement() : Statement(NODE_EXPRESSION_STATEMENT) { }
+    MultipleStatement() : Statement(NODE_MULTIPLE_STATEMENT) { }
     ~MultipleStatement() { }
 
     QStringList traversal(int depth) const override
@@ -31,11 +36,19 @@ public:
     QList<QSharedPointer<Statement>> statements() const
     { return m_statements; }
 
+private:
     void append(const QSharedPointer<Statement>& statement)
-    { m_statements.append(statement); }
-
-    void append(const QList<QSharedPointer<Statement>>& statements)
-    { m_statements.append(statements); }
+    {
+        if (statement->is(NODE_MULTIPLE_STATEMENT))
+        {
+            m_statements.append(
+                qSharedPointerDynamicCast<MultipleStatement>
+                (statement)->m_statements
+            );
+        }
+        else
+            m_statements.append(statement);
+    }
 
 private:
     QList<QSharedPointer<Statement>> m_statements;

@@ -9,7 +9,7 @@ QSharedPointer<Expression> Parser::parse_prefix()
 {
     QString op = currToken().literal();
     nextToken();
-    return QSharedPointer<Prefix>(new Prefix(
-        op, parse_expression(tokenPrecedence(Token::TOKEN_NEGATIVE))
+    return QSharedPointer<Expression>(new Prefix(
+        op, parse_expression(PREFIX)
     ));
 }

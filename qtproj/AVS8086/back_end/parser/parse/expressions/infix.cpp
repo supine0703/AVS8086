@@ -11,7 +11,7 @@ Parser::parse_infix(const QSharedPointer<Expression>& left)
     auto precedence = currTokenPrecedence();
     Token t = currToken();
     nextToken();
-    return QSharedPointer<Infix>(
+    return QSharedPointer<Expression>(
         new Infix(left, parse_expression(precedence), t)
     );
 }

@@ -1,8 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <QVariant>
-// #include <QMap>
+#include "ast/value.h"
+#include <QSharedPointer>
+#include <QMap>
 // #include <QStringList>
 
 namespace avs8086::ast {
@@ -19,7 +20,7 @@ public:
         NODE_PREFIX,    // ~x +x -x
         NODE_REGISTER,  // reg
         NODE_ADDRESS,   // []
-        NODE_INFIX,     // * / % + - & ^ | << >> =
+        NODE_INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
         NODE_COMMA,     // ,
         NODE_LABEL,     // label
         NODE_COLON,     // :
@@ -28,6 +29,7 @@ public:
         NODE_EXPRESSION_STATEMENT,
         NODE_MULTIPLE_STATEMENT,
 
+        NODE_SINGLE,
         NODE_WELL,      // #
         NODE_MOV,
     };
@@ -63,16 +65,22 @@ class Expression : public Node
 {
 public:
     enum ValueType {
-        Error = 0,
-        String,
-        Integer,
-        Float,
-        Bool,
+        ERROR = 0,
+        FLOAT,
+        STRING,
+        INTEGER,
+        BOOL,
     };
 
 public:
     Expression(Type type) : Node(type) { }
     virtual ~Expression() { }
+    ValueType valueType() { return m_valueType; }
+    Value value() const { return m_value; }
+
+protected:
+    ValueType m_valueType;
+    Value m_value;
 };
 
 /* ========================================================================== */

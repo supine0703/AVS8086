@@ -101,12 +101,12 @@ void Parser::addNoPrefixParseFnErrorInfo()
     );
 }
 
-void Parser::addNoDealingWithTokenErrorInfo()
+void Parser::addReservedWordErrorInfo()
 {
     const auto& token = currToken();
     addErrorInfo(
         token.row(), token.column(), token.literal().length(),
-        QString("at present, can not deal with '%1: %2'")
+        QString("this is reserved word, unable to process '%1: %2'")
             .arg(token.typeName(), token.literal())
     );
 }
@@ -119,10 +119,14 @@ void Parser::fristToken()
     if (m_lexer->isError())
         m_errorInfos.append(m_lexer->errorInfos());
 
-    auto first = m_lexer->first();
     m_tokens.clear();
-    m_tokens.append(first);
-    m_tokens.append(first);
+    m_tokens.append(m_lexer->first());
+    while (currToken().is(Token::TOKEN_ANNOTATION))
+    {
+        m_tokens.pop_back();
+        m_tokens.append(m_lexer->next());
+    }
+    m_tokens.append(m_tokens.at(0));
     m_tokens.append(m_lexer->next());
     nextToken();
 }

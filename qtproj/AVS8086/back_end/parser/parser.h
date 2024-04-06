@@ -20,8 +20,7 @@ public:
         SHIFT,          // << >>
         SUM,            // +, -
         PRODUCT,        // *, /, %
-        BITNOT,         // ~
-        NEGATIVE,       // -x
+        PREFIX,         // -x +x ~x
     };
 
 
@@ -46,10 +45,12 @@ private:
     QSharedPointer<ast::Expression>  parse_expression(Precedence precedence);
 
     // statement
+    QSharedPointer<ast::Statement> parse_single();
     QSharedPointer<ast::Statement> parse_well();
     QSharedPointer<ast::Statement> parse_mov();
 
     // prefix
+    QSharedPointer<ast::Expression> parse_reserved_word();
     QSharedPointer<ast::Expression> parse_illegal();
     QSharedPointer<ast::Expression> parse_not_end();
     QSharedPointer<ast::Expression> parse_prefix();
@@ -57,6 +58,7 @@ private:
     QSharedPointer<ast::Expression> parse_integer();
     QSharedPointer<ast::Expression> parse_string();
     QSharedPointer<ast::Expression> parse_group();
+    QSharedPointer<ast::Expression> parse_address();
 
     // infix
     QSharedPointer<ast::Expression>
@@ -76,7 +78,7 @@ private:
     void addExpectPeekTokenErrorInfo(token::Token::Type type);
     void addExpectPeekTokenErrorInfo(const QList<token::Token::Type>& types);
     void addNoPrefixParseFnErrorInfo();
-    void addNoDealingWithTokenErrorInfo();
+    void addReservedWordErrorInfo();
 
     // 封装了对需要 token 的操作, 辅助之后的语法分析
     void fristToken();
@@ -95,7 +97,7 @@ private:
 
 private:
     lexer::Lexer* m_lexer;
-    // 三空间分别位: curr, peek, buff; 每个token需要先进入buff再往前走
+    // 三空间分别位: curr, peek, buff;
     QList<token::Token> m_tokens;
 
     QStringList m_warningInfos;

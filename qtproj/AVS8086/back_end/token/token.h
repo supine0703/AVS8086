@@ -22,8 +22,6 @@ public:
         TOKEN_INTEGER,          // integer
         TOKEN_FLOAT,            // float
 
-
-        TOKEN_NEGATIVE,         // -x
         TOKEN_BIT_NOT,          // ~
         TOKEN_ASTERISK,         // *
         TOKEN_SLASH,            // /
@@ -110,19 +108,14 @@ public:
         TOKEN_RCL,              // RCL
         TOKEN_RCR,              // RCR
 
-        TOKEN_MOVS,             // MOVS
         TOKEN_MOVSB,            // MOVSB
         TOKEN_MOVSW,            // MOVSW
-        TOKEN_CMPS,             // CMPS
         TOKEN_CMPSB,            // CMPSB
         TOKEN_CMPSW,            // CMPSW
-        TOKEN_SCAS,             // SCAS
         TOKEN_SCASB,            // SCASB
         TOKEN_SCASW,            // SCASW
-        TOKEN_LODS,             // LODS
         TOKEN_LODSB,            // LODSB
         TOKEN_LODSW,            // LODSW
-        TOKEN_STOS,             // STOS
         TOKEN_STOSB,            // STOSB
         TOKEN_STOSW,            // STOSW
 

@@ -118,7 +118,7 @@ Token::Type Token::tokenType(const QString& literal)
     {
         return TOKEN_ANNOTATION;
     }
-    else if ((head == tail) && (head == '\'' || head == '"') && up.length() > 1)
+    else if ((head == tail) && (head == '\'' || head == '\"') && up.length() > 1)
     {
         return TOKEN_STRING;
     }
@@ -153,7 +153,7 @@ Token::Type Token::tokenType(const QString& literal)
         {
             if (up.length() == 1)
             {
-                return tokenType(up.at(0).toLatin1());
+                return tokenType(up.at(0));
             }
             else if (up.length() == 2)
             {

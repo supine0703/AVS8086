@@ -148,7 +148,7 @@ void Lexer::scan()
                 appendToken(_r, _c);
                 continue;
             }
-            else if (ch == '\'' || ch == '"')
+            else if ((ch == '\'' || ch == '\"'))
             { // 串类型
                 appendToken(_r, _c);
                 int len = textStrLen(line, col);
@@ -280,11 +280,11 @@ int Lexer::textStrLen(const QString& line, int col)
 {
     int len = -1;
     const auto& ch = line.at(col);
-    if (ch == '\'' || ch == '"')
+    if (ch == '\'' || ch == '\"')
     {
         for (int i = col + 1, end = line.length(); i < end; i++)
         {
-            if (line.at(i) == ch)
+            if (line.at(i - 1) != '\\' && line.at(i) == ch)
             {
                 len = i - col - 1;
                 break;
