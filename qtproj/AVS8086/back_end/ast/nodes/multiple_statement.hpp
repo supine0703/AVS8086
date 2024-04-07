@@ -3,26 +3,16 @@
 
 #include "ast/node.h"
 
-namespace avs8086::parser {
-class Parser;
-} // namespace avs8086::parser
-
 namespace avs8086::ast {
 
 class MultipleStatement : public Statement
 {
-    friend class avs8086::parser::Parser;
 public:
     MultipleStatement() : Statement(NODE_MULTIPLE_STATEMENT) { }
     ~MultipleStatement() { }
 
     QStringList traversal(int depth) const override
     {
-        // if (isError())
-        //     return {
-        //         QString("%1| %2: member is false!")
-        //             .arg(QString(depth * 4, '-'), typeName())
-        //     };
         QStringList info;
         info.append(QString("%1| %2").arg(
             QString(depth * 4, '-'), typeName()
@@ -33,10 +23,20 @@ public:
         return info;
     }
 
-    QList<QSharedPointer<Statement>> statements() const
-    { return m_statements; }
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        QJsonObject stmts;
+        for (const auto& s : m_statements)
+        {
+            stmts[s->typeName()] = s->json();
+        }
+        js["statements"] = stmts;
+        return js;
+    }
 
-private:
+public:
     void append(const QSharedPointer<Statement>& statement)
     {
         if (statement->is(NODE_MULTIPLE_STATEMENT))
@@ -50,7 +50,7 @@ private:
             m_statements.append(statement);
     }
 
-private:
+public:
     QList<QSharedPointer<Statement>> m_statements;
 };
 

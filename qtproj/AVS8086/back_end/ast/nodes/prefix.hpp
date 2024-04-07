@@ -1,5 +1,5 @@
-#ifndef PREFIX_H
-#define PREFIX_H
+#ifndef PREFIX_HPP
+#define PREFIX_HPP
 
 #include "ast/node.h"
 
@@ -9,23 +9,24 @@ class Prefix : public Expression
 {
 public:
     Prefix(
-        const QString& op,
+        const token::Token& token,
         const QSharedPointer<Expression>& expression)
         : Expression(NODE_PREFIX)
-        , m_operator(op)
+        , m_op(token.literal())
         , m_expression(expression)
     {
+        m_token = token;
         if (expression->isError())
         {
             m_valueType = ERROR;
             goError();
         }
-        else if (op == "-" || op == "+" || op == "~")
+        else if (m_op == "-" || m_op == "+" || m_op == "~")
         {
             m_valueType = expression->valueType();
-            if (op == "-")
+            if (m_op == "-")
                 m_value = -expression->value();
-            else if (op == "~")
+            else if (m_op == "~")
                 m_value = ~expression->value();
         }
         else
@@ -38,27 +39,33 @@ public:
 
     QStringList traversal(int depth) const override
     {
-        // if (isError())
-        //     return {
-        //         QString("%1| %2: member is error!")
-        //             .arg(QString(depth * 4, '-'), typeName())
-        //     };
         QStringList info;
         info.append(QString("%1| %2: %3: '%4(%5)'").arg(
             QString(depth * 4, '-'), typeName(),
-            isError() ? "error" : m_operator,
+            (isError() ? "error" : m_op),
             m_value.toHex(' '), m_value.toString()
         ));
         info.append(m_expression->traversal(depth + 1));
         return info;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["m_op"] = m_op;
+        js["hexValue"] = m_value.toHex(' ');
+        js["strValue"] = m_value.toString();
+        js["right"] = m_expression->json();
+        return js;
+    }
+
+    QSharedPointer<Expression> m_expression;
 
 private:
-    QString m_operator;
-    QSharedPointer<Expression> m_expression;
+    QString m_op;
 };
 
 } // namespace avs8086::ast
 
-#endif // PREFIX_H
+#endif // PREFIX_HPP

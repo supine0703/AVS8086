@@ -18,7 +18,7 @@ QSharedPointer<Program> Parser::parse_program()
             {
                 s->m_statements.append(
                     qSharedPointerDynamicCast<MultipleStatement>
-                    (stmt)->statements()
+                    (stmt)->m_statements
                 );
             }
             else

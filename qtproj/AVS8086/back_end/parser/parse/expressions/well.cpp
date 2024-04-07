@@ -53,11 +53,10 @@ QSharedPointer<Statement> Parser::parse_well()
         // 检测取值是否合理(警告)
         if (s->valueType() == Token::TOKEN_REGISTER)
         {
-            static QStringList _8b = {
-                "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH",
-            };
+            auto index = Token::findRegisters(s->value());
+
             auto value = s->value().toInt();
-            int max = _8b.contains(s->value()) ? 0xff : 0xffff;
+            int max = index < 8 ? 0xff : 0xffff;
             if (!(0 <= value && value <= max))
             {
                 addWarningInfo(

@@ -12,6 +12,7 @@ public:
     Integer(const token::Token& token)
         : Expression(NODE_INTEGER)
     {
+        m_token = token;
         m_valueType = INTEGER;
         m_value = token::Token::textToInt(token.literal());
     }
@@ -20,13 +21,20 @@ public:
     QStringList traversal(int depth) const override
     {
         QStringList info;
-        info.append(
-            QString("%1| %2: %3")
-                .arg(QString(depth * 4, '-'), typeName()).arg(m_value.toInt())
-        );
+        info.append(QString("%1| %2: %3").arg(
+            QString(depth * 4, '-'), typeName(),
+            m_value.toHex(' ')
+        ));
         return info;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["value"] = m_value.toHex(' ');
+        return js;
+    }
 };
 
 } // namespace avs8086::ast

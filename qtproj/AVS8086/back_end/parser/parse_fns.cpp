@@ -64,7 +64,9 @@ const QMap<Token::Type, Parser::prefix_parse_fn> Parser::sm_prefix_parse_fns = {
     { Token::TOKEN_STRING,      &Parser::parse_string },        // string
     { Token::TOKEN_LPAREN,      &Parser::parse_group },         // (
 
+    { Token::TOKEN_REGISTER,    &Parser::parse_register },      // reg
     { Token::TOKEN_LSQUARE,     &Parser::parse_address },       // [
+
     { Token::TOKEN_LOCK,        &Parser::parse_reserved_word }, // lock
 };
 
@@ -88,7 +90,6 @@ const QMap<Token::Type, Parser::infix_parse_fn> Parser::sm_infix_parse_fns = {
     { Token::TOKEN_NE,              &Parser::parse_infix },     // !=
 
     { Token::TOKEN_COMMA,           &Parser::parse_comma },     // ,
-
-    // { Token::TOKEN_COLON,           &Parser::parse_colon },     // :
+    { Token::TOKEN_COLON,           &Parser::parse_colon },     // :
 };
 

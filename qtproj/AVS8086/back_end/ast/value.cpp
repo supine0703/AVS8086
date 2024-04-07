@@ -11,6 +11,7 @@ Value::Value(int v)
         m_value.append(v & 0xff);
         v >>= 8;
     } while (v && --bytes);
+    least(m_value);
 }
 
 Value::Value(const char* v)
@@ -62,6 +63,7 @@ int Value::toInt() const
     //     value <<= 8;
     // }
     // return value;
+
     return m_value.toHex().toUInt(nullptr, 16);
 }
 
@@ -200,11 +202,16 @@ Value Value::operator/(const Value& other) const
         return b;
     }
     Value nv1 = *this;
-    int len = nv1.m_value.length();
 
     Value nv;
 
-    while ((nv1 -= other).m_value.length() == len)
+    while (nv1 < 0)
+    {
+        nv += 1;
+        nv1 -= other;
+    }
+
+    while ((nv1 -= other) >= 0)
         nv += 1;
 
     if (!m_extend && nv.m_value.length() > this->m_value.length())
@@ -224,11 +231,15 @@ Value Value::operator%(const Value& other) const
         return b;
     }
     Value nv1 = *this;
-    int len = nv1.m_value.length();
-
     Value nv;
 
-    while ((nv1 -= other).m_value.length() == len)
+    while (nv1 < 0)
+    {
+        nv += 1;
+        nv1 -= other;
+    }
+
+    while ((nv1 -= other) >= 0)
         nv += 1;
 
     nv1.m_value.removeLast();
@@ -304,9 +315,17 @@ Value Value::operator>>(const Value& other) const
 {
     Value count = other;
     Value nv = *this;
+    bool flg = -(nv < 0);
     while (count != 0)
     {
         count -= 1;
+        if (flg)
+        {
+            nv /= 2;
+            auto& v = nv.m_value.back();
+            v |= 0x80;
+            continue;
+        }
         nv /= 2;
     }
     return nv.m_value;
@@ -366,13 +385,13 @@ Value& Value::operator >>=(const Value& other)
 
 /* ========================================================================== */
 
-bool Value::operator>(const Value& other) const
+int Value::operator>(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = false;
+    int flg = 0;
 
     for (int i = len - 1; i >= 0; i--)
     {
@@ -383,16 +402,16 @@ bool Value::operator>(const Value& other) const
         }
     }
 
-    return flg;
+    return -flg;
 }
 
-bool Value::operator>=(const Value& other) const
+int Value::operator>=(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = true;
+    int flg = 1;
 
     for (int i = len - 1; i >= 0; i--)
     {
@@ -403,16 +422,16 @@ bool Value::operator>=(const Value& other) const
         }
     }
 
-    return flg;
+    return -flg;
 }
 
-bool Value::operator<(const Value& other) const
+int Value::operator<(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = false;
+    bool flg = 0;
 
     for (int i = len - 1; i >= 0; i--)
     {
@@ -423,16 +442,16 @@ bool Value::operator<(const Value& other) const
         }
     }
 
-    return flg;
+    return -flg;
 }
 
-bool Value::operator<=(const Value& other) const
+int Value::operator<=(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = true;
+    bool flg = 1;
 
     for (int i = len - 1; i >= 0; i--)
     {
@@ -443,47 +462,47 @@ bool Value::operator<=(const Value& other) const
         }
     }
 
-    return flg;
+    return -flg;
 }
 
-bool Value::operator==(const Value& other) const
+int Value::operator==(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = true;
+    bool flg = 1;
 
     for (int i = len - 1; i >= 0; i--)
     {
         if (nb1.at(i) != nb2.at(i))
         {
-            flg = false;
+            flg = 0;
             break;
         }
     }
 
-    return flg;
+    return -flg;
 }
 
-bool Value::operator!=(const Value& other) const
+int Value::operator!=(const Value& other) const
 {
     QByteArray nb1, nb2;
 
     int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    bool flg = false;
+    bool flg = 0;
 
     for (int i = len - 1; i >= 0; i--)
     {
         if (nb1.at(i) != nb2.at(i))
         {
-            flg = true;
+            flg = 1;
             break;
         }
     }
 
-    return flg;
+    return -flg;
 }
 
 /* ========================================================================== */
@@ -502,23 +521,37 @@ int Value::init_nb(
         if (nb2.isEmpty())
             nb2.resize(len, 0);
         else
-            nb2.resize(len, nb2.at(nb2.length() - 1) < 0 ? 0xff : 0);
+            nb2.resize(len, nb2.back() < 0 ? 0xff : 0);
     }
     else
     {
         len = b2.length();
         if (nb1.isEmpty())
             nb1.resize(len, 0);
-        nb1.resize(len, nb1.at(nb1.length() - 1) < 0 ? 0xff : 0);
+        nb1.resize(len, nb1.back() < 0 ? 0xff : 0);
     }
     return len;
 }
 
 void Value::least(QByteArray& b)
 {
-    while (!b.isEmpty() && b.at(b.length() - 1) == 0)
-        b.removeLast();
-
     if (b.isEmpty())
+    {
         b.resize(1, 0);
+        return;
+    }
+    // else if (b.back() & 0x80)
+    // { // < 0
+    //     while (!b.isEmpty() && b.back() == '\xff')
+    //         b.removeLast();
+    //     if (b.isEmpty())
+    //         b.resize(1, '\xff');
+    // }
+    else
+    {
+        while (!b.isEmpty() && b.back() == 0)
+            b.removeLast();
+        if (b.isEmpty())
+            b.resize(1, 0);
+    }
 }

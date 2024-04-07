@@ -11,16 +11,6 @@ Node::~Node()
 
 /* ========================================================================== */
 
-bool Node::isError() const
-{
-    return m_isError;
-}
-
-void Node::goError()
-{
-    m_isError = true;
-}
-
 bool Node::is(Type type) const
 {
     return m_type == type;

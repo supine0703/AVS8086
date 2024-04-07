@@ -13,8 +13,7 @@ public:
         : Statement(NODE_MOV), m_expression(expression)
     {
         if (!m_expression.isNull()
-            // && m_expression->type() == NODE_COMMA
-            )
+            && m_expression->is(NODE_COMMA))
         {
 
         }
@@ -38,8 +37,16 @@ public:
         return info;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        return js;
+    }
 
-private:
+
+
+public:
     QSharedPointer<Expression> m_expression;
 };
 

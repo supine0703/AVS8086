@@ -181,27 +181,28 @@ int Token::textToInt(const QString& numStr)
         QString suffix = match.captured(3);
         bool ok;
         int num, suf = 10;
-        if (hex.length() == 1 || suffix.isEmpty())
+
+        if (hex.length() == 2)
         {
-            if (hex.length() == 2)
-                suf = 16;
-            else
-            {
-                number.push_front(hex);
-                if (!suffix.isEmpty() && suffix != "D")
-                {
-                    if (suffix == "H")
-                        suf = 16;
-                    else if (suffix == "O")
-                        suf = 8;
-                    else if (suffix == "B")
-                        suf = 2;
-                }
-            }
-            num = number.toInt(&ok, suf);
-            if (ok)
-                return sm_lastTextToInt = num;
+            number.append(suffix);
+            suf = 16;
         }
+        else
+        {
+            number.push_front(hex);
+            if (!suffix.isEmpty() && suffix != "D")
+            {
+                if (suffix == "H")
+                    suf = 16;
+                else if (suffix == "O")
+                    suf = 8;
+                else if (suffix == "B")
+                    suf = 2;
+            }
+        }
+        num = number.toInt(&ok, suf);
+        if (ok)
+            return sm_lastTextToInt = num;
         return sm_lastTextToInt = -2;
     }
     return sm_lastTextToInt = -1;
@@ -217,6 +218,11 @@ bool Token::textIsFloat(const QString& numStr)
     bool ok;
     numStr.toDouble(&ok);
     return ok;
+}
+
+int Token::findRegisters(const QString& reg)
+{
+    return sm_registers.indexOf(reg);
 }
 
 /* ========================================================================== */

@@ -21,5 +21,7 @@ const QMap<Token::Type, Parser::Precedence> Parser::sm_precedences = {
     { Token::TOKEN_BIT_XOR,         LOGIC },        // ^
     { Token::TOKEN_BIT_OR,          LOGIC },        // |
     { Token::TOKEN_COMMA,           COMMA },        // ,
+    { Token::TOKEN_COLON,           ASSIGN },       // :
+    { Token::TOKEN_LSQUARE,         ADDRESS },      // []
 };
 

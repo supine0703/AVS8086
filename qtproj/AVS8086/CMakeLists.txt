@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(AVS8086 VERSION 0.1.4 LANGUAGES CXX)
+project(AVS8086 VERSION 0.1.5 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -89,6 +89,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     # TEMPLATE_PATH="${FILES_PATH}/template"
     # SHARE_PATH="${FILES_PATH}/share"
     CONFIG_INI="${FILES_PATH}/config.ini"
+    DOCS_PATH="E:/Project/.Github/AVS8086/docs/"
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets

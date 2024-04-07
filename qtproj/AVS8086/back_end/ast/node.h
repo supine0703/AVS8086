@@ -2,7 +2,9 @@
 #define NODE_H
 
 #include "ast/value.h"
+#include "token/token.h"
 #include <QSharedPointer>
+#include <QJsonObject>
 #include <QMap>
 // #include <QStringList>
 
@@ -18,12 +20,12 @@ public:
         NODE_INTEGER,   // integer
         NODE_STRING,    // string
         NODE_PREFIX,    // ~x +x -x
-        NODE_REGISTER,  // reg
-        NODE_ADDRESS,   // []
         NODE_INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
         NODE_COMMA,     // ,
-        NODE_LABEL,     // label
         NODE_COLON,     // :
+        NODE_LABEL,     // label
+        NODE_REGISTER,  // reg
+        NODE_ADDRESS,   // []
 
         NODE_PROGRAM,
         NODE_EXPRESSION_STATEMENT,
@@ -41,21 +43,26 @@ public:
     Node(Type type);
     virtual ~Node();
 
-    bool isError() const;
     bool is(Type type) const;
     Type type() const;
 
     QString typeName() const;
     static QString nodeTypeName(Type type);
 
-    virtual QStringList traversal(int depth) const = 0;
+    virtual QStringList traversal(int depth) const { return {}; };
+    virtual QJsonObject json() const = 0;
 
-protected:
-    void goError();
+    bool isError() const { return m_isError; }
+    void goError() { m_isError = true; }
+
+
+public:
+    token::Token m_token;
+
 
 private:
+    bool m_isError = false;
     Type m_type;
-    bool m_isError;
     static const QMap<Type, QString> sm_typeNames;
 };
 
@@ -66,16 +73,17 @@ class Expression : public Node
 public:
     enum ValueType {
         ERROR = 0,
+        REGISTER,
         FLOAT,
         STRING,
         INTEGER,
-        BOOL,
     };
 
 public:
     Expression(Type type) : Node(type) { }
     virtual ~Expression() { }
-    ValueType valueType() { return m_valueType; }
+    bool valueIs(ValueType type) const { return m_valueType == type;}
+    ValueType valueType() const { return m_valueType; }
     Value value() const { return m_value; }
 
 protected:

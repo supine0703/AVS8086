@@ -21,6 +21,7 @@ public:
         SUM,            // +, -
         PRODUCT,        // *, /, %
         PREFIX,         // -x +x ~x
+        ADDRESS,        // []
     };
 
 
@@ -58,6 +59,7 @@ private:
     QSharedPointer<ast::Expression> parse_integer();
     QSharedPointer<ast::Expression> parse_string();
     QSharedPointer<ast::Expression> parse_group();
+    QSharedPointer<ast::Expression> parse_register();
     QSharedPointer<ast::Expression> parse_address();
 
     // infix
@@ -65,6 +67,8 @@ private:
     parse_infix(const QSharedPointer<ast::Expression>& left);
     QSharedPointer<ast::Expression>
     parse_comma(const QSharedPointer<ast::Expression>& left);
+    QSharedPointer<ast::Expression>
+    parse_colon(const QSharedPointer<ast::Expression>& left);
 
     // postfix
     QSharedPointer<ast::Expression>

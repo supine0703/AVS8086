@@ -6,7 +6,7 @@
 
 namespace avs8086::ast {
 
-// 感觉封装的很...的一个值类(计算为无符号类型计算)
+// 感觉封装的很...的一个值类
 class Value
 {
 public:
@@ -57,12 +57,12 @@ public:
     Value& operator<<=(const Value& other);
     Value& operator>>=(const Value& other);
 
-    bool operator>(const Value& other) const;
-    bool operator>=(const Value& other) const;
-    bool operator<(const Value& other) const;
-    bool operator<=(const Value& other) const;
-    bool operator==(const Value& other) const;
-    bool operator!=(const Value& other) const;
+    int operator>(const Value& other) const;
+    int operator>=(const Value& other) const;
+    int operator<(const Value& other) const;
+    int operator<=(const Value& other) const;
+    int operator==(const Value& other) const;
+    int operator!=(const Value& other) const;
 
 private:
     static int init_nb(

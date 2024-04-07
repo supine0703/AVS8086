@@ -1,0 +1,15 @@
+{
+    "file": "D:/Leisure/Desktop/8086/test/test.txt",
+    "statements": {
+        "stmt 1": {
+            "type": "MOV"
+        },
+        "stmt 2": {
+            "type": "MOV"
+        },
+        "stmt 3": {
+            "type": "Single Instruction"
+        }
+    },
+    "type": "Program"
+}

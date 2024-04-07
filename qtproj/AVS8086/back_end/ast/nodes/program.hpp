@@ -4,15 +4,10 @@
 #include "ast/node.h"
 #include <QSharedPointer>
 
-namespace avs8086::parser {
-class Parser;
-} // namespace avs8086::parser
-
 namespace avs8086::ast {
 
 class Program : public Statement
 {
-    friend class avs8086::parser::Parser;
 public:
     Program(const QString& file)
         : Statement(NODE_PROGRAM), m_file(file)
@@ -34,14 +29,29 @@ public:
         return tree;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["file"] = m_file;
+        QJsonObject stmts;
+        for (int i = 0; i < m_statements.length(); i++)
+        {
+            const auto& s = m_statements.at(i);
+            stmts[QString("stmt %1").arg(i + 1)] = s->json();
+        }
+        js["statements"] = stmts;
+        return js;
+    }
+
     QString file() const { return m_file; }
 
-    QList<QSharedPointer<Statement>> statements() const
-    { return m_statements; }
+public:
+    QList<QSharedPointer<Statement>> m_statements;
+
 
 private:
     QString m_file;
-    QList<QSharedPointer<Statement>> m_statements;
 };
 
 } // namespace avs8086::ast

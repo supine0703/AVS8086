@@ -221,6 +221,8 @@ public:
     static int lastTextToInt();
 
     static bool textIsFloat(const QString& numStr);
+    
+    static int findRegisters(const QString& reg);
 
 private:
     Type m_type;

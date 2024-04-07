@@ -7,9 +7,21 @@ using namespace avs8086::parser;
 
 QSharedPointer<Expression> Parser::parse_prefix()
 {
-    QString op = currToken().literal();
+    int row = currToken().row();
+    int col = currToken().column();
+    auto curr = currToken();
     nextToken();
-    return QSharedPointer<Expression>(new Prefix(
-        op, parse_expression(PREFIX)
-    ));
+    auto right = parse_expression(PREFIX);
+    int len = currToken().column() + currToken().literal().length() - col;
+
+    if (!(right->valueIs(Expression::STRING)
+          || right->valueIs(Expression::INTEGER)))
+    {
+        addErrorInfo(
+            row, col, len,
+            QString("'%1' expect string or integer").arg(curr.literal())
+        );
+    }
+
+    return QSharedPointer<Expression>(new Prefix(curr, right));
 }

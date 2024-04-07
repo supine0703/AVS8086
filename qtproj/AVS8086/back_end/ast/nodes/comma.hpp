@@ -19,11 +19,6 @@ public:
 
     QStringList traversal(int depth) const override
     {
-        // if (isError())
-        //     return {
-        //         QString("%1| %2: member pointer is null!")
-        //             .arg(QString(depth * 4, '-'), typeName())
-        //     };
         QStringList info;
         info.append(
             QString("%1| %2: %3(%4)")
@@ -40,8 +35,21 @@ public:
         return info;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        QJsonObject exprs;
+        for (const auto& e : m_expressions)
+        {
+            exprs[e->typeName()] = e->json();
+        }
+        js["expression"] = exprs;
+        return js;
+    }
 
-private:
+
+public:
     void append(const QSharedPointer<Expression>& expression)
     {
         if (expression->isError())
@@ -60,7 +68,7 @@ private:
         }
     }
 
-private:
+public:
     QList<QSharedPointer<Expression>> m_expressions;
 };
 

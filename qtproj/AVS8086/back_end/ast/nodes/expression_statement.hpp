@@ -11,10 +11,7 @@ class ExpressionStatement : public Statement
 public:
     ExpressionStatement(const QSharedPointer<Expression>& expression)
         : Statement(NODE_EXPRESSION_STATEMENT), m_expression(expression)
-    {
-        if (m_expression->isError())
-            goError();
-    }
+    { }
     ~ExpressionStatement() { }
     
     QStringList traversal(int depth) const override
@@ -25,6 +22,14 @@ public:
         ));
         info.append(m_expression->traversal(depth + 1));
         return info;
+    }
+
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["statement"] = m_expression->json();
+        return js;
     }
 
 private:

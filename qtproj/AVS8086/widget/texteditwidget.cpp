@@ -1,9 +1,10 @@
 #include "texteditwidget.h"
 #include "ui_texteditwidget.h"
 
+#include "json/json.h"
 #include "parser/parser.h"
-// #include "lexer/lexer.h"
-// #include "assembler.h"
+#include "assembler/assembler.h"
+#include "vm/vm.h"
 #include "settings.h"
 #include <QStatusBar>
 #include <QFileDialog>
@@ -117,6 +118,8 @@ void TextEditWidget::on_pushButton_7_clicked()
 using namespace avs8086::token;
 using namespace avs8086::lexer;
 using namespace avs8086::parser;
+using namespace avs8086::assembler;
+using namespace avs8086::vm;
 void TextEditWidget::on_pushButton_2_clicked()
 {
     // Assembler a(ui->lineEdit->text(), this);
@@ -139,15 +142,19 @@ void TextEditWidget::on_pushButton_2_clicked()
     // }
 
     Lexer l(ui->lineEdit->text());
-    for (const auto& t : l.tokens())
-        qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
-    auto lt(l.end());
-    qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
+    // for (const auto& t : l.tokens())
+    //     qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
+    // auto lt(l.end());
+    // qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
     // qDebug() << "error:";
     // for (const auto& e : l.errorInfos())
     //     qDebug() << e;
     Parser p(&l);
     auto root = p.newAST();
+
+    // Assembler a(root);
+    // a.saveToFile();
+
 
     for (const auto& s : root->traversal())
         qDebug() << s;
@@ -157,6 +164,11 @@ void TextEditWidget::on_pushButton_2_clicked()
     qDebug() << "warning:";
     for (const auto& w : p.warningInfos())
         qDebug() << w;
+
+    tools::Json js;
+    js.setObject(root->json());
+    js.saveToFile(DOCS_PATH"/ast.json");
+
 }
 
 

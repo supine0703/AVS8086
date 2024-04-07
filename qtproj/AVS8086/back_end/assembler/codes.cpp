@@ -95,6 +95,78 @@ const QMap<QByteArray, Token::Type> Assembler::sm_single_codes_B = {
     { BYTE_CODE("\x90", 1),         Token::TOKEN_NOP },         // NOP
 };
 
+const QMap<QString, QMap<Assembler::CodeBit, QString>> Assembler::sm_address_codes = {
+    { "BX+SI",      { { BIT_MOD, "00" }, { BIT_R_M, "000" }, } },
+    { "BX+SI+@8",   { { BIT_MOD, "01" }, { BIT_R_M, "000" }, } },
+    { "BX+SI+@16",  { { BIT_MOD, "10" }, { BIT_R_M, "000" }, } },
+    { "BX+DI",      { { BIT_MOD, "00" }, { BIT_R_M, "001" }, } },
+    { "BX+DI+@8",   { { BIT_MOD, "01" }, { BIT_R_M, "001" }, } },
+    { "BX+DI+@16",  { { BIT_MOD, "10" }, { BIT_R_M, "001" }, } },
+    { "BP+SI",      { { BIT_MOD, "00" }, { BIT_R_M, "010" }, } },
+    { "BP+SI+@8",   { { BIT_MOD, "01" }, { BIT_R_M, "010" }, } },
+    { "BP+SI+@16",  { { BIT_MOD, "10" }, { BIT_R_M, "010" }, } },
+    { "BP+DI",      { { BIT_MOD, "00" }, { BIT_R_M, "011" }, } },
+    { "BP+DI+@8",   { { BIT_MOD, "01" }, { BIT_R_M, "011" }, } },
+    { "BP+DI+@16",  { { BIT_MOD, "10" }, { BIT_R_M, "011" }, } },
+    { "SI",         { { BIT_MOD, "00" }, { BIT_R_M, "100" }, } },
+    { "SI+@8",      { { BIT_MOD, "01" }, { BIT_R_M, "100" }, } },
+    { "SI+@16",     { { BIT_MOD, "10" }, { BIT_R_M, "100" }, } },
+    { "DI",         { { BIT_MOD, "00" }, { BIT_R_M, "101" }, } },
+    { "DI+@8",      { { BIT_MOD, "01" }, { BIT_R_M, "101" }, } },
+    { "DI+@16",     { { BIT_MOD, "10" }, { BIT_R_M, "101" }, } },
+    { "@16",        { { BIT_MOD, "00" }, { BIT_R_M, "110" }, } },
+    { "BP+@8",      { { BIT_MOD, "01" }, { BIT_R_M, "110" }, } },
+    { "BP+@16",     { { BIT_MOD, "10" }, { BIT_R_M, "110" }, } },
+    { "BX",         { { BIT_MOD, "00" }, { BIT_R_M, "111" }, } },
+    { "BX+@8",      { { BIT_MOD, "01" }, { BIT_R_M, "111" }, } },
+    { "BX+@16",     { { BIT_MOD, "10" }, { BIT_R_M, "111" }, } },
+};
+
+const QMap<QString, QString> Assembler::sm_reg_codes = {
+    { "AL" , "" },
+    { "CL" , "" },
+    { "DL" , "" },
+    { "BL" , "" },
+    { "AH" , "" },
+    { "CH" , "" },
+    { "DH" , "" },
+    { "BH" , "" },
+    { "AX" , "" },
+    { "CX" , "" },
+    { "DX" , "" },
+    { "BX" , "" },
+    { "SP" , "" },
+    { "BP" , "" },
+    { "SI" , "" },
+    { "DI" , "" },
+    { "AX" , "" },
+    { "AX" , "" },
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // XLAT  11010111
 // LAHF  10011111
 // SAHF  10011110

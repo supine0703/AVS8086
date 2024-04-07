@@ -18,13 +18,20 @@ public:
     {
         return {
             QString("%1| %2: %3").arg(
-                QString(depth * 4, '-'), typeName(), m_token.literal()
+                QString(depth * 4, '-'), typeName(), m_token.literal().toUpper()
             )
         };
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        return js;
+    }
 
-private:
+
+public:
     token::Token m_token;
 };
 

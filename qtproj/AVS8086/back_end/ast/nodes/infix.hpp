@@ -15,9 +15,9 @@ public:
         : Expression(NODE_INFIX)
         , m_left(left)
         , m_right(right)
-        , m_token_type(token.type())
         , m_op(token.literal())
     {
+        m_token = token;
         static const QStringList op({
             "*", "/", "%", "+", "-", "&", "^", "|", "<<", ">>",
             "=", ">", ">=", "<", "<=", "==", "!="
@@ -32,6 +32,11 @@ public:
             m_valueType =  left->valueType();
         else
             m_valueType =  right->valueType();
+
+        if (m_valueType == Expression::REGISTER)
+        {
+            return;
+        }
 
         int index = op.indexOf(m_op);
         switch (index)
@@ -98,11 +103,10 @@ public:
         QStringList info;
         if (m_valueType == INTEGER)
         {
-            info.append(
-                QString("%1| %2: %3")
-                    .arg(QString(depth * 4, '-'), typeName())
-                    .arg(m_value.toInt())
-            );
+            info.append(QString("%1| %2: %3").arg(
+                QString(depth * 4, '-'), typeName(),
+                m_value.toHex(' ')
+            ));
         }
         else if (m_valueType == STRING)
         {
@@ -124,9 +128,26 @@ public:
         return info;
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["op"] = m_op;
+        js["hexValue"] = m_value.toHex(' ');
+        js["strValue"] = m_value.toString();
+        js["left"] = m_left->json();
+        js["right"] = m_right->json();
+        return js;
+    }
+
+    QString op() const { return m_op; }
+
+    QSharedPointer<Expression> left() const { return m_left; }
+
+    QSharedPointer<Expression> right() const { return m_right; }
+
 
 private:
-    token::Token::Type m_token_type;
     QString m_op;
     QSharedPointer<Expression> m_left;
     QSharedPointer<Expression> m_right;

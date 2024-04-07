@@ -10,8 +10,7 @@ QSharedPointer<Expression> Parser::parse_group()
     int col = currToken().column();
     nextToken();
     auto e = parse_expression(LOWEST);
-    int _r = peekToken().row();
-    if (row != _r)
+    if (peekToken().is(Token::TOKEN_EOF))
     {
         addErrorInfo(row, col, 1, "'(' is not close on this line");
     }

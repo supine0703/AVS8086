@@ -24,6 +24,15 @@ public:
         };
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["tokenType"] = m_token.typeName();
+        js["token"] = m_token.literal();
+        return js;
+    }
+
 private:
     token::Token m_token;
 };

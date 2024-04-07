@@ -26,6 +26,13 @@ public:
         ));
         return info;
     }
+
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        return js;
+    }
 };
 
 } // namespace avs8086::ast

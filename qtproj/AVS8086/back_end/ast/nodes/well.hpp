@@ -65,6 +65,15 @@ public:
         };
     }
 
+    QJsonObject json() const override
+    {
+        QJsonObject js;
+        js["type"] = typeName();
+        js["op"] = m_op;
+        js["Statement"] = isError() ? m_key : m_key + m_op + m_value;
+        return js;
+    }
+
     QString op() const { return m_op; }
     QString key() const { return m_key; }
     QString value() const { return m_value; }

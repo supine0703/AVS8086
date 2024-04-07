@@ -3,9 +3,9 @@
 using namespace avs8086::token;
 
 const QStringList Token::sm_registers = {
-    "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH",
-    "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI",
-    "ES", "CS", "SS", "DS", "IP",
+    "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH", // 0-7
+    "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI", // 8-15
+    "ES", "CS", "SS", "DS", "IP",                   // 16-20
 };
 
 const QMap<Token::Type, QString> Token::sm_mnemonics_A = {
