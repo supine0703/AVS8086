@@ -74,7 +74,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         main.cpp
-        widget_ui/Interaction/interactionwidget.h widget_ui/Interaction/interactionwidget.cpp widget_ui/Interaction/interactionwidget.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET power_carrier APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -107,6 +106,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     # EXAMPLE_PATH="${FILES_PATH}/example"
     # TEMPLATE_PATH="${FILES_PATH}/template"
     # SHARE_PATH="${FILES_PATH}/share"
+    CONFIG_PATH="${FILES_PATH}/config_ini/"
     CONFIG_INI="${FILES_PATH}/config.ini"
     CONFIG_UI_INI="${FILES_PATH}/config_ui.ini"
     DOCS_PATH="E:/Project/.Github/AVS8086/docs/"

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     // int fontSize = 8 * SETTINGS().value(_APP_SCALE_).toDouble();
 
     QApplication::setFont(QFont(fontName, 13));
-    QApplication::setWindowIcon(QIcon(":/ico/img/AppIcon.ico"));
+    QApplication::setWindowIcon(QIcon(":/cpu.png"));
 
     mainwidget w;
     // TextEditWidget w;

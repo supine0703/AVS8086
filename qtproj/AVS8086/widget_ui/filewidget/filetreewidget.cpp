@@ -9,7 +9,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <fstream>
-#include <QDesktopServices>>
+#include <QDesktopServices>
 #include <QRegularExpression>
 #include <QFile>
 #include <QFileDialog>

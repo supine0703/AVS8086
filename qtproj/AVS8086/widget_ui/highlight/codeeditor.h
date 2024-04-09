@@ -32,6 +32,8 @@ public:
     void getWarnLineList(QStringList* tmp);
     void getErrLineList(QStringList* tmp);
 
+    QList<int> breakLine() const;
+
     void goToErrLine(int errLine, int errWord, int errWordLengh);
 
     QStringList errLineList;

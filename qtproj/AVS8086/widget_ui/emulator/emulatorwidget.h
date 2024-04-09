@@ -60,6 +60,8 @@ private:
 
     QString m_file;
 
+    bool interOpen = false;
+
     avs8086::vm::VM vm;
 
     QStringList code1 = {

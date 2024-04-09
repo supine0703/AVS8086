@@ -37,11 +37,11 @@ class FramelessWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit FramelessWidget(QWidget *parent = nullptr, Func func = All);
+    explicit FramelessWidget(const QString& name, QWidget *parent = nullptr, Func func = All);
     ~FramelessWidget();
     void InitDesigner();
 
-    static void setcentralWidget(QWidget* widget, Func func);
+    static void setcentralWidget(const QString& name, QWidget* widget, Func func);
 
     QWidget* getMain_Widget();
     QLabel* getmenu_label();
@@ -80,6 +80,8 @@ private slots:
 
 private:
     Ui::FramelessWidget *ui;
+
+    QString ini_file;
 
     bool isLeftPressed;
     bool isDoubleClick;

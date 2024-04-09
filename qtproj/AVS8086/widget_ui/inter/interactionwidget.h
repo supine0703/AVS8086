@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include "FramelessWidget.h"
-#include "emulatorwidget.h"
+#include "codeeditor.h"
+#include "highlighter.h"
+class emulatorwidget;
 
 namespace Ui {
 class InteractionWidget;
@@ -17,12 +19,23 @@ public:
     explicit InteractionWidget(emulatorwidget* emu, QWidget* parent = nullptr);
     ~InteractionWidget();
 
-private:
+public:
     Ui::InteractionWidget* ui;
 
     emulatorwidget* m_emu;
 
+    CodeEditor* inputEdit;
+    CodeEditor* breaksEdit;
+
+    Highlighter* inputEditLight;
+    Highlighter* breaksEditLight;
+
     QList<int> m_bks;
+
+    // QWidget interface
+protected:
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // INTERACTIONWIDGET_H

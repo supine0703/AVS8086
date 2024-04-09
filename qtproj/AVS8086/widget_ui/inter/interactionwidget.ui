@@ -37,8 +37,8 @@
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <widget class="QPlainTextEdit" name="plainTextEdit"/>
-        <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+        <widget class="QPlainTextEdit" name="breaksEdit"/>
+        <widget class="QPlainTextEdit" name="inputEdit"/>
        </widget>
       </item>
       <item>

@@ -3,7 +3,7 @@
 #include "ui_buildwidget.h"
 
 BuildWidget::BuildWidget(QWidget *parent)
-    : FramelessWidget(parent, Func::Close)
+    : FramelessWidget("buile", parent, Func::Close)
     , isLeftPress(false)
     , ui(new Ui::BuildWidget)
 {

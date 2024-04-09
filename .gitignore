@@ -55,4 +55,4 @@ dkms.conf
 /qtproj/build*/
 /qtproj/version
 /qtproj/version-*
-
+Release

@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include <QSettings>
+#include <QSet>
 
 class Settings
 {
@@ -22,6 +23,9 @@ public:
     );
 
     static QSettings& getUISettings();
+
+
+    static QSettings getSettings(const QString& file);
 
 };
 

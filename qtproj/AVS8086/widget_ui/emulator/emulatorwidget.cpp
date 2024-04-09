@@ -18,7 +18,7 @@ using namespace avs8086::assembler;
 using namespace avs8086::vm;
 
 emulatorwidget::emulatorwidget(QWidget *parent)
-    : FramelessWidget(parent, Func::Close)
+    : FramelessWidget("emu", parent, Func::Close)
     , ui(new Ui::emulatorwidget)
 {
     QWidget* main_widget = FramelessWidget::getMain_Widget();
@@ -32,6 +32,7 @@ emulatorwidget::emulatorwidget(QWidget *parent)
     this->hide();
 
     inter = new InteractionWidget(this, this->parentWidget());
+    inter->setVisible(false);
 }
 
 emulatorwidget::~emulatorwidget()
@@ -65,6 +66,9 @@ void emulatorwidget::setFile(const QString& file)
 
     updateReg();
     updateMem();
+
+    inter->breaksEdit->setPlainText(ui->asmCode->toPlainText());
+
     runCount = 0;
 }
 
@@ -157,7 +161,7 @@ void emulatorwidget::allRun()
     if (hlt == false)
     {
         singleRun();
-        if (!m_bs.contains(runCount))
+        if (!m_bs.contains(runCount + 1))
         {
             QTimer* t = new QTimer(this);
             t->start(10);
@@ -302,6 +306,8 @@ void emulatorwidget::updateCode()
 
     setColor(ui->asmCode, 0);
 
+    setColor(inter->breaksEdit, 0);
+
     // // 假设你有一个QPlainTextEdit对象名为plainTextEdit
     // QTextCursor cursor(ui->member->document());
     // QTextBlockFormat blockFormat;
@@ -348,7 +354,8 @@ void emulatorwidget::setEdit()
     });
 
     connect(ui->debugbutton, &QToolButton::clicked, this, [this]() {
-        inter->show();
+        interOpen = !interOpen;
+        inter->setVisible(interOpen);
     });
 
 }

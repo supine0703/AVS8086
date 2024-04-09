@@ -148,6 +148,11 @@ void CodeEditor::getErrLineList(QStringList* tmp)
     this->errLineList = *tmp;
 }
 
+QList<int> CodeEditor::breakLine() const
+{
+    return breakPoints.values();
+}
+
 void CodeEditor::goToErrLine(int errLine, int errWord, int errWordLengh)
 {
     if (errLine > this->document()->blockCount() || errLine <= 0)

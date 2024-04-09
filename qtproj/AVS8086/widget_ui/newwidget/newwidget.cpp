@@ -10,7 +10,7 @@
 #include "settings.h"
 
 Newwidget::Newwidget(QWidget *parent)
-    : FramelessWidget(parent, Func::Close)
+    : FramelessWidget("new", parent, Func::Close)
     , selectRow(0)//默认为0
     , suffix(".bin")
     , pathIsErr(false)

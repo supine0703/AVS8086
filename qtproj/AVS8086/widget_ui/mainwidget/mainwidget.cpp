@@ -7,7 +7,7 @@
 #include <QTableWidget>
 
 mainwidget::mainwidget(QWidget *parent) :
-    FramelessWidget(parent, Func::All)
+    FramelessWidget("main", parent, Func::All)
     , fileTree(new FileTreewidget(this))
     , newwidget(new Newwidget())
     , edit_widget(new QTabWidget())

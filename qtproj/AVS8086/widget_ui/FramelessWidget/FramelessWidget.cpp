@@ -18,8 +18,9 @@
 
 #define PADDING 5 //5个像素
 
-FramelessWidget::FramelessWidget(QWidget *parent, Func func_)
+FramelessWidget::FramelessWidget(const QString& name, QWidget *parent, Func func_)
     : QDialog(parent)
+    , ini_file(CONFIG_PATH + name + ".ini")
     , isLeftPressed(false)
     , titlePressed(false)
     , menuButtonPressed(false)
@@ -58,10 +59,10 @@ FramelessWidget::FramelessWidget(QWidget *parent, Func func_)
 //    ui->main_widget->layout()->addWidget(childwidget);
     this->setMouseTracking(true);
 
-    if (SETTINGS_UI().contains(_WINDOW_SIZE_))
-        this->resize(SETTINGS_UI().value(_WINDOW_SIZE_).toSize());
-    if (SETTINGS_UI().contains(_WINDOW_POS_))
-        this->move(SETTINGS_UI().value(_WINDOW_POS_).toPoint());
+    if (SETTINGS(ini_file).contains(_WINDOW_SIZE_))
+        this->resize(SETTINGS(ini_file).value(_WINDOW_SIZE_).toSize());
+    if (SETTINGS(ini_file).contains(_WINDOW_POS_))
+        this->move(SETTINGS(ini_file).value(_WINDOW_POS_).toPoint());
 
 
     connect(ui->MenuButton, &QToolButton::clicked, this, [this](){
@@ -83,7 +84,7 @@ void FramelessWidget::changeEvent(QEvent *event)
         }
         else if (stateChangeEvent->oldState() != Qt::WindowMinimized)
         {
-            SETTINGS_UI().setValue(_WINDOW_SIZE_, this->size());
+            SETTINGS(ini_file).setValue(_WINDOW_SIZE_, this->size());
         }
 //        if (stateChangeEvent->oldState() & Qt::WindowMaximized)
 //        {
@@ -244,9 +245,9 @@ void FramelessWidget::mouseMoveEvent(QMouseEvent  *event)
         }
 
         this->setGeometry(rMove);
-        SETTINGS_UI().setValue(_WINDOW_SIZE_, this->size());
+        SETTINGS(ini_file).setValue(_WINDOW_SIZE_, this->size());
         m_widgetPos = this->pos();
-        SETTINGS_UI().setValue(_WINDOW_POS_, this->pos());
+        SETTINGS(ini_file).setValue(_WINDOW_POS_, this->pos());
     }
 
     if (titlePressed)
@@ -274,7 +275,7 @@ void FramelessWidget::mouseMoveEvent(QMouseEvent  *event)
         {
             if(this->isMaximized() && location != TOP && location != TOP_RIGHT && location != TOP_LEFT)
             {
-                this->resize(SETTINGS_UI().value(_WINDOW_SIZE_).toSize());
+                this->resize(SETTINGS(ini_file).value(_WINDOW_SIZE_).toSize());
 
                 QPoint leftTopPos =
                     (globalPos.x() > screenWidth / 2)
@@ -734,12 +735,12 @@ void FramelessWidget::menuBarMove()
 //    //    }
 //}
 
-void FramelessWidget::setcentralWidget(QWidget *widget, Func func = All)
+void FramelessWidget::setcentralWidget(const QString& name, QWidget *widget, Func func = All)
 {
     if (widget == nullptr)
         widget = new QWidget;
 
-    FramelessWidget* framelesswidget = new FramelessWidget(widget->parentWidget(), func);
+    FramelessWidget* framelesswidget = new FramelessWidget(name, widget->parentWidget(), func);
     widget->setParent(framelesswidget);
     framelesswidget->ui->main_widget->deleteLater();
     framelesswidget->ui->centrallayout->addWidget(widget);
