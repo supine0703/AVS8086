@@ -11,11 +11,19 @@ Assembler::Assembler()
 Assembler::Assembler(const QSharedPointer<ast::Program>& root)
     : m_root(root)
     , m_path("")
+    , m_initsList(INIT_SIZE, 0)
 {
     if (root.isNull())
         return;
     QFileInfo info(root->file());
     m_file = info.baseName() + ".bin";
+
+    m_initsList[LOAD_SEGMENT] = 0x0500;
+    m_initsList[INIT_CS] = 0x0500;
+    m_initsList[INIT_DS] = 0x0500;
+    m_initsList[INIT_ES] = 0x0600;
+    m_initsList[INIT_SS] = 0x0500;
+    m_initsList[INIT_SP] = 0xfffe;
 }
 
 Assembler::~Assembler()
@@ -53,6 +61,21 @@ bool Assembler::saveToFile() const
     return true;
 }
 
+Assembler::OutType Assembler::outType() const
+{
+    return m_outType;
+}
+
+QList<quint16> Assembler::wellInitInfos() const
+{
+    return m_initsList;
+}
+
+QStringList Assembler::errorInfos() const
+{
+    return m_errorInfos;
+}
+
 /* ========================================================================== */
 
 void Assembler::compile()
@@ -77,6 +100,18 @@ void Assembler::compile()
     }
 }
 
+void Assembler::copy(const QString& f1, const QString& f2)
+{
+    QFile in(f1);
+    in.open(QIODevice::ReadOnly);
+    QByteArray f = in.readAll();
+    in.close();
+    QFile out(f2);
+    out.open(QIODevice::WriteOnly);
+    out.write(f);
+    out.close();
+}
+
 void Assembler::addErrorInfo(int row, int col, int len, const QString& info)
 {
     m_errorInfos.append(
@@ -91,12 +126,7 @@ QByteArray& Assembler::appendCode(const QByteArray& bytes)
     return m_codes;
 }
 
-QByteArray Assembler::binStrToByte(const QString& bin)
+QPair<QString, QString> Assembler::compile_address(const QString& str)
 {
-    QByteArray bytes;
-    for (int i = bin.length() - 1; i >= 0; i--)
-    {
 
-    }
 }
-

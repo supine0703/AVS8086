@@ -11,6 +11,7 @@ class Value
 {
 public:
     Value(int v = 0);
+    Value(quint64 v);
     Value(const char* v);
     Value(const std::string& v);
     Value(const QString& v);
@@ -26,8 +27,8 @@ public:
 
     QByteArray value() const;
 
-    bool isExtend() const;
-    void setExtend(bool yes);
+    // bool isExtend() const;
+    // void setExtend(bool yes);
 
     Value operator~() const;
     Value operator+() const;
@@ -73,7 +74,7 @@ private:
     static void least(QByteArray& b);
 
 private:
-    bool m_extend = true;
+    // bool m_extend = true;
     QByteArray m_value;
 };
 

@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon_window_close.png</file>
+        <file>icon_window_maximize.png</file>
+        <file>icon_window_minimize.png</file>
+        <file>icon_window_restore.png</file>
+        <file>menu.png</file>
+    </qresource>
+</RCC>

@@ -12,7 +12,7 @@ public:
     Well(const QList<token::Token>& tokens)
         : Statement(NODE_WELL)
         , m_keyType(tokens.at(0).type())
-        , m_key(tokens.at(0).literal())
+        , m_key(tokens.at(0).literal().toUpper())
     {
         if (m_keyType == token::Token::TOKEN_MAKE_ && tokens.length() == 1)
         {
@@ -41,7 +41,8 @@ public:
         }
         else
         {
-            int space = tokens.at(0).column() + tokens.at(0).literal().length();
+            int space =
+                tokens.at(0).column() + tokens.at(0).literal().length();
             for (int i = 1; i < tokens.length(); i++)
             {
                 const auto& t = tokens.at(i);

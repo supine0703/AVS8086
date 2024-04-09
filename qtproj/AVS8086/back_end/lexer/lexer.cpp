@@ -54,7 +54,9 @@ void Lexer::setFileName(const QString& fileName)
             QTextStream in(&inFile);
             // 结尾添加空白符:
             // 1. 确保最后一个token成功append; 2. eof column 不用额外 +1;
-            m_input.append(in.readAll().append(' ').split('\n'));
+            // m_input.append(in.readAll().append(' ').split('\n'));
+            while (!in.atEnd())
+                m_input.append(in.readLine().append(' '));
             inFile.close();
         }
     }
@@ -111,7 +113,7 @@ void Lexer::addErrorInfo(int row, int column, int len, const QString& info)
 
 void Lexer::scan()
 {
-    if (isError())
+    if (isError() || m_input.isEmpty())
         return;
 
     QString token;
@@ -190,6 +192,7 @@ void Lexer::scan()
                     auto chType = Token::tokenType(ch, line.at(_c));
                     if (chType != Token::TOKEN_ILLEGAL)
                     { // 双目运算符
+                        appendToken(_r, _c);
                         m_tokens.append(Token(
                             chType, QString(ch).append(line.at(_c)), _r, _c
                         ));

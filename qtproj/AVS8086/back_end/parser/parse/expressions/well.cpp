@@ -53,9 +53,9 @@ QSharedPointer<Statement> Parser::parse_well()
         // 检测取值是否合理(警告)
         if (s->valueType() == Token::TOKEN_REGISTER)
         {
-            auto index = Token::findRegisters(s->value());
+            auto index = Token::findRegisters(s->key());
 
-            auto value = s->value().toInt();
+            auto value = s->value().toUInt();
             int max = index < 8 ? 0xff : 0xffff;
             if (!(0 <= value && value <= max))
             {

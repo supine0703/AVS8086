@@ -41,6 +41,7 @@ public:
     {
         QJsonObject js;
         js["type"] = typeName();
+        js["operand"] = m_expression->json();
         return js;
     }
 

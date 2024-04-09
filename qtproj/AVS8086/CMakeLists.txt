@@ -31,21 +31,39 @@ set(RES_PATH     ${CMAKE_CURRENT_SOURCE_DIR}/res)
 set(SRC_PATH     ${CMAKE_CURRENT_SOURCE_DIR}/widget)
 set(UI_PATH      ${CMAKE_CURRENT_SOURCE_DIR}/ui)
 
-set(ASSEMBLY_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/assembly)
 set(BACK_END_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/back_end)
+set(WIDGET_UI_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/widget_ui)
 
 recurse_directories(INCLUDE_ALL_DIR ${INCLUDE_PATH})
 recurse_directories(UI_ALL_DIR      ${UI_PATH})
 
-list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS ${UI_ALL_DIR})
+recurse_directories(WIDGET_UI_ALL_DIR ${WIDGET_UI_MODEL})
 
-include_directories(${INCLUDE_ALL_DIR} ${BACK_END_MODEL})
+list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
+    ${UI_ALL_DIR}
+    ${WIDGET_UI_ALL_DIR}
+)
+
+include_directories(
+    ${INCLUDE_ALL_DIR}
+    ${BACK_END_MODEL}
+    ${WIDGET_UI_ALL_DIR}
+    settings
+)
 
 file(GLOB_RECURSE PROJECT_SOURCES
-    # ${ASSEMBLY_MODEL}/*.h ${ASSEMBLY_MODEL}/*.hpp ${ASSEMBLY_MODEL}/*.cpp
-    ${BACK_END_MODEL}/*.h ${BACK_END_MODEL}/*.hpp ${BACK_END_MODEL}/*.cpp
+    settings/*.h settings/*.cpp
+
+    ${BACK_END_MODEL}/*.h ${BACK_END_MODEL}/*.hpp
+    ${BACK_END_MODEL}/*.cpp ${BACK_END_MODEL}/*.ui
+
+    ${WIDGET_UI_MODEL}/*.h
+    ${WIDGET_UI_MODEL}/*.cpp
+    ${WIDGET_UI_MODEL}/*.ui
+
     ${INCLUDE_PATH}/*.hpp ${INCLUDE_PATH}/*.h
     ${SRC_PATH}/*.cpp     ${SRC_PATH}/*.c
+
     ${RES_PATH}/*.qrc     ${RES_PATH}/*.rc
     ${UI_PATH}/*.ui
 )
@@ -56,6 +74,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         main.cpp
+        widget_ui/Interaction/interactionwidget.h widget_ui/Interaction/interactionwidget.cpp widget_ui/Interaction/interactionwidget.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET power_carrier APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -89,6 +108,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     # TEMPLATE_PATH="${FILES_PATH}/template"
     # SHARE_PATH="${FILES_PATH}/share"
     CONFIG_INI="${FILES_PATH}/config.ini"
+    CONFIG_UI_INI="${FILES_PATH}/config_ui.ini"
     DOCS_PATH="E:/Project/.Github/AVS8086/docs/"
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE

@@ -9,7 +9,7 @@ QSharedPointer<Expression> Parser::parse_expression(Precedence precedence)
     auto prefix = sm_prefix_parse_fns.find(currToken().type());
     if (prefix == sm_prefix_parse_fns.end())
     {
-        addNoPrefixParseFnErrorInfo();
+        // addNoPrefixParseFnErrorInfo();
         return parse_illegal();
     }
 

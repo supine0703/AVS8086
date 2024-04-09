@@ -14,6 +14,17 @@ Value::Value(int v)
     least(m_value);
 }
 
+Value::Value(quint64 v)
+{
+    int bytes = 8;
+    do
+    {
+        m_value.append(v & 0xff);
+        v >>= 8;
+    } while (v && --bytes);
+    least(m_value);
+}
+
 Value::Value(const char* v)
     : m_value(v)
 {
@@ -82,15 +93,15 @@ QByteArray Value::value() const
     return m_value;
 }
 
-bool Value::isExtend() const
-{
-    return m_extend;
-}
+// bool Value::isExtend() const
+// {
+//     return m_extend;
+// }
 
-void Value::setExtend(bool yes)
-{
-    m_extend = yes;
-}
+// void Value::setExtend(bool yes)
+// {
+//     m_extend = yes;
+// }
 
 /* ========================================================================== */
 
@@ -130,13 +141,13 @@ Value Value::operator+(const Value& other) const
     for (int i = 0; i < len; i++)
     {
         qint16 sum = static_cast<quint8>(nb1.at(i));
-        sum += static_cast<quint8>(nb2.at(i));
-        nb[i] += sum & 0xff;
+        sum += static_cast<quint8>(nb2.at(i)) + nb[i];
+        nb[i] = sum & 0xff;
         nb[i + 1] += (sum >> 8) & 0xff;
     }
 
-    if (!m_extend)
-        nb.removeLast();
+    // if (!m_extend)
+    //     nb.removeLast();
 
     least(nb);
     return nb;
@@ -146,20 +157,19 @@ Value Value::operator-(const Value& other) const
 {
     QByteArray nb1, nb2;
 
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
+    int len = init_nb(nb1, nb2, this->m_value, (-other).m_value);
 
     QByteArray nb(len + 1, 0);
 
     for (int i = 0; i < len; i++)
     {
         qint16 sum = static_cast<quint8>(nb1.at(i));
-        sum -= static_cast<quint8>(nb2.at(i));
-        nb[i] += sum & 0xff;
+        sum += static_cast<quint8>(nb2.at(i)) + nb[i];
+        nb[i] = sum & 0xff;
         nb[i + 1] += (sum >> 8) & 0xff;
     }
 
-    if (!m_extend)
-        nb.removeLast();
+    nb.removeLast();
 
     least(nb);
     return nb;
@@ -184,8 +194,8 @@ Value Value::operator*(const Value& other) const
         }
     }
 
-    if (!m_extend)
-        return nb.left(len);
+    // if (!m_extend)
+    //     return nb.left(len);
 
     least(nb);
     return nb;
@@ -193,6 +203,25 @@ Value Value::operator*(const Value& other) const
 
 Value Value::operator/(const Value& other) const
 {
+    // if (this->m_value.length() <= 8 && other.m_value.length() <= 8)
+    // {
+    //     quint64 v1 = 0, v2 = 0;
+    //     for (const auto& va : this->m_value)
+    //     {
+    //         v1 += va;
+    //         v1 <<= 8;
+    //     }
+    //     for (const auto& va : other.m_value)
+    //     {
+    //         v2 += va;
+    //         v2 <<= 8;
+    //     }
+    //     int len = qMax(this->m_value.length(), other.m_value.length());
+
+    //     return (v1 / v2);
+    // }
+
+
     if (other == 0)
         return 0;
     if (*this == 0)
@@ -205,19 +234,20 @@ Value Value::operator/(const Value& other) const
 
     Value nv;
 
-    while (nv1 < 0)
-    {
-        nv += 1;
-        nv1 -= other;
-    }
+    // while (nv1 < 0)
+    // {
+    //     nv += 1;
+    //     nv1 -= other;
+    // }
 
     while ((nv1 -= other) >= 0)
+    {
+        // qDebug() << nv1.toHex() << nv.toHex();
         nv += 1;
+    }
+    // qDebug() << nv1.toHex() << (nv1 >= 0);
 
-    if (!m_extend && nv.m_value.length() > this->m_value.length())
-        nv.m_value.resize(this->m_value.length());
-
-    return nv.m_value;
+    return nv;
 }
 
 Value Value::operator%(const Value& other) const
@@ -243,7 +273,6 @@ Value Value::operator%(const Value& other) const
         nv += 1;
 
     nv1.m_value.removeLast();
-    nv1.setExtend(false);
 
     return nv1 + other;
 }
@@ -308,7 +337,7 @@ Value Value::operator<<(const Value& other) const
         count -= 1;
         nv *= 2;
     }
-    return nv.m_value;
+    return nv;
 }
 
 Value Value::operator>>(const Value& other) const
@@ -328,7 +357,7 @@ Value Value::operator>>(const Value& other) const
         }
         nv /= 2;
     }
-    return nv.m_value;
+    return nv;
 }
 
 /* ========================================================================== */
@@ -378,7 +407,7 @@ Value& Value::operator<<=(const Value& other)
     return *this = *this << other;
 }
 
-Value& Value::operator >>=(const Value& other)
+Value& Value::operator>>=(const Value& other)
 {
     return *this = *this >> other;
 }
@@ -387,122 +416,54 @@ Value& Value::operator >>=(const Value& other)
 
 int Value::operator>(const Value& other) const
 {
-    QByteArray nb1, nb2;
+    auto v = *this - other;
+    return -(v.m_value.back() > 0 || (v.m_value.back() == 0 && v.m_value.length() != 1));
 
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
+    // QByteArray nb1, nb2;
 
-    int flg = 0;
+    // int len = init_nb(nb1, nb2, this->m_value, other.m_value);
 
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = nb1.at(i) > nb2.at(i);
-            break;
-        }
-    }
+    // int flg = 0;
 
-    return -flg;
+    // for (int i = len - 1; i >= 0; i--)
+    // {
+    //     if (nb1.at(i) != nb2.at(i))
+    //     {
+    //         flg = nb1.at(i) > nb2.at(i);
+    //         break;
+    //     }
+    // }
+
+    // return -flg;
 }
 
 int Value::operator>=(const Value& other) const
 {
-    QByteArray nb1, nb2;
-
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
-
-    int flg = 1;
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = nb1.at(i) > nb2.at(i);
-            break;
-        }
-    }
-
-    return -flg;
+    return -(*this > other || *this == 0);
 }
 
 int Value::operator<(const Value& other) const
 {
-    QByteArray nb1, nb2;
-
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
-
-    bool flg = 0;
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = nb1.at(i) < nb2.at(i);
-            break;
-        }
-    }
-
-    return -flg;
+    return -(!(*this >= other));
+    // auto v = *this - other;
+    // return -(v.m_value.back() < 0);
 }
 
 int Value::operator<=(const Value& other) const
 {
-    QByteArray nb1, nb2;
-
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
-
-    bool flg = 1;
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = nb1.at(i) < nb2.at(i);
-            break;
-        }
-    }
-
-    return -flg;
+    return -(*this < other || *this == 0);
 }
 
 int Value::operator==(const Value& other) const
 {
-    QByteArray nb1, nb2;
-
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
-
-    bool flg = 1;
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = 0;
-            break;
-        }
-    }
-
-    return -flg;
+    auto v = *this - other;
+    return -(v.m_value.back() == 0 && v.m_value.length() == 1);
 }
 
 int Value::operator!=(const Value& other) const
 {
-    QByteArray nb1, nb2;
-
-    int len = init_nb(nb1, nb2, this->m_value, other.m_value);
-
-    bool flg = 0;
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        if (nb1.at(i) != nb2.at(i))
-        {
-            flg = 1;
-            break;
-        }
-    }
-
-    return -flg;
+    auto v = *this - other;
+    return -(v.m_value.back() != 0 || v.m_value.length() != 1);
 }
 
 /* ========================================================================== */
@@ -550,7 +511,14 @@ void Value::least(QByteArray& b)
     else
     {
         while (!b.isEmpty() && b.back() == 0)
+        {
             b.removeLast();
+            if (!b.isEmpty() && b.back() < 0)
+            { // 修补正数变负数bug
+                b.append('\0');
+                break;
+            }
+        }
         if (b.isEmpty())
             b.resize(1, 0);
     }

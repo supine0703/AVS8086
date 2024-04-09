@@ -21,8 +21,31 @@ public:
         BIT_Z,
     };
 
-    // enum
+    enum OutType {
+        OUT_BIN = 0,
+        OUT_COM,
+        OUT_EXE,
+    };
 
+
+    enum InitIndex {
+        INIT_AX = 0,
+        INIT_CX,
+        INIT_DX,
+        INIT_BX,
+        INIT_SP,
+        INIT_BP,
+        INIT_SI,
+        INIT_DI,
+        INIT_ES,
+        INIT_CS,
+        INIT_SS,
+        INIT_DS,
+        INIT_IP,
+        LOAD_SEGMENT,
+        LOAD_OFFSET,
+        INIT_SIZE,
+    };
 
 public:
     Assembler();
@@ -32,21 +55,32 @@ public:
     void setOutputPath(const QString& path);
     bool saveToFile() const;
 
+    OutType outType() const;
+
+    QList<quint16> wellInitInfos() const;
+
+
+    QStringList errorInfos() const;
+
     void compile();
 
+    void copy(const QString& f1, const QString& f2);
 
 
 private:
+
     void compile_single(const QSharedPointer<ast::Statement>& s);
     void compile_mov(const QSharedPointer<ast::Statement>& s);
+    void compile_well(const QSharedPointer<ast::Statement>& s);
 
 
     void addErrorInfo(int row, int col, int len, const QString& info);
 
     QByteArray& appendCode(const QByteArray& bytes);
 
-    QByteArray binStrToByte(const QString& bin);
+    QPair<QString, QString> compile_address(const QString& str);
 
+    QList<quint16> m_initsList;
 
 
 private:
@@ -56,6 +90,8 @@ private:
     QSharedPointer<ast::Program> m_root;
 
     QStringList m_errorInfos;
+
+    OutType m_outType;
 
 
     typedef

@@ -37,3 +37,9 @@ void Settings::checkSettings(QAnyStringView key, QString defaultValue, QStringLi
     s.setValue(key, defaultValue);
 }
 
+QSettings& Settings::getUISettings()
+{
+    static QSettings s(CONFIG_UI_INI, QSettings::IniFormat);
+    return s;
+}
+

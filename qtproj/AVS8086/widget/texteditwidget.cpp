@@ -152,22 +152,36 @@ void TextEditWidget::on_pushButton_2_clicked()
     Parser p(&l);
     auto root = p.newAST();
 
-    // Assembler a(root);
+    Assembler a(root);
+    a.compile();
+    // for (const auto& e : a.errorInfos())
+    //     qDebug() << e;
+
     // a.saveToFile();
+    a.copy(R"(D:\Leisure\Desktop\8086\AVS\mycode.bin)",
+           R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
+    VM vm;
+    vm.m_regs = a.wellInitInfos();
+    vm.readFromFile(R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
 
 
-    for (const auto& s : root->traversal())
-        qDebug() << s;
-    qDebug() << "error:";
-    for (const auto& e : p.errorInfos())
-        qDebug() << e;
-    qDebug() << "warning:";
-    for (const auto& w : p.warningInfos())
-        qDebug() << w;
+
+    // for (const auto& s : root->traversal())
+    //     qDebug() << s;
+    // qDebug() << "error:";
+    // for (const auto& e : p.errorInfos())
+    //     qDebug() << e;
+    // qDebug() << "warning:";
+    // for (const auto& w : p.warningInfos())
+    //     qDebug() << w;
 
     tools::Json js;
     js.setObject(root->json());
     js.saveToFile(DOCS_PATH"/ast.json");
+
+    qDebug() << a.wellInitInfos();
+
+
 
 }
 

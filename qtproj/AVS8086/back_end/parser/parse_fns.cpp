@@ -6,6 +6,8 @@ using namespace avs8086::parser;
 const QMap<Token::Type, Parser::stmt_parse_fn> Parser::sm_stmt_parse_fns = {
     { Token::TOKEN_WELL,        &Parser::parse_well },      // #
     { Token::TOKEN_MOV,         &Parser::parse_mov },       // mov
+    { Token::TOKEN_ADD,         &Parser::parse_mov },       // mov
+    { Token::TOKEN_ADC,         &Parser::parse_mov },       // mov
 
     { Token::TOKEN_XLAT,        &Parser::parse_single },    // XLAT
     { Token::TOKEN_LAHF,        &Parser::parse_single },    // LAHF

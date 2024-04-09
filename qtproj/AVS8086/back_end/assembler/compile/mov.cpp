@@ -56,9 +56,31 @@ void Assembler::compile_mov(const QSharedPointer<Statement>& s)
             {
                 format = "10001100 modregr_m";
             }
+            else if (_e1->regType() != _e2->regType())
+            {
+                auto t1 = _e1->m_token;
+                auto t2 = _e2->m_token;
+                addErrorInfo(
+                    t1.row(), t1.column(), t2.column() + t2.literal().length(),
+                    "reg must be same when not segment!"
+                );
+                return;
+            }
             else
             {
                 format = "100010dw modregr_m";
+                format
+                    .replace(
+                        "w", _e1->regType() == Register::R_8BIT ? "0" : "1")
+                    .replace("mod", "11").replace("d", "1")
+                    .replace(
+                        "reg", sm_reg_codes.value(_e1->value().toString()))
+                    .replace(
+                        "r_m", sm_reg_codes.value(_e2->value().toString()));
+                int bin = format.toInt(nullptr, 2);
+                // appendCode(QByteArray(QChar(bin & 0xff)));
+                // appendCode(format);
+                // qDebug() << format;
             }
         }
         else if (e2->is(Node::NODE_ADDRESS))
@@ -101,47 +123,5 @@ void Assembler::compile_mov(const QSharedPointer<Statement>& s)
         );
         return;
     }
-
-    QStringList p;
-
-
-    for (const auto& e : comma->m_expressions)
-    {
-        if (e->is(Node::NODE_COLON))
-        {
-
-        }
-        else if (e->is(Node::NODE_ADDRESS))
-        {
-            p.append(e->value().toString());
-        }
-        else if (e->is(Node::NODE_REGISTER))
-        {
-            p.append(e->value().toString());
-        }
-        else if (e->is(Node::NODE_INTEGER) || e->is(Node::NODE_STRING))
-        {
-            p.append(e->value().toHex());
-        }
-        else
-        {
-            auto t = e->m_token;
-            addErrorInfo(
-                t.row(), t.column(), t.literal().length(),
-                "unkonw the mov parameter"
-            );
-            return;
-        }
-    }
-
-    if (p.length() == 2)
-    {
-
-    }
-    else
-    {
-        return;
-    }
 }
-
 
