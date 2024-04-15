@@ -28,6 +28,8 @@ public:
 
     void add_();
 
+    void clearAll();
+
 
 signals:
     void errLineNumber(int errLine, int errWord, int errWordLengh);//向mainwidget返回错误行号

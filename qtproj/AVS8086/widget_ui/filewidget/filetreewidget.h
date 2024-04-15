@@ -35,7 +35,7 @@ public slots:
     void bulidNewFile(QString name, QString path, QString suffix);
     void newProject(QString pathName);
     void createAsmCheckedSlots();
-    // void
+    void openFileSlot(QString pathName);
 
 signals:
     void buildFile();//action
@@ -49,6 +49,8 @@ signals:
     void saveFile(QString path);
     void reNameSignals();
     void nowFilePath(QString path);
+    void closeFileTree();//关闭文件树，然后设置editor不可见
+    void showEdit();//用于显示editor
 
 private:
     Ui::filewidget *ui;
@@ -80,6 +82,8 @@ private:
     void setBuildwidget();
     QTreeWidgetItem* findTargetItem(QTreeWidgetItem* item, QString target);
     void m_mkdir(QString path, QString name);
+    void m_mkfile(QString path);
+    void m_mkConfile(QString path, QString text);
 
 private slots:
     void DoubleClickpath(QTreeWidgetItem *item, int column);

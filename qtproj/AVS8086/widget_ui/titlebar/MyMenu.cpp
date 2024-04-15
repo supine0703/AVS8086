@@ -4,6 +4,7 @@
 MyMenu::MyMenu(QWidget* parent):
     QMenu(parent)
 {
+    this->setAttribute(Qt::WA_StyleSheet);
 }
 
 MyMenu::MyMenu(const QString &title, QWidget *parent):

@@ -2,18 +2,20 @@
 #define MAINWIDGET_H
 
 #include <QWidget>
+#include <QFileDialog>
+#include <QVector>
 #include "FramelessWidget.h"
 #include "filetreewidget.h"
 #include "newwidget.h"
 #include "codeeditor.h"
 #include "debugwidget.h"
-#include "highlighter.h"
 #include "emulatorwidget.h"
 #include "leftwidget.h"
 
 namespace Ui {
 class mainwidget;
 }
+
 
 class mainwidget : public FramelessWidget
 {
@@ -40,6 +42,7 @@ private slots:
     void newFileButtonClickedSlots(QAction* action);
     void buildFolderSlot();
     void clickFunMenuSlot(QAction* action);
+    void openFileButtonClickedSlot();
 
 private:
     QString m_file;
@@ -49,10 +52,13 @@ private:
     FileTreewidget* fileTree;
     Newwidget* newwidget;
 
-    CodeEditor *editor;
-    Highlighter *highlighter;
+    CodeEditor *currentEditor;
+
+    QStringList* currentFile;//存储所有打开的文件，用于多窗口
 
     Debugwidget* debugwidget;
+
+    // QFileDialog* openDialog;
 
     Leftwidget* leftwidget;
     emulatorwidget* emuwidget;
@@ -62,7 +68,7 @@ private:
 
     QTabWidget* edit_widget;
 
-    MyMenu* funcMenu;
+    QMenu* funcMenu;
     QList<QAction*> ListActions;
     QList<QToolButton*> ListToolButton;
     QWidget* menu_widget;
@@ -70,6 +76,8 @@ private:
     void setupEditor();
     void setLayout(QWidget* widget);
     void setNewwidget(QString type, int idx);
+    CodeEditor* addNewEditor();
+    bool checkInTab(QString fileName);
 //    void setTmpFile(QString* tmpFilePath);
 
     // QWidget interface

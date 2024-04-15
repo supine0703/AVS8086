@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QDialog>
 #include <QTimer>
-#include "MyMenu.h"
 
 enum Location {
     TOP,
@@ -41,12 +40,9 @@ public:
     ~FramelessWidget();
     void InitDesigner();
 
-    static void setcentralWidget(const QString& name, QWidget* widget, Func func);
-
+protected:
     QWidget* getMain_Widget();
     QLabel* getmenu_label();
-
-protected:
     QWidget* getMenuwidget();
     void setWidgetFixed(int w, int h);
 
@@ -62,7 +58,7 @@ signals:
     void clickTwiceEvent();
     void menuButtonClicked();
     void newFileButtonClicked(QAction* action);
-
+    void openFileButtonClicked();
 
     //UI界面控件的信号槽函数，可自定义重新设计
 private slots:
@@ -79,54 +75,50 @@ private slots:
     void menuBarActionClicked(QAction* action);
 
 private:
-    Ui::FramelessWidget *ui;
+    void initSignal();//用于连接所有信号
 
-    QString ini_file;
-
-    bool isLeftPressed;
-    bool isDoubleClick;
-    QPoint mouseLastPos;
-    Location location;
-    Func func;
-    QPoint mousePos;
-    QPoint wndPos;
-    QPoint m_lastMousePos;
-    bool titlePressed;
-    bool menuButtonPressed;
-    bool edc;
-    bool fixed;
-    int last_width;
-
-//    QTimer* _clickTimer;
-    int clickCount;
-
-    int screenWidth;
-    int screenHeigh;
-
-    QPoint m_lastPos; //最大化前的窗口位置
-
-    QPoint m_widgetPos;
-    bool m_widgetPosInit = false;
-
-private:
     void setMouseShape(const QPoint& p);
     void setFunc();
-private:
-    QString buttonStyle;
-    QImage *img = new QImage;
-
-    QMenuBar *menuBar;
-
-private:
     void setMenu();
-    void addMenuTobar(MyMenu* menuBar);
-    MyMenu* createMenu(const QStringList &actions, QWidget* parent);
+    void addMenuTobar(QMenu* menuBar);
+    QMenu* createMenu(const QStringList &actions, QWidget* parent);
     QAction* createAction(const QString &text, QWidget* parent);
     void menuBarMove();
     bool findNoButton();
     void setButton();
 
+private:
+    Ui::FramelessWidget *ui;
 
+    QString ini_file;
+    QString buttonStyle;
+
+    QImage *img = new QImage;
+    QMenuBar *menuBar;
+
+    bool isLeftPressed;
+    bool isDoubleClick;
+    bool titlePressed;
+    bool menuButtonPressed;
+    bool edc;
+    bool fixed;
+    bool m_widgetPosInit = false;
+
+    QPoint mouseLastPos;
+    QPoint m_lastPos; //最大化前的窗口位置
+    QPoint m_widgetPos;
+    QPoint mousePos;
+    QPoint wndPos;
+    QPoint m_lastMousePos;
+
+    Location location;
+    Func func;
+
+    int last_width;
+    int clickCount;
+
+    int screenWidth;
+    int screenHeigh;
 };
 
 #endif // FRAMELESSWIDGET_H

@@ -22,11 +22,12 @@ FramelessWidget::FramelessWidget(const QString& name, QWidget *parent, Func func
     : QDialog(parent)
     , ini_file(CONFIG_PATH + name + ".ini")
     , isLeftPressed(false)
+    , isDoubleClick(false)
     , titlePressed(false)
     , menuButtonPressed(false)
     , edc(false)
     , fixed(false)
-    , isDoubleClick(false)
+    , m_widgetPosInit(false)
     , menuBar(new QMenuBar(this))
     , func(func_)
     , last_width(1000)
@@ -35,6 +36,7 @@ FramelessWidget::FramelessWidget(const QString& name, QWidget *parent, Func func
     ui->setupUi(this);
 
     InitDesigner();
+    initSignal();
 
     setFunc();
 
@@ -51,7 +53,7 @@ FramelessWidget::FramelessWidget(const QString& name, QWidget *parent, Func func
     screenWidth =  QGuiApplication::screenAt(QCursor::pos())->geometry().width();
     screenHeigh = QGuiApplication::screenAt(QCursor::pos())->geometry().height();
 
-    connect(menuBar, &QMenuBar::triggered, this, &FramelessWidget::menuBarActionClicked);//点击menuBar事件
+
 
 //    connect(_clickTimer, &QTimer::timeout, this, &FramelessWidget::clickTimerSlot);
 
@@ -64,10 +66,6 @@ FramelessWidget::FramelessWidget(const QString& name, QWidget *parent, Func func
     if (SETTINGS(ini_file).contains(_WINDOW_POS_))
         this->move(SETTINGS(ini_file).value(_WINDOW_POS_).toPoint());
 
-
-    connect(ui->MenuButton, &QToolButton::clicked, this, [this](){
-       emit menuButtonClicked();
-    });
 }
 
 //获取窗口改变前的宽度，设置最大最小按钮时候有用
@@ -319,14 +317,6 @@ bool FramelessWidget::eventFilter(QObject *obj, QEvent *event)
 {
     QMouseEvent *pMouse = dynamic_cast<QMouseEvent *>(event);
 
-
-//    qDebug()<<isLeftPressed<<titlePressed<<isMaximized();
-
-    // if (isMaximized() && isLeftPressed)
-    // {
-    //     return QWidget::eventFilter(obj, event);
-    // }
-
     // check mouse move event when mouse is moved on any object
     if (event->type() == QEvent::MouseMove)
     {
@@ -335,40 +325,34 @@ bool FramelessWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    if (event->type() == QEvent::MouseButtonPress)
+    if (event->type() == QEvent::MouseButtonPress && obj == this)
     {
+        qDebug() << this;
         mousePressEvent(pMouse);
-        return QWidget::eventFilter(obj, event);
+        qDebug() << this;
+        return true;
     }
-
-    else if (event->type() == QEvent::MouseButtonDblClick  && !fixed)
+    else if (event->type() == QEvent::MouseButtonDblClick  && !fixed && obj == ui->widget)
     {
-        qDebug()<<"000";
-        if (isLeftPressed && titlePressed)
+        if (pMouse->button() == Qt::LeftButton)
         {
             if (!isMaximized())
             {
-                qDebug()<<"111";
                 on_MaxButton_clicked();
-                return true;
             }
             else
             {
-                qDebug()<<"222";
                 on_RecoverButton_clicked();
-                return true;
             }
         }
     }
-    else if (event->type() == QEvent::MouseButtonRelease)
+
+    if (event->type() == QEvent::MouseButtonRelease)
     {
         if (isLeftPressed) {
-            pMouse = dynamic_cast<QMouseEvent *>(event);
-            if (pMouse) {
-                mouseReleaseEvent(pMouse);
-            }
+            mouseReleaseEvent(pMouse);
         }
-    } /*else if (){}*/
+    }
 
     return QWidget::eventFilter(obj, event);
 }
@@ -468,7 +452,6 @@ void FramelessWidget::on_MenuButton_clicked()
     }
 
     menuBarMove();
-
 }
 
 void FramelessWidget::menuBarActionClicked(QAction* action)
@@ -478,8 +461,18 @@ void FramelessWidget::menuBarActionClicked(QAction* action)
         || action->text() == "bin template"|| action->text() == "boot template")
     {
         emit newFileButtonClicked(action);
+    }else if (action->text() == "open...")
+    {
+        emit (openFileButtonClicked());
     }
-//    if () 其他方法
+}
+
+void FramelessWidget::initSignal()
+{
+    connect(menuBar, &QMenuBar::triggered, this, &FramelessWidget::menuBarActionClicked);//点击menuBar事件
+    connect(ui->MenuButton, &QToolButton::clicked, this, [this](){
+        emit menuButtonClicked();
+    });
 }
 
 QWidget* FramelessWidget::getMenuwidget()
@@ -495,7 +488,42 @@ void FramelessWidget::setWidgetFixed(int w, int h)
 
 void FramelessWidget::setMenu()
 {
-    MyMenu *fileMenu = new MyMenu(tr("&file"), this);
+    QMenu *fileMenu = new QMenu(tr("&file"), this);
+
+    QString menuStyle = R"(
+        QMenuBar{
+            background-color:transparent;
+            font: 15px;
+            color: rgb(240, 240, 240);
+        }
+        QMenuBar{
+            min-height:30px;
+        }
+        QMenuBar::item:selected{
+            background-color: rgb(79, 79, 80);
+        }
+        QMenu{
+            font: 13px;
+            background-color: rgb(50, 51, 52);
+            border:none;
+            color: rgb(240, 240, 240);
+        }
+        QMenu:selected{
+            background-color: rgb(79, 79, 80);
+        }
+)";//最后一个是省略的菜单栏
+
+    QString menusty = R"(
+        QMenu{
+            font: 13px;
+            background-color: rgb(50, 51, 52);
+            border:none;
+            color: rgb(240, 240, 240);
+        }
+        QMenu:selected{
+            background-color: rgb(79, 79, 80);
+        }
+    )";
 
     QStringList fileAction = {tr("new"), tr("examples"), tr("open..."), tr("save")
                               , tr("save as..."), tr("print..."), tr("export to HTML"), tr("exit")};
@@ -509,7 +537,8 @@ void FramelessWidget::setMenu()
 
     QStringList func1Actions = {tr("com template"), tr("exe template"), tr("bin template")};
 
-    MyMenu* func1 = createMenu(func1Actions, this);
+    QMenu* func1 = createMenu(func1Actions, this);
+    func1->setStyleSheet(menusty);
 
     fileActionList[0]->setMenu(func1);
 
@@ -517,7 +546,8 @@ void FramelessWidget::setMenu()
                                 , tr("binary, hex and octal values"), tr("traffic lights"), tr("palindrome"), tr("LED display test")
                                 , tr("stepper motor"), tr("simple i/o"), tr("more examples...")};
 
-    MyMenu* func2 = createMenu(func2Actions, this);
+    QMenu* func2 = createMenu(func2Actions, this);
+    func2->setStyleSheet(menusty);
     fileActionList[1]->setMenu(func2);
 
 
@@ -528,7 +558,7 @@ void FramelessWidget::setMenu()
 
     fileActionList.clear();
 
-    MyMenu *editMenu = new MyMenu(tr("&edit"), this);
+    QMenu *editMenu = new QMenu(tr("&edit"), this);
 
     fileAction = {tr("undo"), tr("redo"), tr("cut"), tr("copy"), tr("paste"), tr("select all"), tr("find...                  Ctrl+F")
                   , tr("find next            F3"), tr("replace...            Ctrl+H"), tr("go to line           Ctrl+G"), tr("indent                Tab")
@@ -545,6 +575,7 @@ void FramelessWidget::setMenu()
                     , tr("Repeat Next Command...    Ctrl+R"), tr("Record new Keystroke Macro")};
 
     func1 = createMenu(func1Actions, this);
+    func1->setStyleSheet(menusty);
 
     fileActionList[14]->setMenu(func1);
 
@@ -552,7 +583,7 @@ void FramelessWidget::setMenu()
                     , tr("uppercase selection"), tr(" display whitespace")};
 
     func2 = createMenu(func1Actions, this);
-
+    func2->setStyleSheet(menusty);
     fileActionList[15]->setMenu(func2);
 
     for (const auto& ac : fileActionList)
@@ -560,7 +591,7 @@ void FramelessWidget::setMenu()
         editMenu->addAction(ac);
     }
 
-    MyMenu *bookmarksMenu = new MyMenu(tr("&bookmarks"), this);
+    QMenu *bookmarksMenu = new QMenu(tr("&bookmarks"), this);
 
     fileAction = {tr("toggle bookmark         Ctrl+F2"), tr("previous bookmark      Shift+F2")
                   , tr("next bookmark             F2"), tr("jump to first"), tr("jump to last"), tr("clear all bookmarks")};
@@ -570,7 +601,7 @@ void FramelessWidget::setMenu()
         bookmarksMenu->addAction(createAction(ac, this));
     }
 
-    MyMenu *assemblerMenu = new MyMenu(tr("&assembler"), this);
+    QMenu *assemblerMenu = new QMenu(tr("&assembler"), this);
 
     fileAction = {tr("compile"), tr("compile and load in the emulator   F5"), tr("fasm"), tr("set output directory...")};
 
@@ -579,7 +610,7 @@ void FramelessWidget::setMenu()
         assemblerMenu->addAction(createAction(ac, this));
     }
 
-    MyMenu *emulatorMenu = new MyMenu(tr("&assembler"), this);
+    QMenu *emulatorMenu = new QMenu(tr("&assembler"), this);
 
     fileAction = {tr("show emulator"), tr("assemble and load in the emulator")};
 
@@ -588,7 +619,7 @@ void FramelessWidget::setMenu()
         emulatorMenu->addAction(createAction(ac, this));
     }
 
-    MyMenu *mathMenu = new MyMenu(tr("&math"), this);
+    QMenu *mathMenu = new QMenu(tr("&math"), this);
 
     fileAction = {tr("multi base calculator"), tr("base converter")};
 
@@ -597,8 +628,8 @@ void FramelessWidget::setMenu()
         mathMenu->addAction(createAction(ac, this));
     }
 
-    MyMenu *asciiMenu = new MyMenu(tr("&ascii codes"), this);//要写一个窗口
-    MyMenu *helpMenu = new MyMenu(tr("&help"), this);
+    QMenu *asciiMenu = new QMenu(tr("&ascii codes"), this);//要写一个窗口
+    QMenu *helpMenu = new QMenu(tr("&help"), this);
 
     fileAction = {tr("documentation and tutorials        F1"), tr("check for an update..."), tr(" about...")};
 
@@ -606,6 +637,11 @@ void FramelessWidget::setMenu()
     {
         helpMenu->addAction(createAction(ac, this));
     }
+
+    menuBar->setStyleSheet(menuStyle);
+    menuBar->setMinimumHeight(35);
+    menuBar->setContentsMargins(0, 0, 0, 0);
+
 
     menuBar->addMenu(fileMenu);
     menuBar->addMenu(editMenu);
@@ -617,55 +653,29 @@ void FramelessWidget::setMenu()
     menuBar->addMenu(helpMenu);
     //    ui->MenuButton->setVisible(false);
 
-    //设置格式
-    QString menuBarsty = R"(
-        QMenuBar::item {
-            padding:  0 20px; // 设置间隔
-            margin-top:  1px;
-            margin-left:  1px;
-            padding:  3px 8px;
-            color:  black;
-            background:  transparent;
-            border-radius:  0px;
-            width:  65px;
-            height:  26px;
-            color: white;
-        }
-    )";
-
-    QString menusty = R"(
-        "QMenu{
-            border-radius: 20px;
-        }"
-    )";
-
-    QList<MyMenu*> menus = menuBar->findChildren<MyMenu*>();
-    QFont font;
-    font.setPointSize(10);
-    menuBar->setFont(font);
-
-    menuBar->setStyleSheet(menuBarsty);
-
-    for (auto* m : menus)
-    {
-        m->setFont(font);
-        m->setStyleSheet(menusty);
-    }
-
+    fileMenu->setStyleSheet(menusty);//必须要手动设置
+    editMenu->setStyleSheet(menusty);
+    bookmarksMenu->setStyleSheet(menusty);
+    assemblerMenu->setStyleSheet(menusty);
+    emulatorMenu->setStyleSheet(menusty);
+    mathMenu->setStyleSheet(menusty);
+    asciiMenu->setStyleSheet(menusty);
+    helpMenu->setStyleSheet(menusty);
 
     ui->menu_widget->layout()->addWidget(menuBar);
+    ui->horizontalLayout->addStretch();
 
     menuBar->setVisible(false);
 }
 
-void FramelessWidget::addMenuTobar(MyMenu *menu)
+void FramelessWidget::addMenuTobar(QMenu *menu)
 {
     menuBar->addMenu(menu);
 }
 
-MyMenu* FramelessWidget::createMenu(const QStringList &actions, QWidget *parent)
+QMenu* FramelessWidget::createMenu(const QStringList &actions, QWidget *parent)
 {
-    MyMenu* menu = new MyMenu(parent);
+    QMenu* menu = new QMenu(parent);
 
     for (const auto& ac : actions)
     {
@@ -690,62 +700,6 @@ void FramelessWidget::menuBarMove()
     animation->start();
 }
 
-//bool FramelessWidget::findNoButton()
-//{
-//    QPoint globalPos = QCursor::pos();
-//    QPoint ClosePos = ui->CloseButton->pos();
-//    QPoint MaxPos = ui->MaxButton->pos();
-//    QPoint MiniPos = ui->MiniButton->pos();
-//    QPoint RecPos = ui->RecoverButton->pos();
-
-
-//}
-
-//void FramelessWidget::setButton()
-//{
-//    QPoint globalPos = this->mapToGlobal(QCursor::pos());
-
-//    QPoint ClosePos = this->mapToGlobal(ui->CloseButton->pos());
-//    QPoint MaxPos = this->mapToGlobal(ui->MaxButton->pos());
-//    QPoint MiniPos = this->mapToGlobal(ui->MiniButton->pos());
-//    QPoint RecPos = this->mapToGlobal(ui->RecoverButton->pos());
-
-//    if (globalPos.y() <= 3 && globalPos.y() >= 0
-//        && globalPos.x() - ClosePos.x() >= 33 && globalPos.x() - ClosePos.x() <= 36)
-//    {
-//        ui->CloseButton->setAttribute((Qt::WA_TransparentForMouseEvents));
-//    }
-////    if (MaxRect.contains(MaxPos))
-////    {
-////    }
-////    else
-////    {
-////    }
-////    if (MiniRect.contains(MiniPos))
-////    {
-////    }
-////    else
-////    {
-////    }
-////    if (RecRect.contains(RecPos))
-////    {
-////    }
-////    else
-////    {
-//    //    }
-//}
-
-void FramelessWidget::setcentralWidget(const QString& name, QWidget *widget, Func func = All)
-{
-    if (widget == nullptr)
-        widget = new QWidget;
-
-    FramelessWidget* framelesswidget = new FramelessWidget(name, widget->parentWidget(), func);
-    widget->setParent(framelesswidget);
-    framelesswidget->ui->main_widget->deleteLater();
-    framelesswidget->ui->centrallayout->addWidget(widget);
-
-}
 
 QLabel* FramelessWidget::getmenu_label()
 {
@@ -792,8 +746,18 @@ void FramelessWidget::InitDesigner()
     ui->MiniButton->setStyleSheet(buttonStyle);
     ui->RecoverButton->setStyleSheet(buttonStyle);
     ui->MaxButton->setStyleSheet(buttonStyle);
-    ui->CloseButton->setStyleSheet(buttonStyle);
     ui->MenuButton->setStyleSheet(buttonStyle);
+
+    ui->CloseButton->setStyleSheet("QToolButton{"
+                                   "border: none;"
+                                   "}"
+                                   "QToolButton:hover{"
+                                   "background-color: rgb(196, 43, 28)"
+                                   "}"
+                                   "QToolButton:pressed{"
+                                   "background-color: rgb(178, 42, 27)"
+                                   "}");
+
 
     QPainter painter(this);
     painter.setPen(QPen(Qt::gray, 1));

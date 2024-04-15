@@ -26,18 +26,19 @@ emulatorwidget::emulatorwidget(QWidget *parent)
     ui->setupUi(main_widget);
     FramelessWidget::setWidgetFixed(702, 562);
     main_widget->layout()->addWidget(ui->widget_5);
-    this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+    this->setWindowFlags(this->windowFlags()/* | Qt::WindowStaysOnTopHint*/);
 
     setEdit();
     this->hide();
 
-    inter = new InteractionWidget(this, this->parentWidget());
+    inter = new InteractionWidget(this);
     inter->setVisible(false);
 }
 
 emulatorwidget::~emulatorwidget()
 {
     delete ui;
+    inter->deleteLater();
 }
 
 void emulatorwidget::setFile(const QString& file)
@@ -372,13 +373,11 @@ int emulatorwidget::csip()
 
 void emulatorwidget::mouseMoveEvent(QMouseEvent* event)
 {
-    event->accept();
     FramelessWidget::mouseMoveEvent(event);
 }
 
 void emulatorwidget::mousePressEvent(QMouseEvent* event)
 {
-    event->accept();
     FramelessWidget::mousePressEvent(event);
 }
 

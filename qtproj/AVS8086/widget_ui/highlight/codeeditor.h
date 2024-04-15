@@ -5,6 +5,7 @@
 #include <QSet>
 #include <QTimer>
 #include <QTreeWidgetItem>
+#include "highlighter.h"
 // #include "debugwidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -44,7 +45,7 @@ public:
     QString get() const;
 
 signals:
-    void ssssss();
+    void debugSignal();
 
 private :
     enum UColor{//下划线的颜色 暂时就两个
@@ -71,6 +72,8 @@ private:
     int lineClickNumber;
 
     QSet<int> breakPoints;//存储断点行号
+
+    Highlighter *highlighter;
 
     void updatepoints();//使用QTimer定时扫描
     void reset(int line);

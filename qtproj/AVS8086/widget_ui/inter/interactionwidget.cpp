@@ -46,13 +46,11 @@ InteractionWidget::~InteractionWidget()
 
 void InteractionWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    event->accept();
     FramelessWidget::mouseMoveEvent(event);
 }
 
 void InteractionWidget::mousePressEvent(QMouseEvent* event)
 {
-    event->accept();
     FramelessWidget::mousePressEvent(event);
 }
 

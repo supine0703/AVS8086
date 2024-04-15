@@ -2,6 +2,7 @@
 #include "texteditwidget.h"
 #include "mainwidget.h"
 #include "settings.h"
+#include "FramelessWidget.h"
 
 #include <QApplication>
 #include <QFontDatabase>

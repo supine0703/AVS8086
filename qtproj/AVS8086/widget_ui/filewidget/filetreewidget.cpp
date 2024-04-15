@@ -8,7 +8,8 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QScrollBar>
-#include <fstream>
+#include <QTextStream>
+// #include <fstream>
 #include <QDesktopServices>
 #include <QRegularExpression>
 #include <QFile>
@@ -211,7 +212,7 @@ void FileTreewidget::DoubleClickpath(QTreeWidgetItem *item, int /*column*/){
     if(FileInfo->isFile())
     {
         // 发送信号量打开文件
-        openFileSignals(nowItem->toolTip(0));
+        emit openFileSignals(nowItem->toolTip(0));
         emit nowFilePath(nowItem->toolTip(0));
     }
 }
@@ -404,6 +405,8 @@ void FileTreewidget::closeProject()
         parItem->removeChild(item) ;
         delete item;
     }
+
+    emit closeFileTree();
 }
 
 void FileTreewidget::deleteFile()//删除文件
@@ -498,7 +501,7 @@ void FileTreewidget::bulidNewFile(QString name, QString path, QString suffix)
 }
 
 
-void FileTreewidget::m_mkdir(QString path, QString name)
+void FileTreewidget::m_mkdir(QString path, QString name)//给定路径和名称，创建文件夹
 {
     QDir dir(path);
     QString fullPath = path + "/" + name;
@@ -518,7 +521,79 @@ void FileTreewidget::m_mkdir(QString path, QString name)
     dir.mkdir(name);
 }
 
-void FileTreewidget::newProject(QString pathName)
+void FileTreewidget::m_mkfile(QString path)
+{
+    QFile file(path);
+    if (!file.exists()) {
+        if (file.open(QIODevice::WriteOnly)) {
+            // 文件创建成功，您可以在这里写入内容
+            file.close();
+        }
+    }
+    else
+    {
+        if (QMessageBox::warning(
+                this, "警告", ".asm文件已存在，是否情况并覆盖？" ,
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            QFile(path).remove();
+        }
+        else
+        {
+            return;
+        }
+
+        if (file.open(QIODevice::WriteOnly)) {
+            // 文件创建成功，您可以在这里写入内容
+            file.close();
+        }
+        else
+        {
+            QMessageBox::critical(this, "错误", "文件打开失败");
+            return;
+        }
+    }
+}
+
+void FileTreewidget::m_mkConfile(QString path, QString text)
+{
+    QFile file(path);
+    if (!file.exists()) {
+        if (file.open(QIODevice::WriteOnly)) {
+            // 文件创建成功，您可以在这里写入内容
+            QTextStream out(&file);
+            out << text;
+            file.close();
+        }
+    }
+    else
+    {
+        if (QMessageBox::warning(
+                this, "警告", ".asm文件已存在，是否情况并覆盖？" ,
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            QFile(path).remove();
+        }
+        else
+        {
+            return;
+        }
+
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            // 文件创建成功，您可以在这里写入内容
+            QTextStream out(&file);
+            out << text;
+            file.close();
+        }
+        else
+        {
+            QMessageBox::critical(this, "错误", "文件打开失败");
+            return;
+        }
+    }
+}
+
+void FileTreewidget::newProject(QString pathName)//创建新建文件的文件树
 {
     QFileInfo info(pathName);
 
@@ -531,43 +606,16 @@ void FileTreewidget::newProject(QString pathName)
     m_mkdir(abslute_path, proName);
     proName = ".avs";
     m_mkdir(abslute_path, proName);
+    QString filePath = abslute_path += "/" + proName + "/" + "AVSMakeList.txt";
+    m_mkConfile(filePath, pathName);
 
     if (isChecked)
     {
-        QString newFilePath = abslute_path + "/main.asm";
-        QFile file(newFilePath);
-        if (!file.exists()) {
-            if (file.open(QIODevice::WriteOnly)) {
-                // 文件创建成功，您可以在这里写入内容
-                file.close();
-            }
-        }
-        else
-        {
-            if (QMessageBox::warning(
-                    this, "警告", ".asm文件已存在，是否情况并覆盖？" ,
-                    QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-            {
-                QFile(newFilePath).remove();
-            }
-            else
-            {
-                return;
-            }
-
-            if (file.open(QIODevice::WriteOnly)) {
-                // 文件创建成功，您可以在这里写入内容
-                file.close();
-            }
-            else
-            {
-                QMessageBox::critical(this, "错误", "文件打开失败");
-                return;
-            }
-        }
+        QString newFilePath = pathName + "/" + "/main.asm";
+        m_mkfile(newFilePath);
     }
 
-    QString p = info.path();
+    QString p = pathName;
     CreateTopItem(&p);
     isChecked = false;
 }
@@ -575,6 +623,11 @@ void FileTreewidget::newProject(QString pathName)
 void FileTreewidget::createAsmCheckedSlots()
 {
     isChecked = true;
+}
+
+void FileTreewidget::openFileSlot(QString pathName)
+{
+    CreateTopItem(&pathName);
 }
 
 // 创建文件的具体实现

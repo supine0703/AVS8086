@@ -47,6 +47,7 @@ QStringList* Debugwidget::getWarnlineList()
 void Debugwidget::add_()
 {
     this->clear();
+    qDebug() << errStringList.isEmpty() << "qwertuiioooo";
     for (const auto& s : errStringList)
     {
         this->appendPlainText(s);
@@ -56,6 +57,11 @@ void Debugwidget::add_()
     {
         this->appendPlainText(s);
     }
+}
+
+void Debugwidget::clearAll()
+{
+    this->document()->clear();
 }
 
 

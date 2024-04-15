@@ -3,7 +3,9 @@
 #include "mainwidget.h"
 #include "ui_mainwidget.h"
 #include <QMessageBox>
+#include <QListView>
 #include <QSplitter>
+#include <QFileDialog>
 #include <QTableWidget>
 
 mainwidget::mainwidget(QWidget *parent) :
@@ -11,13 +13,14 @@ mainwidget::mainwidget(QWidget *parent) :
     , fileTree(new FileTreewidget(this))
     , newwidget(new Newwidget())
     , edit_widget(new QTabWidget())
+    , m_file(" ")
     , leftwidget(new Leftwidget(this))
-    , editor(new CodeEditor(this))
+    , currentFile(new QStringList())
+    , currentEditor()
     , debugwidget(new Debugwidget(this))
-    , funcMenu(new MyMenu(this))
-    , emuwidget(new emulatorwidget(this))
+    , funcMenu(new QMenu(this))
+    , emuwidget(new emulatorwidget())
     , menu_widget(FramelessWidget::getMenuwidget())
-    , highlighter(new Highlighter(editor->document()))
     , ui(new Ui::mainwidget)
 {
     QWidget* main_widget = FramelessWidget::getMain_Widget();
@@ -30,28 +33,42 @@ mainwidget::mainwidget(QWidget *parent) :
 
     fileTree->setParent(ui->dirwidget);
 
-    ui->show_label->setVisible(false);
-
     init();
 
-    qDebug()<<debugwidget->getErrlineList()->isEmpty();
-
-    editor->getWarnLineList(debugwidget->getWarnlineList());
-    editor->getErrLineList(debugwidget->getErrlineList());
+    // qDebug()<<debugwidget->getErrlineList()->isEmpty();
 
     // connect(editor->document(), &QTextDocument::errLineWordChanged, this, [this](){
     //     editor->warnLineWordChangedReicive(debugwidget->getWarnlineList());
     // });
 
-    connect(editor, &CodeEditor::ssssss, this, [this](){
+    connect(fileTree, &FileTreewidget::openFileSignals, this, [this](QString path){
+        QFileInfo info = QFileInfo(path);
+        if (!checkInTab(info.fileName()))
+        {
+            currentEditor = addNewEditor();
+            currentEditor->openFileSignalsSlot(path);
 
-        debugwidget->warnStringList = editor->warnLineStringList;
-        debugwidget->errStringList = editor->errLineStringList;
-        debugwidget->add_();
-    });//传递错误的单词列
+            int index = ui->tabWidget->addTab(currentEditor, info.fileName());
+            currentEditor->setObjectName(info.fileName());
+            ui->tabWidget->setCurrentIndex(index);
 
-    connect(fileTree, &FileTreewidget::openFileSignals, editor, &CodeEditor::openFileSignalsSlot);
-    connect(fileTree, &FileTreewidget::saveFile, editor, &CodeEditor::saveFileSlot);
+            ui->tabWidget->setVisible(true);
+            ui->show_label->setVisible(false);
+        }
+
+        connect(currentEditor, &CodeEditor::debugSignal, this, [this](){
+
+            debugwidget->warnStringList = currentEditor->warnLineStringList;
+            debugwidget->errStringList = currentEditor->errLineStringList;
+            debugwidget->add_();
+        });//传递错误的单词列
+
+        currentEditor->getWarnLineList(debugwidget->getWarnlineList());
+        currentEditor->getErrLineList(debugwidget->getErrlineList());
+        currentEditor->setCompileFile(path);
+    });
+    connect(fileTree, &FileTreewidget::saveFile, currentEditor, &CodeEditor::saveFileSlot);
+
     connect(ui->closebutton, &QToolButton::clicked, this, [this](){
         ui->widget_5->setVisible(false);
         for (auto button : ListToolButton)
@@ -61,7 +78,15 @@ mainwidget::mainwidget(QWidget *parent) :
         ui->closebutton->setStyleSheet(style1);
     });
 
-    connect(newwidget, &Newwidget::PathEditContent, fileTree, &FileTreewidget::newProject);
+    connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this, [this](int index){
+        auto widget = ui->tabWidget->widget(index);
+        ui->tabWidget->removeTab(index);
+        if(widget != nullptr){
+            widget->deleteLater(); // 安全删除QWidget对象
+        }
+    });
+
+    connect(newwidget, &Newwidget::PathEditContent, fileTree, &FileTreewidget::newProject);//传递创建文件的路径，用于创建文件树
 
     connect(fileTree, &FileTreewidget::nowFilePath, this, [this](auto f) {
         m_file = f;
@@ -71,7 +96,8 @@ mainwidget::mainwidget(QWidget *parent) :
         emuwidget->setFile(m_file);
         emuwidget->runButton_clickedSlot();
     });
-    connect(fileTree, &FileTreewidget::nowFilePath, editor, &CodeEditor::setCompileFile);
+
+    connect(this, &FramelessWidget::openFileButtonClicked, this, &mainwidget::openFileButtonClickedSlot);//接收打开文件信号
 }
 
 mainwidget::~mainwidget()
@@ -106,7 +132,9 @@ void mainwidget::init()
     //    QString("%1").arg(1, 4, 10, QChar(' '));
     ui->leftwidget->layout()->addWidget(leftwidget);
     ui->dirwidget->layout()->addWidget(fileTree);
-    ui->widget_4->layout()->addWidget(editor);
+    ui->tabWidget->setVisible(false);
+    ui->tabWidget->setTabsClosable(true);
+    ui->tabWidget->clear();
     ui->showerr_widget->layout()->addWidget(debugwidget);
     ui->filetreewidget->setVisible(false);
 
@@ -140,12 +168,19 @@ void mainwidget::init()
     // connect(newwidget, &Newwidget::buildFile, fileTree, &FileTreewidget::bulidNewFile);
 
     connect(debugwidget, &Debugwidget::errLineNumber, this, [this](int errLine, int errWord, int errWordLengh){
-        editor->goToErrLine(errLine, errWord, errWordLengh);
+        currentEditor->goToErrLine(errLine, errWord, errWordLengh);
     });//接收debug信号
 
-    connect(fileTree, &FileTreewidget::showTextSignal, editor, &CodeEditor::showTextSignalSlot);
+    connect(fileTree, &FileTreewidget::showTextSignal, currentEditor, &CodeEditor::showTextSignalSlot);
 
     connect(newwidget, &Newwidget::createAsmChecked, fileTree, &FileTreewidget::createAsmCheckedSlots);
+
+    connect(fileTree, &FileTreewidget::closeFileTree, this, [this](){
+        ui->tabWidget->setVisible(false);
+        ui->show_label->setVisible(true);
+        ui->tabWidget->clear();
+        this->debugwidget->clearAll();
+    });
 }
 
 void mainwidget::initFileWidgetButton()
@@ -293,6 +328,29 @@ void mainwidget::clickFunMenuSlot(QAction* action)
     }
 }
 
+void mainwidget::openFileButtonClickedSlot()
+{
+    QString deFilePath;
+    if (m_file == " ") deFilePath = "/home";
+    else deFilePath = m_file;
+
+    QString filePath = QFileDialog::getOpenFileName(this
+                                                    , tr("打开项目")
+                                                    , m_file
+                                                    , "*.txt");
+
+    QFile ConFile(filePath);
+    if (!ConFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "无法打开文件进行读取";
+        return;
+    }
+    QTextStream in(&ConFile);
+    QString address = in.readLine();
+    ConFile.close();
+
+    fileTree->openFileSlot(address);
+}
+
 void mainwidget::setupEditor()
 {
     QFont font;
@@ -300,7 +358,7 @@ void mainwidget::setupEditor()
     font.setFixedPitch(true);
     font.setPointSize(10);
 
-    editor->setFont(font);
+    currentEditor->setFont(font);
 }
 
 void mainwidget::setLayout(QWidget* widget)
@@ -316,6 +374,23 @@ void mainwidget::setNewwidget(QString type, int idx)
     tablewidget->setCurrentItem(selectedItem);
     newwidget->editClear();
     newwidget->show();
+}
+
+CodeEditor* mainwidget::addNewEditor()
+{
+    CodeEditor* editor = new CodeEditor(this);
+    return editor;
+}
+
+bool mainwidget::checkInTab(QString fileName)
+{
+    foreach (QWidget *widget, ui->tabWidget->findChildren<QWidget*>()) {
+        if (QFileInfo(widget->objectName()).fileName() == fileName) {
+
+            return true;
+        }
+    }
+    return false;
 }
 
 void mainwidget::mousePressEvent(QMouseEvent* event)

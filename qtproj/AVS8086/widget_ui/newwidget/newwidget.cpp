@@ -319,8 +319,7 @@ void Newwidget::mousePressEvent(QMouseEvent* event)
 //    {
 ////        ui->path_widget->setStyleSheet(editWidgetStyle);
 //    }
-
-    event->accept();
+    // event->accept();
 
     FramelessWidget::mousePressEvent(event);
 }
@@ -328,7 +327,6 @@ void Newwidget::mousePressEvent(QMouseEvent* event)
 void Newwidget::mouseMoveEvent(QMouseEvent* event)
 {
     FramelessWidget::mouseMoveEvent(event);
-    event->accept();
 }
 
 

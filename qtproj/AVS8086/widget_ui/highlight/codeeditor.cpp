@@ -13,6 +13,7 @@ CodeEditor::CodeEditor(QWidget *parent)
     : QPlainTextEdit(parent)
     , isLineListChanged(false)
     , timer(new QTimer(this))
+    , highlighter(new Highlighter(this->document()))
 {
     lineNumberArea = new LineNumberArea(this);
 
@@ -45,9 +46,7 @@ CodeEditor::CodeEditor(QWidget *parent)
     });
 
     connect(this->document(), &QTextDocument::contentsChanged, this, [this](){
-
         if (comFilePath.isEmpty()) return;
-        qDebug()<<comFilePath;
         QFile file(comFilePath);
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream stream(&file);
@@ -83,7 +82,6 @@ CodeEditor::CodeEditor(QWidget *parent)
             }
             else
             {
-                // qDebug()<<s;
                 qDebug()<<"读取失败！\n"<< __FILE__ << __LINE__;
                 return;
             }
@@ -128,7 +126,7 @@ CodeEditor::CodeEditor(QWidget *parent)
             warnLineList.append(QString::number(warnLine) + " "
                                + QString::number(warnWord) + " " + QString::number(warnWordLengh));//相当于拷贝副本
         }
-        emit ssssss();//传递给debug显示
+        emit debugSignal();//传递给debug显示
     });
 
 }
@@ -250,7 +248,7 @@ bool CodeEditor::openFileSignalsSlot(QString path)
 bool CodeEditor::saveFileSlot(QString path)
 {
     QFile file(path);
-    qDebug()<<path;
+    // qDebug()<<path;
     if (!file.open(QIODevice::WriteOnly))
     {
         QMessageBox::warning(this, "错误", "打开文件失败！");
@@ -400,11 +398,9 @@ void CodeEditor::resetPoints()
     }
     if (!resetErrLineList.isEmpty() && isLineListChanged)
     {
-        // qDebug()<<"1";
         int errLine = 0, errWord = 0, errWordLengh = 0;
         for (int i = 0; i < resetErrLineList.length(); i++)
         {
-            // qDebug()<<resetErrLineList;
             QStringList tmp = resetErrLineList.at(i).split(" ");
             errLine = tmp.at(0).toInt();errWord = tmp.at(1).toInt();
             errWordLengh = tmp.at(2).toInt();
