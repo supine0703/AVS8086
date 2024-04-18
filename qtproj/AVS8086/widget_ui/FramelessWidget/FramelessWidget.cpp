@@ -327,9 +327,9 @@ bool FramelessWidget::eventFilter(QObject *obj, QEvent *event)
 
     if (event->type() == QEvent::MouseButtonPress && obj == this)
     {
-        qDebug() << this;
+        // qDebug() << this;
         mousePressEvent(pMouse);
-        qDebug() << this;
+        // qDebug() << this;
         return true;
     }
     else if (event->type() == QEvent::MouseButtonDblClick  && !fixed && obj == ui->widget)

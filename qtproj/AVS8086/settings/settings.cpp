@@ -43,11 +43,10 @@ QSettings& Settings::getUISettings()
     return s;
 }
 
-QSettings Settings::getSettings(const QString& file)
+QSettings& Settings::getSettings(const QString& file)
 {
-    // static QSet<QSettings> set;
-    // set.insert(QSettings(file, QSettings::IniFormat));
-
-    return QSettings(file, QSettings::IniFormat);
+    static QSettings s;
+    s.setPath(QSettings::IniFormat, QSettings::UserScope, file);
+    return s;
 }
 

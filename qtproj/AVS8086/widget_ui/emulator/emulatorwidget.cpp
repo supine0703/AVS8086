@@ -57,7 +57,7 @@ void emulatorwidget::setFile(const QString& file)
     a.compile();
 
 
-    a.copy(R"(D:\Leisure\Desktop\8086\AVS\mycode.bin)",
+    a.copy(CONFIG_PATH"mycode.bin",
            info.path() + "/main.bin");
 
     vm.m_regs = a.wellInitInfos();
