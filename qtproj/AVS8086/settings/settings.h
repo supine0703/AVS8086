@@ -24,8 +24,7 @@ public:
 
     static QSettings& getUISettings();
 
-
-    static QSettings getSettings(const QString& file);
+    static QSettings& getSettings(const QString& file);
 
 };
 
