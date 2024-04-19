@@ -79,9 +79,9 @@ void Parser::addExpectPeekTokenErrorInfo(const QList<Token::Type>& types)
 {
     if (types.empty())
         return;
-    QString expectType = Token::typeName(types.at(0));
+    QString expectType = Token::tokenTypeName(types.at(0));
     for (int i = 1, end = types.length(); i < end; i++)
-        expectType += QString(",%1").arg(Token::typeName(types.at(i)));
+        expectType += QString(",%1").arg(Token::tokenTypeName(types.at(i)));
 
     const auto& token = peekToken();
     addErrorInfo(
@@ -121,7 +121,7 @@ void Parser::fristToken()
 
     m_tokens.clear();
     m_tokens.append(m_lexer->first());
-    while (currToken().is(Token::ANNOTATION))
+    while (currToken().is(Token::TOKEN_ANNOTATION))
     {
         m_tokens.pop_back();
         m_tokens.append(m_lexer->next());
@@ -134,7 +134,7 @@ void Parser::fristToken()
 void Parser::nextToken()
 {
     // 缓冲区去除注释
-    while (m_tokens.at(2).is(Token::ANNOTATION))
+    while (m_tokens.at(2).is(Token::TOKEN_ANNOTATION))
     {
         m_tokens.pop_back();
         m_tokens.append(m_lexer->next());

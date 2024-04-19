@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(AVS8086 VERSION 0.1.5 LANGUAGES CXX)
+project(AVS8086 VERSION 0.3.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -37,16 +37,17 @@ set(WIDGET_UI_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/widget_ui)
 recurse_directories(INCLUDE_ALL_DIR ${INCLUDE_PATH})
 recurse_directories(UI_ALL_DIR      ${UI_PATH})
 
-recurse_directories(WIDGET_UI_ALL_DIR ${WIDGET_UI_MODEL})
+# recurse_directories(WIDGET_UI_ALL_DIR ${WIDGET_UI_MODEL})
 
 list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
     ${UI_ALL_DIR}
-    ${WIDGET_UI_ALL_DIR}
+    # ${WIDGET_UI_ALL_DIR}
 )
 
 include_directories(
     ${INCLUDE_ALL_DIR}
     ${BACK_END_MODEL}
+    # ${BACK_END_MODEL}_2
     ${WIDGET_UI_ALL_DIR}
     settings
 )
@@ -57,9 +58,12 @@ file(GLOB_RECURSE PROJECT_SOURCES
     ${BACK_END_MODEL}/*.h ${BACK_END_MODEL}/*.hpp
     ${BACK_END_MODEL}/*.cpp ${BACK_END_MODEL}/*.ui
 
-    ${WIDGET_UI_MODEL}/*.h
-    ${WIDGET_UI_MODEL}/*.cpp
-    ${WIDGET_UI_MODEL}/*.ui
+    # ${BACK_END_MODEL}_2/*.h ${BACK_END_MODEL}_2/*./*.hpp
+    # ${BACK_END_MODEL}_2/*./*.cpp ${BACK_END_MODEL}_2/*./*.ui
+
+    # ${WIDGET_UI_MODEL}/*.h
+    # ${WIDGET_UI_MODEL}/*.cpp
+    # ${WIDGET_UI_MODEL}/*.ui
 
     ${INCLUDE_PATH}/*.hpp ${INCLUDE_PATH}/*.h
     ${SRC_PATH}/*.cpp     ${SRC_PATH}/*.c

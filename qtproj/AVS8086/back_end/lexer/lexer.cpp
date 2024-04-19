@@ -7,13 +7,11 @@ using namespace avs8086::token;
 using namespace avs8086::lexer;
 
 Lexer::Lexer()
-    : Lexer("")
 { }
 
-Lexer::Lexer(const QString& fileName)
+Lexer::Lexer(const QString& file, const QStringList& input)
 {
-    setFileName(fileName);
-    scan();
+    scan(file, input);
 }
 
 Lexer::~Lexer()
@@ -24,8 +22,6 @@ Lexer::~Lexer()
 void Lexer::clear()
 {
     m_file.clear();
-    m_input.clear();
-    m_labels.clear();
     m_errorInfos.clear();
     m_tokens.clear();
     m_tokenIt = 0;
@@ -37,12 +33,18 @@ QString Lexer::fileName() const
     return m_file;
 }
 
-void Lexer::setFileName(const QString& fileName)
+void Lexer::scan(const QString& file, const QStringList& input)
 {
     clear();
-    if (!fileName.isEmpty())
+    m_file = file;
+    if (!input.isEmpty())
     {
-        QFile inFile(m_file = fileName);
+        scan(input);
+        return;
+    }
+    if (!m_file.isEmpty())
+    {
+        QFile inFile(m_file);
         if (!inFile.open(QIODevice::ReadOnly))
         {
             // TODO: translate
@@ -52,16 +54,14 @@ void Lexer::setFileName(const QString& fileName)
         else
         {
             QTextStream in(&inFile);
-            // 结尾添加空白符:
-            // 1. 确保最后一个token成功append; 2. eof column 不用额外 +1;
-            // m_input.append(in.readAll().append(' ').split('\n'));
+            QStringList f_input;
             while (!in.atEnd())
-                m_input.append(in.readLine().append(' '));
+                f_input.append(in.readLine().append(' '));
             inFile.close();
+            scan(f_input);
         }
     }
 }
-
 
 bool Lexer::atEnd() const
 {
@@ -111,40 +111,46 @@ void Lexer::addErrorInfo(int row, int column, int len, const QString& info)
 }
 
 
-void Lexer::scan()
+void Lexer::scan(const QStringList& input)
 {
-    if (isError() || m_input.isEmpty())
+    if (isError() || input.isEmpty())
         return;
 
-    QString token;
-    auto appendToken = [this, &token](int row, int column) {
-        if (!token.isEmpty())
+    QString tokenStr;
+    QList<int> illegalIndex;
+    QStringList labels;
+    // TODO 没有对变量, 段名的扫描
+    // QStringList segs;
+    // QStringList vars;
+
+    auto appendToken = [this, &tokenStr, &illegalIndex](int row, int column) {
+        if (!tokenStr.isEmpty())
         {
-            Token::Type type = Token::tokenType(token);
-            if (type == Token::TOKEN_INTEGER && Token::lastTextToInt() == -2)
+            Token::Type type = Token::tokenType(tokenStr);
+            if (type == Token::ILLEGAL || type == Token::ILLEGAL_INTEGER)
             {
-                type = Token::TOKEN_ILLEGAL;
-                addErrorInfo(
-                    row, column - token.length(), token.length(),
-                    "integer illegal: " + token
-                );
+                illegalIndex.append(m_tokens.length());
             }
             m_tokens.append(
-                Token(type, token, row, (column - token.length()))
+                Token(type, tokenStr, row, (column - tokenStr.length()))
             );
-            token.clear();
+            tokenStr.clear();
         }
     };
 
     // 逐个扫描分离出 token
-    for (int row = 0, end_r = m_input.length(); row < end_r; row++)
+    for (int row = 0, end_r = input.length(); row < end_r; row++)
     {
         int _r = row + 1;
-        const auto& line(m_input.at(row));
+        const auto& line(input.at(row));
         for (int col = 0, end_c = line.length(); col < end_c; col++)
         {
             int _c = col + 1;
             const auto& ch(line.at(col));
+            /**
+             * @bug: QPlainTextEdit的 '\n'会出现不可识别为空白字符的情况,
+             *       可能是编码问题, 因此采用提前分好行的方式进行扫描
+             */
             if (ch.isSpace())
             { // 空白字符 如果有token 则建立token
                 appendToken(_r, _c);
@@ -156,7 +162,7 @@ void Lexer::scan()
                 int len = textStrLen(line, col);
                 if (len > 0)
                 { // 串
-                    token = line.mid(col, len + 2);
+                    tokenStr = line.mid(col, len + 2);
                     col += len + 1;
                     appendToken(_r, col + 2);
                 }
@@ -178,7 +184,7 @@ void Lexer::scan()
                     }
 
                     m_tokens.append(Token(
-                        Token::TOKEN_ILLEGAL,
+                        Token::ILLEGAL,
                         line.last(col - _c),
                         _r, _c
                     ));
@@ -190,7 +196,7 @@ void Lexer::scan()
                 if (_c < end_c)
                 {
                     auto chType = Token::tokenType(ch, line.at(_c));
-                    if (chType != Token::TOKEN_ILLEGAL)
+                    if (chType != Token::ILLEGAL)
                     { // 双目运算符
                         appendToken(_r, _c);
                         m_tokens.append(Token(
@@ -201,80 +207,84 @@ void Lexer::scan()
                     }
                 }
                 auto chType = Token::tokenType(ch);
-                if (chType != Token::TOKEN_ILLEGAL)
+                if (chType != Token::ILLEGAL)
                 { // 是单目符号
                     appendToken(_r, _c);
-                    if (chType == Token::TOKEN_ANNOTATION)
+                    if (chType == Token::ANNOTATION)
                     { // 注释
                         col = end_c;
-                        token = line.last(col - _c + 1).trimmed();
+                        tokenStr = line.last(col - _c + 1).trimmed();
                         appendToken(_r, col);
                         continue;
                         // qDebug() << "注释:"
                         //          << line.last(col - _c + 1).trimmed();
                     }
-                    else if (chType == Token::TOKEN_COLON)
+                    else if (chType == Token::COLON)
                     { // 标签 label
                         auto& last(m_tokens.last());
-                        if (last.is(Token::TOKEN_ILLEGAL)
+                        if (last.is(Token::ILLEGAL)
                             && last.row() == _r)
                         {
-                            if (!QString("0123456789").contains(
-                                    last.literal().at(0))
-                                )
-                            {
-                                last.resetType(Token::TOKEN_LABEL);
-                                m_labels.append(last.literal());
-                            }
-                            else
+                            auto last_l = last.literal();
+                            last.resetType(Token::LABEL);
+                            labels.append(last_l);
+                            if (last_l.at(0).isDigit())
                             {
                                 addErrorInfo(
-                                    _r, last.column(), last.literal().length(),
-                                    "label first can not be 0-9"
+                                    _r, last.column(), last.length(),
+                                    "label first char can not be 0-9"
                                 );
                             }
                         }
+                        // 词法检测仅检测是否合法, 重复定义放到语法检测中处理
                     }
                     m_tokens.append(Token(chType, ch, _r, _c));
                 }
                 else
-                { // 其他字符标识符
-                    token.append(ch);
+                { // 往后扫描, 构成 token
+                    tokenStr.append(ch);
                 }
             }
         }
     }
 
     // 二次遍历
-    for (auto& t : m_tokens)
+    for (const int i : illegalIndex)
     {
-        if (t.is(Token::TOKEN_ILLEGAL))
+        auto& t = m_tokens[i];
+        auto tl = t.literal();
+        if (t.is(Token::ILLEGAL_INTEGER))
         {
-            const auto& tl = t.literal();
-            if (m_labels.contains(tl))
-            { // 标出标签
-                t.resetType(Token::TOKEN_LABEL);
-            }
-            else if (tl.back() == 'H' || tl.back() == 'h')
-            { // 检测不合法单词中是否可以辨别第一位不为0的数字
-                auto new_tl = "0" + tl;
-                if (Token::textToInt(new_tl) >= 0)
-                {
-                    t.resetType(Token::TOKEN_INTEGER);
-                }
-            }
-            else
+            t.resetType(Token::ILLEGAL);
+            addErrorInfo(
+                t.row(), t.column(), t.length(), "illegal integer: " + tl
+            );
+        }
+        else if (labels.contains(tl))
+        { // 标出标签
+            t.resetType(Token::LABEL);
+            if (tl.at(0).isDigit())
             {
                 addErrorInfo(
-                    t.row(), t.column(), tl.length(), "illegal token: " + tl
+                    t.row(), t.column(), t.length(),
+                    "label first char can not be 0-9"
                 );
             }
+        }
+        else if (tl.back().toUpper() == 'H' && Token::textToInt("0" + tl) >= 0)
+        { // 检测不合法单词中是否可以辨别第一位不为0的数字
+            t.resetType(Token::INTEGER);
+        }
+        else
+        {
+            addErrorInfo(
+                t.row(), t.column(), tl.length(), "illegal token: " + tl
+            );
         }
     }
 
     m_eofToken = Token(
-        Token::TOKEN_EOF, "",
-        m_input.length(), m_input.at(m_input.length() - 1).length()
+        Token::TOKEN_EOF, "", input.length(), input.back().length()
     );
 }
 
@@ -294,6 +304,6 @@ int Lexer::textStrLen(const QString& line, int col)
             }
         }
     }
-    return len;
+    return len; // -1: not string; 0: empty string;
 }
 

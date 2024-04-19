@@ -2,9 +2,11 @@
 #include "ui_texteditwidget.h"
 
 #include "json/json.h"
-#include "parser/parser.h"
-#include "assembler/assembler.h"
-#include "vm/vm.h"
+#include "lexer/lexer.h"
+// #include "parser/parser.h"
+// #include "assembler/assembler.h"
+// #include "vm/vm.h"
+
 #include "settings.h"
 #include <QStatusBar>
 #include <QFileDialog>
@@ -27,7 +29,7 @@ TextEditWidget::TextEditWidget(QWidget* parent)
     {
         if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            ui->textEdit->setText(f.readAll());
+            ui->textEdit->setPlainText(f.readAll());
             f.close();
         }
         else
@@ -66,7 +68,7 @@ void TextEditWidget::on_pushButton_6_clicked()
         {
             if (f.open(QIODevice::ReadOnly | QIODevice::Text))
             {
-                ui->textEdit->setText(f.readAll());
+                ui->textEdit->setPlainText(f.readAll());
                 f.close();
             }
             else
@@ -117,52 +119,33 @@ void TextEditWidget::on_pushButton_7_clicked()
 
 using namespace avs8086::token;
 using namespace avs8086::lexer;
-using namespace avs8086::parser;
-using namespace avs8086::assembler;
-using namespace avs8086::vm;
+// using namespace avs8086::parser;
+// using namespace avs8086::assembler;
+// using namespace avs8086::vm;
 void TextEditWidget::on_pushButton_2_clicked()
 {
-    // Assembler a(ui->lineEdit->text(), this);
-    // a.compile();
-
-    // Lexer l(ui->lineEdit->text());
-    // if (l.isError())
-    // {
-    //     qDebug() << "error:";
-    //     for (const auto& e : l.errorInfos())
-    //         qDebug() << e;
-    // }
-    // auto tokens = l.tokens();
-    // qDebug() << "tokens:";
-    // for (const auto &t : tokens)
-    // {
-    //     if (t.type() == Token::TOKEN_ILLEGAL)
-    //         qDebug() << t.typeName() << ":" << t.literal()
-    //                  << "(" << t.row() << t.column() << ")";
-    // }
-
     Lexer l(ui->lineEdit->text());
-    // for (const auto& t : l.tokens())
-    //     qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
-    // auto lt(l.end());
-    // qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
-    // qDebug() << "error:";
-    // for (const auto& e : l.errorInfos())
-    //     qDebug() << e;
-    Parser p(&l);
-    auto root = p.newAST();
+    for (const auto& t : l.tokens())
+        qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
+    auto lt(l.end());
+    qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
+    qDebug() << "error:";
+    for (const auto& e : l.errorInfos())
+        qDebug() << e;
+    // Parser p(&l);
+    // auto root = p.newAST();
 
-    Assembler a(root);
-    a.compile();
-    // for (const auto& e : a.errorInfos())
-    //     qDebug() << e;
+    // Assembler a(root);
+    // a.compile();
+    // // for (const auto& e : a.errorInfos())
+    // //     qDebug() << e;
 
-    // a.saveToFile();
-    a.copy(R"(D:\Leisure\Desktop\8086\AVS\mycode.bin)",
-           R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
-    VM vm;
-    vm.m_regs = a.wellInitInfos();
-    vm.readFromFile(R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
+    // // a.saveToFile();
+    // a.copy(R"(D:\Leisure\Desktop\8086\AVS\mycode.bin)",
+    //        R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
+    // VM vm;
+    // vm.m_regs = a.wellInitInfos();
+    // vm.readFromFile(R"(D:\Leisure\Desktop\8086\AVS\test.bin)");
 
 
 
@@ -175,13 +158,11 @@ void TextEditWidget::on_pushButton_2_clicked()
     // for (const auto& w : p.warningInfos())
     //     qDebug() << w;
 
-    tools::Json js;
-    js.setObject(root->json());
-    js.saveToFile(DOCS_PATH"/ast.json");
+    // tools::Json js;
+    // js.setObject(root->json());
+    // js.saveToFile(DOCS_PATH"/ast.json");
 
-    qDebug() << a.wellInitInfos();
-
-
+    // qDebug() << a.wellInitInfos();
 
 }
 

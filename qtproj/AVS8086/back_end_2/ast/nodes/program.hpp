@@ -10,7 +10,7 @@ class Program : public Statement
 {
 public:
     Program(const QString& file)
-        : Statement(PROGRAM), m_file(file)
+        : Statement(NODE_PROGRAM), m_file(file)
     { }
     ~Program() { }
 

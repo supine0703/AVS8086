@@ -1,8 +1,7 @@
 // #include "widget.h"
 #include "texteditwidget.h"
-#include "mainwidget.h"
+// #include "mainwidget.h"
 #include "settings.h"
-#include "FramelessWidget.h"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -40,8 +39,8 @@ int main(int argc, char* argv[])
     QApplication::setFont(QFont(fontName, 13));
     QApplication::setWindowIcon(QIcon(":/cpu.png"));
 
-    mainwidget w;
-    // TextEditWidget w;
+    // mainwidget w;
+    TextEditWidget w;
     w.show();
 
     return a.exec();

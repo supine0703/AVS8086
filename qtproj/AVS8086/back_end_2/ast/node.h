@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "ast/value.h"
 #include "token/token.h"
 #include <QSharedPointer>
 #include <QJsonObject>
@@ -13,26 +14,26 @@ class Node
 {
 public:
     enum Type {
-        ILLEGAL = 0,
+        NODE_ILLEGAL = 0,
 
-        FLOAT,     // float
-        INTEGER,   // integer
-        STRING,    // string
-        PREFIX,    // ~x +x -x
-        INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
-        COMMA,     // ,
-        COLON,     // :
-        LABEL,     // label
-        REGISTER,  // reg
-        ADDRESS,   // []
+        NODE_FLOAT,     // float
+        NODE_INTEGER,   // integer
+        NODE_STRING,    // string
+        NODE_PREFIX,    // ~x +x -x
+        NODE_INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
+        NODE_COMMA,     // ,
+        NODE_COLON,     // :
+        NODE_LABEL,     // label
+        NODE_REGISTER,  // reg
+        NODE_ADDRESS,   // []
 
-        PROGRAM,
-        EXPRESSION_STATEMENT,
-        MULTIPLE_STATEMENT,
+        NODE_PROGRAM,
+        NODE_EXPRESSION_STATEMENT,
+        NODE_MULTIPLE_STATEMENT,
 
-        SINGLE,
-        WELL,      // #
-        MOV,
+        NODE_SINGLE,
+        NODE_WELL,      // #
+        NODE_MOV,
     };
 
 public:
@@ -46,7 +47,7 @@ public:
     Type type() const;
 
     QString typeName() const;
-    static QString typeName(Type type);
+    static QString nodeTypeName(Type type);
 
     virtual QStringList traversal(int depth) const { return {}; };
     virtual QJsonObject json() const = 0;
@@ -81,10 +82,13 @@ public:
 public:
     Expression(Type type) : Node(type) { }
     virtual ~Expression() { }
-
+    bool valueIs(ValueType type) const { return m_valueType == type;}
+    ValueType valueType() const { return m_valueType; }
+    Value value() const { return m_value; }
 
 protected:
-
+    ValueType m_valueType;
+    Value m_value;
 };
 
 /* ========================================================================== */

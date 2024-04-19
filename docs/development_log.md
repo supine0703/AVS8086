@@ -1,3 +1,24 @@
+# 2024-4-19
+  - 版本 v0.3
+  - 优化了 Token 实现
+    - 去掉了 Token 的枚举前缀 'TOKEN_', 因为: 类内意义不大, 类外 'Token::'
+    - MATE_ -> MAKE_X, LOAD_ -> LOAD_X
+    - EOF -> TOKEN_EOF, 因为 'EOF' 是 stdio 的宏, 值调整为 -1 和 c 统一
+    - 新增 ILLEGAL_INTEGER, LINE_BREAK('\\')
+    - 优化了 tokenType 的实现细节
+    - 静态的 tokenTypeName -> typeName, 静态的要加前缀 'Token::', 故前缀 'token' 意义不大
+  - 优化了 Lexer 实现
+    - 重构 scan 二次遍历的逻辑, 
+    - 优化 scan 的添加错误逻辑, 修复对一个词多次提示
+    - 优化 scan 的实现细节
+  - 重构了 Lexer 的构造以及调用逻辑, 提高复用性和使用的灵活性
+    - 取消了 setFileName 接口
+    - 添加 scan 接口, 可以扫描文件 或是 提取好的文本
+  - 优化了 ast 实现
+    - 去掉了 Nde 的枚举前缀 'NODE_', 因为: 类内意义不大, 类外 'Node::'
+    - 静态的 nodeTypeName -> typeName, 静态的要加前缀 'Node::', 故前缀 'node' 意义不大
+  - 打算重写 ast, parser
+
 # 2024-4-7
   - 使用JSON生成抽象语法树(AST)
   - 解决优化value后除法取余运算卡死的bug

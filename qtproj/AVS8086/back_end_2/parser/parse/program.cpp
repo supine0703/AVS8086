@@ -14,7 +14,7 @@ QSharedPointer<Program> Parser::parse_program()
         auto stmt = parse_statement();
         if (!stmt.isNull())
         {
-            if (stmt->is(Node::MULTIPLE_STATEMENT))
+            if (stmt->is(Node::NODE_MULTIPLE_STATEMENT))
             {
                 s->m_statements.append(
                     qSharedPointerDynamicCast<MultipleStatement>

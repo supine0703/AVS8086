@@ -3,6 +3,9 @@
 #include <QTextStream>
 #include <QRegularExpression>
 
+using namespace avs8086::token;
+using namespace avs8086::lexer;
+
 Lexer::Lexer()
     : Lexer("")
 { }
@@ -29,7 +32,7 @@ void Lexer::clear()
     m_eofToken = Token(Token::TOKEN_EOF, "", 0, 0);
 }
 
-QString Lexer::fileName()
+QString Lexer::fileName() const
 {
     return m_file;
 }
@@ -43,16 +46,18 @@ void Lexer::setFileName(const QString& fileName)
         if (!inFile.open(QIODevice::ReadOnly))
         {
             // TODO: translate
-            addErrorInfo(0, 0, "file open false: " + inFile.errorString());
+            addErrorInfo(0, 0, 0, "file open false: " + inFile.errorString());
             return;
         }
         else
         {
             QTextStream in(&inFile);
+            // 结尾添加空白符:
+            // 1. 确保最后一个token成功append; 2. eof column 不用额外 +1;
+            // m_input.append(in.readAll().append(' ').split('\n'));
             while (!in.atEnd())
-                m_input.append(in.readLine().append('\n'));
+                m_input.append(in.readLine().append(' '));
             inFile.close();
-            m_tokens.append(Token(Token::TOKEN_PROGRAM, m_file, 0, 0));
         }
     }
 }
@@ -97,37 +102,46 @@ QStringList Lexer::errorInfos() const
 
 /* ========================================================================== */
 
-void Lexer::addErrorInfo(int row, int column, const QString& info)
+void Lexer::addErrorInfo(int row, int column, int len, const QString& info)
 {
     m_errorInfos.append(
-        QString("[%1:(%3,%4)]>%2").arg(m_file, info).arg(row).arg(column)
+        QString("[%1:(%3,%4,%5)]>%2")
+            .arg(m_file, info).arg(row).arg(column).arg(len)
     );
 }
 
 
 void Lexer::scan()
 {
-    if (isError())
+    if (isError() || m_input.isEmpty())
         return;
 
     QString token;
     auto appendToken = [this, &token](int row, int column) {
         if (!token.isEmpty())
         {
-            int len = token.length();
+            Token::Type type = Token::tokenType(token);
+            if (type == Token::TOKEN_INTEGER && Token::lastTextToInt() == -2)
+            {
+                type = Token::TOKEN_ILLEGAL;
+                addErrorInfo(
+                    row, column - token.length(), token.length(),
+                    "integer illegal: " + token
+                );
+            }
             m_tokens.append(
-                Token(Token::tokenType(token), token, row, (column - len))
+                Token(type, token, row, (column - token.length()))
             );
             token.clear();
         }
     };
 
     // 逐个扫描分离出 token
-    for (int row = 0, end = m_input.length(); row < end; row++)
+    for (int row = 0, end_r = m_input.length(); row < end_r; row++)
     {
         int _r = row + 1;
         const auto& line(m_input.at(row));
-        for (int col = 0, end = line.length(); col < end; col++)
+        for (int col = 0, end_c = line.length(); col < end_c; col++)
         {
             int _c = col + 1;
             const auto& ch(line.at(col));
@@ -136,30 +150,31 @@ void Lexer::scan()
                 appendToken(_r, _c);
                 continue;
             }
-            else if (ch == '\'' || ch == '"')
+            else if ((ch == '\'' || ch == '\"'))
             { // 串类型
                 appendToken(_r, _c);
                 int len = textStrLen(line, col);
                 if (len > 0)
-                {
-                    col += len + 3;
-                    token = line.mid(row - 1, len + 2);
-                    appendToken(_r, col);
+                { // 串
+                    token = line.mid(col, len + 2);
+                    col += len + 1;
+                    appendToken(_r, col + 2);
                 }
                 else
-                {
-                    col = end;
+                { // 异常串
+                    col = end_c;
                     if (len == -1)
                     { // 串界符没匹配上
                         // TODO: translate
                         addErrorInfo(
-                            _r, _c, "string is not closed on this line"
+                            _r, _c, end_c - col,
+                            "string is not closed on this line"
                         );
                     }
                     else if (len == 0)
                     { // 空串
                         // TODO: translate
-                        addErrorInfo(_r, _c, "string can not be empty");
+                        addErrorInfo(_r, _c, 2, "string can not be empty");
                     }
 
                     m_tokens.append(Token(
@@ -172,26 +187,52 @@ void Lexer::scan()
             }
             else
             {
-                Token::Type chType = Token::tokenType(ch.toLatin1());
+                if (_c < end_c)
+                {
+                    auto chType = Token::tokenType(ch, line.at(_c));
+                    if (chType != Token::TOKEN_ILLEGAL)
+                    { // 双目运算符
+                        appendToken(_r, _c);
+                        m_tokens.append(Token(
+                            chType, QString(ch).append(line.at(_c)), _r, _c
+                        ));
+                        col++;
+                        continue;
+                    }
+                }
+                auto chType = Token::tokenType(ch);
                 if (chType != Token::TOKEN_ILLEGAL)
                 { // 是单目符号
                     appendToken(_r, _c);
                     if (chType == Token::TOKEN_ANNOTATION)
                     { // 注释
-                        col = end;
+                        col = end_c;
                         token = line.last(col - _c + 1).trimmed();
                         appendToken(_r, col);
+                        continue;
                         // qDebug() << "注释:"
                         //          << line.last(col - _c + 1).trimmed();
                     }
                     else if (chType == Token::TOKEN_COLON)
                     { // 标签 label
                         auto& last(m_tokens.last());
-                        if (last.type() == Token::TOKEN_ILLEGAL
+                        if (last.is(Token::TOKEN_ILLEGAL)
                             && last.row() == _r)
                         {
-                            last.resetType(Token::TOKEN_LABEL);
-                            m_labels.append(last.literal());
+                            if (!QString("0123456789").contains(
+                                    last.literal().at(0))
+                                )
+                            {
+                                last.resetType(Token::TOKEN_LABEL);
+                                m_labels.append(last.literal());
+                            }
+                            else
+                            {
+                                addErrorInfo(
+                                    _r, last.column(), last.literal().length(),
+                                    "label first can not be 0-9"
+                                );
+                            }
                         }
                     }
                     m_tokens.append(Token(chType, ch, _r, _c));
@@ -204,70 +245,49 @@ void Lexer::scan()
         }
     }
 
-    // 遍历标出 label
+    // 二次遍历
     for (auto& t : m_tokens)
     {
-        if (t.type() == Token::TOKEN_ILLEGAL
-            && m_labels.contains(t.literal()))
+        if (t.is(Token::TOKEN_ILLEGAL))
         {
-            t.resetType(Token::TOKEN_LABEL);
-        }
-    }
-
-    auto the_end(m_input.at(m_input.length() - 1));
-    if (!m_input.isEmpty())
-        m_eofToken = Token(
-            Token::TOKEN_EOF, "",
-            m_input.length() + (the_end == "\n"), the_end.length()
-        );
-}
-
-int Lexer::textToInt(const QString& numStr)
-{
-    static const QRegularExpression regex(
-        "^(0X)?([0-9A-F]+?)([HDOB])?$",
-        QRegularExpression::CaseInsensitiveOption
-    );
-    QRegularExpressionMatch match = regex.match(numStr.toUpper());
-
-    if (match.hasMatch())
-    {
-        QString hex = match.captured(1);
-        QString number = match.captured(2);
-        QString suffix = match.captured(3);
-        bool ok;
-        int num, suf = 10;
-        if (hex.isEmpty() || suffix.isEmpty())
-        {
-            if (!hex.isEmpty())
-                suf = 16;
-            else if (!suffix.isEmpty() && suffix != "D")
-            {
-                if (suffix == "H")
-                    suf = 16;
-                else if (suffix == "O")
-                    suf = 8;
-                else if (suffix == "B")
-                    suf = 2;
+            const auto& tl = t.literal();
+            if (m_labels.contains(tl))
+            { // 标出标签
+                t.resetType(Token::TOKEN_LABEL);
             }
-            num = number.toInt(&ok, suf);
-            if (!ok)
-                return num;
+            else if (tl.back() == 'H' || tl.back() == 'h')
+            { // 检测不合法单词中是否可以辨别第一位不为0的数字
+                auto new_tl = "0" + tl;
+                if (Token::textToInt(new_tl) >= 0)
+                {
+                    t.resetType(Token::TOKEN_INTEGER);
+                }
+            }
+            else
+            {
+                addErrorInfo(
+                    t.row(), t.column(), tl.length(), "illegal token: " + tl
+                );
+            }
         }
-        return -2;
     }
-    return -1;
+
+    m_eofToken = Token(
+        Token::TOKEN_EOF, "",
+        m_input.length(), m_input.at(m_input.length() - 1).length()
+    );
 }
+
 
 int Lexer::textStrLen(const QString& line, int col)
 {
     int len = -1;
-    auto ch = line.at(col);
-    if (ch == '\'' || ch == '"')
+    const auto& ch = line.at(col);
+    if (ch == '\'' || ch == '\"')
     {
         for (int i = col + 1, end = line.length(); i < end; i++)
         {
-            if (line.at(i) == ch)
+            if (line.at(i - 1) != '\\' && line.at(i) == ch)
             {
                 len = i - col - 1;
                 break;

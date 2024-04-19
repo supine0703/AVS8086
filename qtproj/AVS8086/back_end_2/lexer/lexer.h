@@ -3,6 +3,8 @@
 
 #include "token/token.h"
 
+namespace avs8086::lexer {
+
 class Lexer
 {
 public:
@@ -12,25 +14,24 @@ public:
 
     void clear();
 
-    QString fileName();
+    QString fileName() const;
     void setFileName(const QString& fileName);
 
     bool atEnd() const;
-    Token next() const;
-    Token first() const;
-    Token end() const;
-    QList<Token> tokens() const;
+    token::Token next() const;
+    token::Token first() const;
+    token::Token end() const;
+    QList<token::Token> tokens() const;
 
     bool isError() const;
     QStringList errorInfos() const;
 
 
 private:
-    void addErrorInfo(int row, int column, const QString& info);
+    void addErrorInfo(int row, int column, int len, const QString& info);
 
     void scan();
 
-    static int textToInt(const QString& numStr);
     static int textStrLen(const QString& line, int col);
 
 
@@ -40,9 +41,11 @@ private:
     QStringList m_labels;
     QStringList m_errorInfos;
 
-    QList<Token> m_tokens;
+    QList<token::Token> m_tokens;
     mutable int m_tokenIt;
-    Token m_eofToken;
+    token::Token m_eofToken;
 };
+
+} // namespace avs8086::lexer
 
 #endif // LEXER_H

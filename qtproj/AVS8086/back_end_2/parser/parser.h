@@ -2,8 +2,8 @@
 #define PARSER_H
 
 #include "lexer/lexer.h"
-#include "ast/nodes/program.hpp"
-#include "ast/nodes/expression_statement.hpp"
+#include "ast/header.h"
+HEADER_H
 
 namespace avs8086::parser {
 

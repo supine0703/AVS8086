@@ -3,26 +3,26 @@
 using namespace avs8086::ast;
 
 const QMap<Node::Type, QString> Node::sm_typeNames = {
-    { NODE_ILLEGAL,                 "Illegal" },
-    { NODE_INTEGER,                 "Integer" },
-    { NODE_STRING,                  "String" },
+    { ILLEGAL,                 "Illegal" },
+    { INTEGER,                 "Integer" },
+    { STRING,                  "String" },
 
-    { NODE_PREFIX,                  "Prefix" },
-    { NODE_INFIX,                   "Infix" },
+    { PREFIX,                  "Prefix" },
+    { INFIX,                   "Infix" },
 
-    { NODE_COMMA,                   "',' comma"},
-    { NODE_COLON,                   "':'label or reg"},
+    { COMMA,                   "',' comma"},
+    { COLON,                   "':'label or reg"},
 
-    { NODE_LABEL,                   "Label" },
-    { NODE_REGISTER,                "Register" },
-    { NODE_ADDRESS,                 "[Address]"},
+    { LABEL,                   "Label" },
+    { REGISTER,                "Register" },
+    { ADDRESS,                 "[Address]"},
 
-    { NODE_PROGRAM,                 "Program" },
-    { NODE_EXPRESSION_STATEMENT,    "Expression Statement" },
-    { NODE_MULTIPLE_STATEMENT,      "Multiple statement" },
+    { PROGRAM,                 "Program" },
+    { EXPRESSION_STATEMENT,    "Expression Statement" },
+    { MULTIPLE_STATEMENT,      "Multiple statement" },
 
 
-    { NODE_SINGLE,                  "Single Instruction" },
-    { NODE_WELL,                    "'#' Instruction" },
-    { NODE_MOV,                     "MOV" },
+    { SINGLE,                  "Single Instruction" },
+    { WELL,                    "'#' Instruction" },
+    { MOV,                     "MOV" },
 };

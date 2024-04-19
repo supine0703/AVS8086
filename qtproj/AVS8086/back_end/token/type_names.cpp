@@ -2,13 +2,21 @@
 
 using namespace avs8086::token;
 
+const QStringList Token::sm_makeNames = {
+    "MAKE_BIN", "MAKE_COM", "MAKE_EXE",
+};
+
+const QStringList Token::sm_loadNames = {
+    "LOAD_SEGMENT", "LOAD_OFFSET",
+};
+
 const QMap<Token::Type, QString> Token::sm_typeNames = {
-    { TOKEN_REGISTER,       "Register" },
-    { TOKEN_ILLEGAL,        "Illegal" },
-    { TOKEN_LABEL,          "Label"},
-    { TOKEN_STRING,         "String"},
-    { TOKEN_INTEGER,        "Integer" },
-    { TOKEN_FLOAT,          "Float" },
-    { TOKEN_MAKE_,          "MAKE_" },
-    { TOKEN_LOAD_,          "LOAD_" },
+    { ILLEGAL,            "Illegal" },
+    { LABEL,              "Label"},
+    { REGISTER,           "Register" },
+    { STRING,             "String"},
+    { INTEGER,            "Integer" },
+    { FLOAT,              "Float" },
+    { MAKE_X,             "MAKE_X" },
+    { LOAD_X,             "LOAD_X" },
 };

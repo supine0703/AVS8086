@@ -4,7 +4,7 @@
 using namespace avs8086::token;
 
 Token::Token()
-    : Token(ILLEGAL, "", 0, 0)
+    : Token(TOKEN_ILLEGAL, "", 0, 0)
 { }
 
 Token::Token(Type type, const QString& literal, int row, int column)
@@ -33,17 +33,12 @@ Token& Token::operator=(const Token& other)
     return *this;
 }
 
-/* ========================================================================== */
-
-void Token::resetType(Type type)
-{
-    m_type = type;
-}
-
 bool Token::is(Type type) const
 {
     return m_type == type;
 }
+
+/* ========================================================================== */
 
 Token::Type Token::type() const
 {
@@ -53,11 +48,6 @@ Token::Type Token::type() const
 QString Token::literal() const
 {
     return m_literal;
-}
-
-int Token::length() const
-{
-    return m_literal.length();
 }
 
 int Token::row() const
@@ -70,14 +60,19 @@ int Token::column() const
     return m_column;
 }
 
+void Token::resetType(Type type)
+{
+    m_type = type;
+}
+
 QString Token::typeName() const
 {
-    return typeName(m_type);
+    return tokenTypeName(m_type);
 }
 
 /* ========================================================================== */
 
-QString Token::typeName(Type type)
+QString Token::tokenTypeName(Type type)
 {
     auto find = [type](const QList<const QMap<Token::Type, QString>*>& map) {
         for (const auto& m : map)
@@ -97,7 +92,7 @@ Token::Type Token::tokenType(const QChar& literal)
     auto it = sm_symbols_B.find(literal);
     if (it != sm_symbols_B.end())
         return it.value();
-    return ILLEGAL;
+    return TOKEN_ILLEGAL;
 }
 
 Token::Type Token::tokenType(const QChar& l1, const QChar& l2)
@@ -106,7 +101,7 @@ Token::Type Token::tokenType(const QChar& l1, const QChar& l2)
     auto it = sm_symbols_C.find(s.append(l2));
     if (it != sm_symbols_C.end())
         return it.value();
-    return ILLEGAL;
+    return TOKEN_ILLEGAL;
 }
 
 Token::Type Token::tokenType(const QString& literal)
@@ -116,47 +111,39 @@ Token::Type Token::tokenType(const QString& literal)
         return TOKEN_EOF;
     }
     auto up(literal.toUpper());
-    auto& head = up.at(0);
-    auto& tail = up.at(up.length() - 1);
+    auto head = up.at(0);
+    auto tail = up.at(up.length() - 1);
 
     if (head == ';')
     {
-        return ANNOTATION;
+        return TOKEN_ANNOTATION;
     }
-    else if ((head == '\'' || head == '\"') && head == tail && up.length() > 1)
+    else if ((head == tail) && (head == '\'' || head == '\"') && up.length() > 1)
     {
-        return STRING;
+        return TOKEN_STRING;
+    }
+    else if (textToInt(up) != -1)
+    {
+        return TOKEN_INTEGER;
+    }
+    else if (textIsFloat(up))
+    {
+        return TOKEN_FLOAT;
     }
     else if (sm_registers.contains(up))
     {
-        return REGISTER;
+        return TOKEN_REGISTER;
     }
     else if (sm_makeNames.contains(up))
     {
-        return MAKE_X;
+        return TOKEN_MAKE_;
     }
     else if (sm_loadNames.contains(up))
     {
-        return LOAD_X;
+        return TOKEN_LOAD_;
     }
     else
     {
-        // 判断数字
-        int num = textToInt(up);
-        if (num > 0)
-        {
-            return INTEGER;
-        }
-        else if (num == -2)
-        {
-            return ILLEGAL_INTEGER;
-        }
-        else if (textIsFloat(up))
-        {
-            return FLOAT;
-        }
-
-        // 判断助记符
         auto it = sm_mnemonics_B.find(up);
         if (it != sm_mnemonics_B.end())
         {
@@ -172,14 +159,18 @@ Token::Type Token::tokenType(const QString& literal)
             {
                 return tokenType(up.at(0), up.at(1));
             }
+            else
+                return TOKEN_ILLEGAL;
         }
     }
-    return ILLEGAL;
 }
 
 int Token::textToInt(const QString& numStr)
 {
-    static const QRegularExpression regex("^(0X|[0-9])([0-9A-F]*?)([HDOB])?$");
+    static const QRegularExpression regex(
+        "^(0X|[0-9])([0-9A-F]*?)([HDOB])?$",
+        QRegularExpression::CaseInsensitiveOption
+    );
 
     QRegularExpressionMatch match = regex.match(numStr.toUpper());
 
@@ -211,10 +202,15 @@ int Token::textToInt(const QString& numStr)
         }
         num = number.toInt(&ok, suf);
         if (ok)
-            return num;
-        return -2;
+            return sm_lastTextToInt = num;
+        return sm_lastTextToInt = -2;
     }
-    return -1;
+    return sm_lastTextToInt = -1;
+}
+
+int Token::lastTextToInt()
+{
+    return sm_lastTextToInt;
 }
 
 bool Token::textIsFloat(const QString& numStr)
@@ -230,3 +226,14 @@ int Token::findRegisters(const QString& reg)
 }
 
 /* ========================================================================== */
+
+int Token::sm_lastTextToInt = -1;
+
+const QStringList Token::sm_makeNames = {
+    "MAKE_BIN", "MAKE_COM", "MAKE_EXE",
+};
+
+const QStringList Token::sm_loadNames = {
+    "LOAD_SEGMENT", "LOAD_OFFSET",
+};
+

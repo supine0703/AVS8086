@@ -10,7 +10,7 @@ class ExpressionStatement : public Statement
 {
 public:
     ExpressionStatement(const QSharedPointer<Expression>& expression)
-        : Statement(EXPRESSION_STATEMENT), m_expression(expression)
+        : Statement(NODE_EXPRESSION_STATEMENT), m_expression(expression)
     { }
     ~ExpressionStatement() { }
     

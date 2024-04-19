@@ -9,13 +9,18 @@ class Lexer
 {
 public:
     Lexer();
-    Lexer(const QString& fileName);
+    Lexer(const QString& file, const QStringList& input = {});
     ~Lexer();
 
     void clear();
 
     QString fileName() const;
-    void setFileName(const QString& fileName);
+
+    /**
+     * @param input: 如果为空, 则读取文件进行扫描, 否则扫描 input;
+     *               约定: input, 每个子串代表一行, 每行末尾至少一个空白符
+     */
+    void scan(const QString& file, const QStringList& input = {});
 
     bool atEnd() const;
     token::Token next() const;
@@ -30,15 +35,13 @@ public:
 private:
     void addErrorInfo(int row, int column, int len, const QString& info);
 
-    void scan();
+    void scan(const QStringList& input);
 
-    static int textStrLen(const QString& line, int col);
+    static int textStrLen(const QString& line, int col); // -1: 不是串; 0: 空串;
 
 
 private:
     QString m_file;
-    QStringList m_input;
-    QStringList m_labels;
     QStringList m_errorInfos;
 
     QList<token::Token> m_tokens;

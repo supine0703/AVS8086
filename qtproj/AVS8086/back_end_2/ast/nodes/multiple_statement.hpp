@@ -8,7 +8,7 @@ namespace avs8086::ast {
 class MultipleStatement : public Statement
 {
 public:
-    MultipleStatement() : Statement(MULTIPLE_STATEMENT) { }
+    MultipleStatement() : Statement(NODE_MULTIPLE_STATEMENT) { }
     ~MultipleStatement() { }
 
     QStringList traversal(int depth) const override
@@ -39,7 +39,7 @@ public:
 public:
     void append(const QSharedPointer<Statement>& statement)
     {
-        if (statement->is(MULTIPLE_STATEMENT))
+        if (statement->is(NODE_MULTIPLE_STATEMENT))
         {
             m_statements.append(
                 qSharedPointerDynamicCast<MultipleStatement>

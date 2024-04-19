@@ -23,12 +23,12 @@ Node::Type Node::type() const
 
 QString Node::typeName() const
 {
-    return typeName(m_type);
+    return nodeTypeName(m_type);
 }
 
 /* ========================================================================== */
 
-QString Node::typeName(Type type)
+QString Node::nodeTypeName(Type type)
 {
     auto it = sm_typeNames.find(type);
     return it != sm_typeNames.end() ? it.value() : "";
