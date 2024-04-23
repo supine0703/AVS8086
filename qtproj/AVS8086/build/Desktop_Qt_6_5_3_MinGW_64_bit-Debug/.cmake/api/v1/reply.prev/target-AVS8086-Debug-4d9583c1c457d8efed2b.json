@@ -1,0 +1,1770 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "AVS8086.exe"
+		},
+		{
+			"path" : "AVS8086.pdb"
+		}
+	],
+	"backtrace" : 4,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"_qt_internal_create_executable",
+			"qt6_add_executable",
+			"qt_add_executable",
+			"install",
+			"target_link_libraries",
+			"set_target_properties",
+			"include",
+			"find_package",
+			"find_dependency",
+			"_qt_internal_find_qt_dependencies",
+			"target_compile_definitions",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreMacros.cmake",
+			"CMakeLists.txt",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsTargets.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreTargets.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreConfig.cmake",
+			"D:/ cmake-3.27.4-windows-x86_64/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeFindDependencyMacro.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsDependencies.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateTargets.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateConfig.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Core/Qt6CoreDependencies.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Gui/Qt6GuiTargets.cmake",
+			"C:/Qt/6.5.3/mingw_64/lib/cmake/Qt6Gui/Qt6GuiConfig.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 73,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 741,
+				"parent" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 549,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 588,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 134,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 114,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 0
+			},
+			{
+				"file" : 4,
+				"parent" : 7
+			},
+			{
+				"command" : 8,
+				"file" : 4,
+				"line" : 157,
+				"parent" : 8
+			},
+			{
+				"file" : 3,
+				"parent" : 9
+			},
+			{
+				"command" : 7,
+				"file" : 3,
+				"line" : 52,
+				"parent" : 10
+			},
+			{
+				"file" : 2,
+				"parent" : 11
+			},
+			{
+				"command" : 6,
+				"file" : 2,
+				"line" : 61,
+				"parent" : 12
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 550,
+				"parent" : 2
+			},
+			{
+				"command" : 7,
+				"file" : 3,
+				"line" : 40,
+				"parent" : 10
+			},
+			{
+				"file" : 9,
+				"parent" : 15
+			},
+			{
+				"command" : 10,
+				"file" : 9,
+				"line" : 39,
+				"parent" : 16
+			},
+			{
+				"command" : 9,
+				"file" : 8,
+				"line" : 111,
+				"parent" : 17
+			},
+			{
+				"command" : 8,
+				"file" : 7,
+				"line" : 76,
+				"parent" : 18
+			},
+			{
+				"file" : 6,
+				"parent" : 19
+			},
+			{
+				"command" : 7,
+				"file" : 6,
+				"line" : 52,
+				"parent" : 20
+			},
+			{
+				"file" : 5,
+				"parent" : 21
+			},
+			{
+				"command" : 6,
+				"file" : 5,
+				"line" : 61,
+				"parent" : 22
+			},
+			{
+				"command" : 7,
+				"file" : 6,
+				"line" : 40,
+				"parent" : 20
+			},
+			{
+				"file" : 12,
+				"parent" : 24
+			},
+			{
+				"command" : 10,
+				"file" : 12,
+				"line" : 39,
+				"parent" : 25
+			},
+			{
+				"command" : 9,
+				"file" : 8,
+				"line" : 111,
+				"parent" : 26
+			},
+			{
+				"command" : 8,
+				"file" : 7,
+				"line" : 76,
+				"parent" : 27
+			},
+			{
+				"file" : 11,
+				"parent" : 28
+			},
+			{
+				"command" : 7,
+				"file" : 11,
+				"line" : 52,
+				"parent" : 29
+			},
+			{
+				"file" : 10,
+				"parent" : 30
+			},
+			{
+				"command" : 6,
+				"file" : 10,
+				"line" : 61,
+				"parent" : 31
+			},
+			{
+				"command" : 6,
+				"file" : 10,
+				"line" : 76,
+				"parent" : 31
+			},
+			{
+				"command" : 9,
+				"file" : 8,
+				"line" : 111,
+				"parent" : 17
+			},
+			{
+				"command" : 8,
+				"file" : 7,
+				"line" : 76,
+				"parent" : 34
+			},
+			{
+				"file" : 14,
+				"parent" : 35
+			},
+			{
+				"command" : 7,
+				"file" : 14,
+				"line" : 52,
+				"parent" : 36
+			},
+			{
+				"file" : 13,
+				"parent" : 37
+			},
+			{
+				"command" : 6,
+				"file" : 13,
+				"line" : 61,
+				"parent" : 38
+			},
+			{
+				"command" : 11,
+				"file" : 1,
+				"line" : 103,
+				"parent" : 0
+			},
+			{
+				"command" : 12,
+				"file" : 1,
+				"line" : 47,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 40,
+					"define" : "CONFIG_INI=\"D:/assem_project/text_5/qtproj/AVS8086/share/config.ini\""
+				},
+				{
+					"backtrace" : 40,
+					"define" : "CONFIG_PATH=\"D:/assem_project/text_5/qtproj/AVS8086/share/config_ini/\""
+				},
+				{
+					"backtrace" : 40,
+					"define" : "CONFIG_UI_INI=\"D:/assem_project/text_5/qtproj/AVS8086/share/config_ui.ini\""
+				},
+				{
+					"backtrace" : 40,
+					"define" : "DOCS_PATH=\"E:/Project/.Github/AVS8086/docs/\""
+				},
+				{
+					"backtrace" : 14,
+					"define" : "MINGW_HAS_SECURE_API=1"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "QT_CORE_LIB"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "QT_GUI_LIB"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "QT_NEEDS_QMAIN"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "QT_WIDGETS_LIB"
+				},
+				{
+					"backtrace" : 40,
+					"define" : "THE_VESION=\"0.1.5\""
+				},
+				{
+					"backtrace" : 14,
+					"define" : "UNICODE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "WIN32"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "WIN64"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_ENABLE_EXTENDED_ALIGNED_STORAGE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_UNICODE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_WIN64"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 0,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/back_end"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/FramelessWidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/appOutput"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/assem_ui"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/debugwidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/emulator"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/filewidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/framless"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/highlight"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/inter"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/leftwidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/lineedit"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/mainwidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/newwidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/promptwidget"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res/d_font"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res/file_images"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res/icon_6wl1qboo45n"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res/left_images"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/res/title_images"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/widget_ui/titlebar"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "D:/assem_project/text_5/qtproj/AVS8086/settings"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.5.3/mingw_64/include/QtCore"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.5.3/mingw_64/include"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.5.3/mingw_64/mkspecs/win32-g++"
+				},
+				{
+					"backtrace" : 6,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.5.3/mingw_64/include/QtWidgets"
+				},
+				{
+					"backtrace" : 6,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.5.3/mingw_64/include/QtGui"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					14,
+					14
+				],
+				"standard" : "17"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				3,
+				4,
+				5,
+				6,
+				7,
+				9,
+				28,
+				29,
+				31,
+				33,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				57,
+				58,
+				59,
+				60,
+				62,
+				63,
+				65,
+				68,
+				75,
+				78,
+				80,
+				82,
+				85,
+				90,
+				93,
+				96,
+				99,
+				102,
+				104,
+				106,
+				108,
+				111,
+				114,
+				116,
+				119,
+				122,
+				125,
+				128,
+				130,
+				132,
+				150,
+				151,
+				152,
+				153,
+				154
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"id" : "AVS8086_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 0,
+			"id" : "AVS8086_autogen::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "AVS8086::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 5,
+				"path" : "bin"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "C:/Program Files (x86)/AVS8086"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-DQT_QML_DEBUG -g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-mwindows",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "C:\\Qt\\6.5.3\\mingw_64\\lib\\libQt6Widgets.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 13,
+				"fragment" : "C:\\Qt\\6.5.3\\mingw_64\\lib\\libQt6Gui.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 14,
+				"fragment" : "C:\\Qt\\6.5.3\\mingw_64\\lib\\libQt6Core.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "-lmpr",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "-luserenv",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 32,
+				"fragment" : "-lmingw32",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 32,
+				"fragment" : "C:\\Qt\\6.5.3\\mingw_64\\lib\\libQt6EntryPoint.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 33,
+				"fragment" : "-lshell32",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 39,
+				"fragment" : "-ld3d11",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 39,
+				"fragment" : "-ldxgi",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 39,
+				"fragment" : "-ldxguid",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "AVS8086",
+	"nameOnDisk" : "AVS8086.exe",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				3,
+				4,
+				5,
+				6,
+				7,
+				9,
+				28,
+				29,
+				31,
+				33,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				57,
+				58,
+				59,
+				60,
+				62,
+				63,
+				65,
+				68,
+				75,
+				78,
+				80,
+				82,
+				85,
+				90,
+				93,
+				96,
+				99,
+				102,
+				104,
+				106,
+				108,
+				111,
+				114,
+				116,
+				119,
+				122,
+				125,
+				128,
+				130,
+				132,
+				150,
+				151,
+				152,
+				153,
+				154
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				2,
+				8,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				30,
+				32,
+				34,
+				56,
+				61,
+				64,
+				66,
+				69,
+				76,
+				79,
+				81,
+				83,
+				86,
+				91,
+				94,
+				97,
+				100,
+				103,
+				105,
+				107,
+				109,
+				112,
+				115,
+				117,
+				120,
+				123,
+				126,
+				129,
+				131,
+				133,
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				143,
+				144,
+				145,
+				146,
+				147,
+				148
+			]
+		},
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				67,
+				70,
+				71,
+				72,
+				73,
+				74,
+				77,
+				84,
+				87,
+				88,
+				89,
+				92,
+				95,
+				98,
+				101,
+				110,
+				113,
+				118,
+				121,
+				124,
+				127,
+				149
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				155,
+				156,
+				157,
+				158,
+				159,
+				160
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/mocs_compilation.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/assembler.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/assembler/assembler.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/codes.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/compile/mov.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/compile/single.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/compile/well.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/assembler/compile_fns.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/header.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/ast/node.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/node.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/address.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/colon.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/comma.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/expression_statement.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/float.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/hlt.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/illegal.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/infix.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/integer.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/mov.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/multiple_statement.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/prefix.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/program.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/register.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/single.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/string.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/nodes/well.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/ast/type_names.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/ast/value.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/ast/value.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/json/json.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/json/json.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/lexer/lexer.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/lexer/lexer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expression.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/address.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/colon.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/comma.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/float.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/group.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/illegal.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/infix.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/integer.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/not_end.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/prefix.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/register.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/reserved_word.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/string.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/expressions/well.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/program.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/statement.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/statement/mov.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse/statement/single.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parse_fns.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/parser.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/parser/parser.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/parser/precedences.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/token/mnemonic.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/token/symbol.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/token/token.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/token/token.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/token/type_names.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/vm/vm.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/vm/vm.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/vm/vmdialog.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/vm/vmdialog.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/vm/vmdialog.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "back_end/vm/vmobject.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "back_end/vm/vmobject.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "res/res_win32.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "res/ui_res/_res.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "res/ui_res/file_images/file_images.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "res/ui_res/left_images/left_images.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "res/ui_res/title_images/title_images.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "settings/settings.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "settings/settings.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "ui/texteditwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget/texteditwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget/texteditwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget/widget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget/widget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/FramelessWidget/FramelessWidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/FramelessWidget/FramelessWidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/FramelessWidget/FramelessWidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/appOutput/outputwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/appOutput/outputwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/appOutput/outputwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/assem_ui/mainwindow.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/assem_ui/titlebar.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/debugwidget/debugwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/debugwidget/debugwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/debugwidget/debugwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/emulator/emulatorwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/emulator/emulatorwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/emulator/emulatorwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/filewidget/buildwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/filewidget/buildwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/filewidget/buildwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/filewidget/filetreewidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/filewidget/filetreewidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/filewidget/filetreewidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/framless/framelesswidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/framless/framelesswidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/highlight/codeeditor.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/highlight/codeeditor.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/highlight/highlighter.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/highlight/highlighter.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/inter/interactionwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/inter/interactionwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/inter/interactionwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/leftwidget/leftwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/leftwidget/leftwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/leftwidget/leftwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/lineedit/mylineedit.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/lineedit/mylineedit.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/mainwidget/mainwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/mainwidget/mainwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/mainwidget/mainwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/mainwidget/test.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/mainwidget/test.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/mainwidget/test.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/newwidget/newwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/newwidget/newwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/newwidget/newwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/promptwidget/promptwidget.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/promptwidget/promptwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/promptwidget/promptwidget.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/titlebar/MyMenu.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/titlebar/MyMenu.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "widget_ui/titlebar/titlebar.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "widget_ui/titlebar/titlebar.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/back_end/vm/ui_vmdialog.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/ui/ui_texteditwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/FramelessWidget/ui_FramelessWidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/appOutput/ui_outputwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/assem_ui/ui_mainwindow.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/assem_ui/ui_titlebar.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/debugwidget/ui_debugwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/emulator/ui_emulatorwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/filewidget/ui_buildwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/filewidget/ui_filetreewidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/inter/ui_interactionwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/leftwidget/ui_leftwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/mainwidget/ui_mainwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/mainwidget/ui_test.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/newwidget/ui_newwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include/widget_ui/promptwidget/ui_promptwidget.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/timestamp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/PNK5WDWK6L/qrc_res_win32.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/ZYDWCPY4ZJ/qrc__res.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/JULL6OFBN3/qrc_file_images.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/EZUXU7CENW/qrc_left_images.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/X62JN66XON/qrc_title_images.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/timestamp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/PNK5WDWK6L/qrc_res_win32.cpp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/ZYDWCPY4ZJ/qrc__res.cpp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/JULL6OFBN3/qrc_file_images.cpp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/EZUXU7CENW/qrc_left_images.cpp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/X62JN66XON/qrc_title_images.cpp.rule",
+			"sourceGroupIndex" : 3
+		}
+	],
+	"type" : "EXECUTABLE"
+}

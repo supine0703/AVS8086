@@ -1,0 +1,26 @@
+{
+	"BUILD_DIR" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen",
+	"CMAKE_BINARY_DIR" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "D:/assem_project/text_5/qtproj/AVS8086",
+	"CMAKE_SOURCE_DIR" : "D:/assem_project/text_5/qtproj/AVS8086",
+	"INCLUDE_DIR" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/AVS8086_autogen/include",
+	"INPUTS" : 
+	[
+		"D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/icon_window_close.png",
+		"D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/icon_window_restore.png",
+		"D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/menu.png",
+		"D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/icon_window_maximize.png",
+		"D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/icon_window_minimize.png"
+	],
+	"LOCK_FILE" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/AVS8086_autogen.dir/AutoRcc_title_images_X62JN66XON_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "title_images" ],
+	"OUTPUT_CHECKSUM" : "X62JN66XON",
+	"OUTPUT_NAME" : "qrc_title_images.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.5.3/mingw_64/./bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "D:/assem_project/text_5/qtproj/AVS8086/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/AVS8086_autogen.dir/AutoRcc_title_images_X62JN66XON_Used.txt",
+	"SOURCE" : "D:/assem_project/text_5/qtproj/AVS8086/res/ui_res/title_images/title_images.qrc",
+	"VERBOSITY" : 0
+}

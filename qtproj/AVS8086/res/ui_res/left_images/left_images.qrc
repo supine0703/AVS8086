@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>24gf-ellipsis.png</file>
+        <file>run.png</file>
+        <file>bianyigoujian.png</file>
+        <file>jianhao.png</file>
+    </qresource>
+</RCC>
