@@ -1,11 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "token/token.h"
 #include <QSharedPointer>
 #include <QJsonObject>
-#include <QMap>
-// #include <QStringList>
+#include <QSet>
 
 namespace avs8086::ast {
 
@@ -15,23 +13,27 @@ public:
     enum Type {
         ILLEGAL = 0,
 
-        FLOAT,     // float
-        INTEGER,   // integer
-        STRING,    // string
-        PREFIX,    // ~x +x -x
-        INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
-        COMMA,     // ,
-        COLON,     // :
-        LABEL,     // label
-        REGISTER,  // reg
-        ADDRESS,   // []
+        FLOAT,      // float
+        INTEGER,    // integer
+        STRING,     // string
+        PREFIX,     // ~x +x -x
+        INFIX,      // * / % + - & ^ | << >> = > >= < <= == !=
+        COMMA,      // ,
+        COLON,      // :
+
+        REGISTER,   // reg
+        ADDRESS,    // []
 
         PROGRAM,
         EXPRESSION_STATEMENT,
         MULTIPLE_STATEMENT,
 
+        VARIABLE,   // variabel
+        SEGMENT,    // segment
+        LABEL,      // label
+
+        WELL,       // #...#
         SINGLE,
-        WELL,      // #
         MOV,
     };
 
@@ -42,27 +44,26 @@ public:
     Node(Type type);
     virtual ~Node();
 
+#if 0
+    bool isError() const;
+    void goError();
+#endif
+
     bool is(Type type) const;
     Type type() const;
 
     QString typeName() const;
     static QString typeName(Type type);
 
-    virtual QStringList traversal(int depth) const { return {}; };
     virtual QJsonObject json() const = 0;
-
-    bool isError() const { return m_isError; }
-    void goError() { m_isError = true; }
-
-
-public:
-    token::Token m_token;
 
 
 private:
+#if 0
     bool m_isError = false;
+#endif
     Type m_type;
-    static const QMap<Type, QString> sm_typeNames;
+    static const QHash<Type, QString> sm_typeNames;
 };
 
 /* ========================================================================== */
@@ -70,21 +71,8 @@ private:
 class Expression : public Node
 {
 public:
-    enum ValueType {
-        ERROR = 0,
-        REGISTER,
-        FLOAT,
-        STRING,
-        INTEGER,
-    };
-
-public:
     Expression(Type type) : Node(type) { }
     virtual ~Expression() { }
-
-
-protected:
-
 };
 
 /* ========================================================================== */
@@ -95,6 +83,10 @@ public:
     Statement(Type type) : Node(type) { }
     virtual ~Statement() { }
 };
+
+// 定义智能指针原型
+using StmtPointer =  QSharedPointer<ast::Statement>;
+using ExprPointer = QSharedPointer<ast::Expression>;
 
 } // namespace avs8086::ast
 

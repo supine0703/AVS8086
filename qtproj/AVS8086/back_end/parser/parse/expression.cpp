@@ -2,23 +2,24 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
+using namespace avs8086::lexer;
 using namespace avs8086::parser;
 
-QSharedPointer<Expression> Parser::parse_expression(Precedence precedence)
+ExprPointer Parser::parse_expression(Precedence precedence)
 {
-    auto prefix = sm_prefix_parse_fns.find(currToken().type());
-    if (prefix == sm_prefix_parse_fns.end())
+    auto prefix = sm_prefix_parseFns.find(currToken().type());
+    if (prefix == sm_prefix_parseFns.end())
     {
-        // addNoPrefixParseFnErrorInfo();
+        addNoPrefixParseFnErrorInfo();
         return parse_illegal();
     }
 
-    QSharedPointer<Expression> e = (this->*prefix.value())();
+    auto e = (this->*prefix.value())();
 
     while (precedence < peekTokenPrecedence())
     {
-        auto infix = sm_infix_parse_fns.find(peekToken().type());
-        if (infix == sm_infix_parse_fns.end())
+        auto infix = sm_infix_parseFns.find(peekToken().type());
+        if (infix == sm_infix_parseFns.end())
         { // not infix, only prefix
             return e;
         }
@@ -28,6 +29,8 @@ QSharedPointer<Expression> Parser::parse_expression(Precedence precedence)
             e = (this->*infix.value())(e);
         }
     }
+
+    Q_ASSERT(!e.isNull());
     return e;
 }
 

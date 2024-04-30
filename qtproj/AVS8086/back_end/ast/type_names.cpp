@@ -2,27 +2,25 @@
 
 using namespace avs8086::ast;
 
-const QMap<Node::Type, QString> Node::sm_typeNames = {
-    { ILLEGAL,                 "Illegal" },
+const QHash<Node::Type, QString> Node::sm_typeNames = {
     { INTEGER,                 "Integer" },
-    { STRING,                  "String" },
+    // { STRING,                  "String" },
 
-    { PREFIX,                  "Prefix" },
-    { INFIX,                   "Infix" },
+    // { PREFIX,                  "Prefix" },
+    // { INFIX,                   "Infix" },
 
-    { COMMA,                   "',' comma"},
-    { COLON,                   "':'label or reg"},
+    // { COMMA,                   "',' comma"},
+    // { COLON,                   "':'label or reg"},
 
-    { LABEL,                   "Label" },
-    { REGISTER,                "Register" },
-    { ADDRESS,                 "[Address]"},
+    // { LABEL,                   "Label" },
+    // { REGISTER,                "Register" },
+    // { ADDRESS,                 "[Address]"},
 
-    { PROGRAM,                 "Program" },
-    { EXPRESSION_STATEMENT,    "Expression Statement" },
-    { MULTIPLE_STATEMENT,      "Multiple statement" },
+    // { PROGRAM,                 "Program" },
+    // { EXPRESSION_STATEMENT,    "Expression Statement" },
+    // { MULTIPLE_STATEMENT,      "Multiple statement" },
 
-
-    { SINGLE,                  "Single Instruction" },
-    { WELL,                    "'#' Instruction" },
-    { MOV,                     "MOV" },
+    // { WELL,                    "'#' Instruction" },
+    // { SINGLE,                  "Single Instruction" },
+    // { MOV,                     "MOV" },
 };

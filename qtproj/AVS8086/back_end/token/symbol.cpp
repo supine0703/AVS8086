@@ -2,40 +2,7 @@
 
 using namespace avs8086::token;
 
-const QMap<Token::Type, QString> Token::sm_symbols_A = {
-    { TOKEN_EOF,          "EOF" },
-    { LINE_BREAK,         "\\Line Break" },
-    { ANNOTATION,         ";Annotation" },
-    { BIT_NOT,            "~" },
-    { ASTERISK,           "*" },
-    { SLASH,              "/" },
-    { MODULO,             "%" },
-    { PLUS,               "+" },
-    { MINUS,              "-" },
-    { LEFT_SHIFT,         "<<" },
-    { RIGHT_SHIFT,        ">>" },
-    { BIT_AND,            "&" },
-    { BIT_XOR,            "^" },
-    { BIT_OR,             "|" },
-    { LT,                 "<" },
-    { GT,                 ">" },
-    { LE,                 "<=" },
-    { GE,                 ">=" },
-    { EQ,                 "==" },
-    { NE,                 "!=" },
-    { ASSIGN,             "=" },
-    { COMMA,              "," },
-    { COLON,              ":" },
-    { QUESTION,           "?" },
-    { DOLLAR,             "$" },
-    { WELL,               "#" },
-    { LPAREN,             "(" },
-    { RPAREN,             ")" },
-    { LSQUARE,            "[" },
-    { RSQUARE,            "]" },
-};
-
-const QMap<QString, Token::Type> Token::sm_symbols_B = {
+const QHash<QString, Token::Type> Token::sm_singleSymbols = {
     { "",               TOKEN_EOF },
     { ";",              ANNOTATION },
     { "~",              BIT_NOT },
@@ -59,9 +26,10 @@ const QMap<QString, Token::Type> Token::sm_symbols_B = {
     { ")",              RPAREN },
     { "[",              LSQUARE },
     { "]",              RSQUARE },
+    { "\\",             LINE_BREAK },
 };
 
-const QMap<QString, Token::Type> Token::sm_symbols_C = {
+const QHash<QString, Token::Type> Token::sm_doubleSymbols = {
     { "<<",             LEFT_SHIFT },
     { ">>",             RIGHT_SHIFT },
     { "<=",             LE },

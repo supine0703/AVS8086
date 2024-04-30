@@ -39,8 +39,11 @@ int main(int argc, char* argv[])
     QApplication::setFont(QFont(fontName, 13));
     QApplication::setWindowIcon(QIcon(":/cpu.png"));
 
-    // mainwidget w;
+#if 0
+    mainwidget w;
+#else
     TextEditWidget w;
+#endif
     w.show();
 
     return a.exec();

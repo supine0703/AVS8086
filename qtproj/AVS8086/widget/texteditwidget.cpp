@@ -3,7 +3,7 @@
 
 #include "json/json.h"
 #include "lexer/lexer.h"
-// #include "parser/parser.h"
+#include "parser/parser.h"
 // #include "assembler/assembler.h"
 // #include "vm/vm.h"
 
@@ -119,7 +119,7 @@ void TextEditWidget::on_pushButton_7_clicked()
 
 using namespace avs8086::token;
 using namespace avs8086::lexer;
-// using namespace avs8086::parser;
+using namespace avs8086::parser;
 // using namespace avs8086::assembler;
 // using namespace avs8086::vm;
 void TextEditWidget::on_pushButton_2_clicked()
@@ -129,11 +129,19 @@ void TextEditWidget::on_pushButton_2_clicked()
         qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
     auto lt(l.end());
     qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
-    qDebug() << "error:";
-    for (const auto& e : l.errorInfos())
+    // qDebug() << "error:";
+    // for (const auto& e : l.errorInfos())
+    //     qDebug() << e;
+    // qDebug().noquote() << l.restore(l.tokens());
+
+    Parser p(&l);
+    auto root = p.newAST();
+    qDebug() << "errors:";
+    for (const auto& e : p.errorInfos())
         qDebug() << e;
-    // Parser p(&l);
-    // auto root = p.newAST();
+    qDebug() << "warnings:";
+    for (const auto& e : p.warningInfos())
+        qDebug() << e;
 
     // Assembler a(root);
     // a.compile();
@@ -158,9 +166,10 @@ void TextEditWidget::on_pushButton_2_clicked()
     // for (const auto& w : p.warningInfos())
     //     qDebug() << w;
 
-    // tools::Json js;
-    // js.setObject(root->json());
-    // js.saveToFile(DOCS_PATH"/ast.json");
+    tools::Json js;
+    js.setObject(root->json());
+    js.saveToFile(DOCS_PATH"/ast.json");
+    // qDebug() << js.getObject();
 
     // qDebug() << a.wellInitInfos();
 

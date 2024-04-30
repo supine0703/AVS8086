@@ -10,7 +10,7 @@ class Lexer
 public:
     Lexer();
     Lexer(const QString& file, const QStringList& input = {});
-    ~Lexer();
+    ~Lexer() = default;
 
     void clear();
 
@@ -18,7 +18,6 @@ public:
 
     /**
      * @param input: 如果为空, 则读取文件进行扫描, 否则扫描 input;
-     *               约定: input, 每个子串代表一行, 每行末尾至少一个空白符
      */
     void scan(const QString& file, const QStringList& input = {});
 
@@ -31,6 +30,7 @@ public:
     bool isError() const;
     QStringList errorInfos() const;
 
+    static QString restore(const QList<token::Token>& tokens);
 
 private:
     void addErrorInfo(int row, int column, int len, const QString& info);
@@ -45,8 +45,8 @@ private:
     QStringList m_errorInfos;
 
     QList<token::Token> m_tokens;
-    mutable int m_tokenIt;
     token::Token m_eofToken;
+    mutable int m_tokenIt;
 };
 
 } // namespace avs8086::lexer

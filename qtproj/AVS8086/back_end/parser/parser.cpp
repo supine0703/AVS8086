@@ -10,9 +10,8 @@ Parser::Parser()
 { }
 
 Parser::Parser(Lexer* lexer)
-{
-    setLexer(lexer);
-}
+    : m_lexer(lexer)
+{ }
 
 Parser::~Parser()
 { }
@@ -22,8 +21,6 @@ Parser::~Parser()
 void Parser::setLexer(Lexer* lexer)
 {
     m_lexer = lexer;
-    if (m_lexer != nullptr)
-        fristToken();
 }
 
 Lexer* Parser::lexer() const
@@ -48,8 +45,18 @@ QStringList Parser::warningInfos() const
 
 QSharedPointer<avs8086::ast::Program> Parser::newAST()
 {
-    setLexer(m_lexer);
-    return parse_program();
+    m_warningInfos.clear();
+    m_errorInfos.clear();
+
+    if (m_lexer == nullptr)
+        return nullptr;
+
+    fristToken();
+    auto p = parse_program();
+
+    m_tokens.clear();
+    m_wellInstructions.clear();
+    return p;
 }
 
 /* ========================================================================== */
@@ -70,33 +77,46 @@ void Parser::addErrorInfo(int row, int column, int len, const QString& info)
     );
 }
 
-void Parser::addExpectPeekTokenErrorInfo(Token::Type type)
+void Parser::addExpectPeekTokenErrorInfo(const QList<token::Token::Type>& types)
 {
-    addExpectPeekTokenErrorInfo(QList({type}));
+    addExpectPeekTokenErrorInfo(types, peekToken());
 }
 
-void Parser::addExpectPeekTokenErrorInfo(const QList<Token::Type>& types)
+void Parser::addExpectPeekTokenErrorInfo(
+    const QList<Token::Type>& types,  const token::Token& token)
 {
     if (types.empty())
         return;
-    QString expectType = Token::typeName(types.at(0));
+    QString expect = Token::typeName(types.at(0));
     for (int i = 1, end = types.length(); i < end; i++)
-        expectType += QString(",%1").arg(Token::typeName(types.at(i)));
+        expect += QString(",%1").arg(Token::typeName(types.at(i)));
 
-    const auto& token = peekToken();
+    QString but;
+    if (token.is(Token::TOKEN_EOF))
+        but = "but line break";
+    else
+    {
+        but = QString("got '%2: %3' instead")
+                  .arg(token.typeName(), token.literal());
+    }
     addErrorInfo(
-        token.row(), token.column(), token.literal().length(),
-        QString("expected next token to be '%1', got '%2' instead")
-            .arg(expectType, token.typeName())
+        token.row(), token.column(), token.length(),
+        QString("expected this token to be '%1', %2").arg(expect, but)
     );
+}
+
+void Parser::addExpectExpressionErrorInfo(
+    ast::Node::Type type, const ast::ExprPointer& expr)
+{
+
 }
 
 void Parser::addNoPrefixParseFnErrorInfo()
 {
     const auto& token = currToken();
     addErrorInfo(
-        token.row(), token.column(), token.literal().length(),
-        QString("no prefix parse function for '%1: %2'")
+        token.row(), token.column(), token.length(),
+        QString("no prefix parse function for '%1': '%2'")
             .arg(token.typeName(), token.literal())
     );
 }
@@ -105,7 +125,7 @@ void Parser::addReservedWordErrorInfo()
 {
     const auto& token = currToken();
     addErrorInfo(
-        token.row(), token.column(), token.literal().length(),
+        token.row(), token.column(), token.length(),
         QString("this is reserved word, unable to process '%1: %2'")
             .arg(token.typeName(), token.literal())
     );
@@ -115,11 +135,9 @@ void Parser::addReservedWordErrorInfo()
 
 void Parser::fristToken()
 {
-    m_errorInfos.clear();
     if (m_lexer->isError())
         m_errorInfos.append(m_lexer->errorInfos());
 
-    m_tokens.clear();
     m_tokens.append(m_lexer->first());
     while (currToken().is(Token::ANNOTATION))
     {
@@ -146,6 +164,7 @@ void Parser::nextToken()
 
     if (currRow < nextRow)
     { // 行结束
+        // 这里EOR使用 下一行行号, 这一列列号, 一个是为了作区分, 另一个是为了方便使用
         m_tokens.insert(
             1,
             Token(
@@ -170,19 +189,42 @@ const Token& Parser::peekToken() const
     return m_tokens.at(1);
 }
 
-bool Parser::expectPeekToken(Token::Type type)
+bool Parser::expectPeekTokenNot(token::Token::Type type)
 {
-    if (!peekToken().is(type))
+    if (peekToken().is(type))
         return false;
     nextToken();
     return true;
 }
 
-bool Parser::expectPeekToken(const QList<Token::Type>& types)
+bool Parser::expectPeekTokenNot(const QList<token::Token::Type>& types)
 {
     for (auto type : types)
-        if (expectPeekToken(type))
+        if (peekToken().is(type))
+            return false;
+    nextToken();
+    return true;
+}
+
+bool Parser::expectPeekToken(Token::Type type, bool addErr)
+{
+    if (!peekToken().is(type))
+    {
+        if (addErr)
+            addExpectPeekTokenErrorInfo({type});
+        return false;
+    }
+    nextToken();
+    return true;
+}
+
+bool Parser::expectPeekToken(const QList<Token::Type>& types, bool addErr)
+{
+    for (auto type : types)
+        if (expectPeekToken(type, false))
             return true;
+    if (addErr)
+        addExpectPeekTokenErrorInfo(types);
     return false;
 }
 

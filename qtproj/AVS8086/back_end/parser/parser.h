@@ -2,8 +2,7 @@
 #define PARSER_H
 
 #include "lexer/lexer.h"
-#include "ast/nodes/program.hpp"
-#include "ast/nodes/expression_statement.hpp"
+#include "ast/nodes/program.h"
 
 namespace avs8086::parser {
 
@@ -39,48 +38,18 @@ public:
 
     QSharedPointer<ast::Program> newAST();
 
-private:
-    QSharedPointer<ast::Program> parse_program();
-    QSharedPointer<ast::Statement> parse_statement();
-    QSharedPointer<ast::ExpressionStatement> parse_expression_statement();
-    QSharedPointer<ast::Expression>  parse_expression(Precedence precedence);
-
-    // statement
-    QSharedPointer<ast::Statement> parse_single();
-    QSharedPointer<ast::Statement> parse_well();
-    QSharedPointer<ast::Statement> parse_mov();
-
-    // prefix
-    QSharedPointer<ast::Expression> parse_reserved_word();
-    QSharedPointer<ast::Expression> parse_illegal();
-    QSharedPointer<ast::Expression> parse_not_end();
-    QSharedPointer<ast::Expression> parse_prefix();
-    QSharedPointer<ast::Expression> parse_float();
-    QSharedPointer<ast::Expression> parse_integer();
-    QSharedPointer<ast::Expression> parse_string();
-    QSharedPointer<ast::Expression> parse_group();
-    QSharedPointer<ast::Expression> parse_register();
-    QSharedPointer<ast::Expression> parse_address();
-
-    // infix
-    QSharedPointer<ast::Expression>
-    parse_infix(const QSharedPointer<ast::Expression>& left);
-    QSharedPointer<ast::Expression>
-    parse_comma(const QSharedPointer<ast::Expression>& left);
-    QSharedPointer<ast::Expression>
-    parse_colon(const QSharedPointer<ast::Expression>& left);
-
-    // postfix
-    QSharedPointer<ast::Expression>
-    parse_postfix(const QSharedPointer<ast::Expression>& left);
-
 
 private:
     void addWarningInfo(int row, int column, int len, const QString& info);
     void addErrorInfo(int row, int column, int len, const QString& info);
 
-    void addExpectPeekTokenErrorInfo(token::Token::Type type);
     void addExpectPeekTokenErrorInfo(const QList<token::Token::Type>& types);
+    void addExpectPeekTokenErrorInfo(
+        const QList<token::Token::Type>& types, const token::Token& token
+    );
+    void addExpectExpressionErrorInfo(
+        ast::Node::Type type, const ast::ExprPointer& expr
+    );
     void addNoPrefixParseFnErrorInfo();
     void addReservedWordErrorInfo();
 
@@ -90,39 +59,83 @@ private:
     const token::Token& currToken() const;
     const token::Token& peekToken() const;
 
-    bool expectPeekToken(token::Token::Type type);
-    bool expectPeekToken(const QList<token::Token::Type>& types);
+    bool expectPeekTokenNot(token::Token::Type type);
+    bool expectPeekTokenNot(const QList<token::Token::Type>& types);
+    bool expectPeekToken(token::Token::Type type, bool addErr = true);
+    bool expectPeekToken(
+        const QList<token::Token::Type>& types, bool addErr = true
+    );
 
     Precedence currTokenPrecedence();
     Precedence peekTokenPrecedence();
     static Precedence tokenPrecedence(token::Token::Type type);
 
 
-
 private:
     lexer::Lexer* m_lexer;
-    // 三空间分别位: curr, peek, buff;
-    QList<token::Token> m_tokens;
+    QList<token::Token> m_tokens; // 三空间分别为: curr, peek, buff;
 
     QStringList m_warningInfos;
     QStringList m_errorInfos;
 
-    QStringList m_wellInstructions;
-    QStringList m_wellInfos;
+    QMap<QString, QList<int>> m_wellInstructions;
 
-    static const QMap<token::Token::Type, Precedence> sm_precedences;
+    QString m_segment = "";
+    int m_offset = 0;
+
+
+    static const QHash<token::Token::Type, Precedence> sm_precedences;
+
 
 private:
-    // 定义函数原型 - 将所有的 (表达式)语句 分为: 语句, 前缀表达式, 中(后)缀表达式
-    typedef QSharedPointer<ast::Statement> (Parser::*stmt_parse_fn)(void);
-    typedef QSharedPointer<ast::Expression> (Parser::*prefix_parse_fn)(void);
-    typedef
-        QSharedPointer<ast::Expression>
-        (Parser::*infix_parse_fn)(const QSharedPointer<ast::Expression>&);
+    QSharedPointer<ast::Program> parse_program();
+    ast::StmtPointer parse_statement();
+    ast::StmtPointer parse_expression_statement();
+    ast::ExprPointer parse_expression(Precedence precedence = LOWEST);
 
-    static const QMap<token::Token::Type, stmt_parse_fn> sm_stmt_parse_fns;
-    static const QMap<token::Token::Type, prefix_parse_fn> sm_prefix_parse_fns;
-    static const QMap<token::Token::Type, infix_parse_fn> sm_infix_parse_fns;
+    // 定义函数原型 - 将所有的 (表达式)语句 分为: 语句, 前缀表达式, 中(后)缀表达式
+    typedef ast::StmtPointer (Parser::*stmt_parseFn)(void);
+    typedef ast::ExprPointer (Parser::*prefix_parseFn)(void);
+    typedef ast::ExprPointer (Parser::*infix_parseFn)(const ast::ExprPointer&);
+
+    // 存储 parse 函数映射表
+    static const QHash<token::Token::Type, stmt_parseFn> sm_stmt_parseFns;
+    static const QHash<token::Token::Type, prefix_parseFn> sm_prefix_parseFns;
+    static const QHash<token::Token::Type, infix_parseFn> sm_infix_parseFns;
+
+    // statement
+    ast::StmtPointer parse_well();
+    ast::StmtPointer parse_identifier();
+    ast::StmtPointer parse_jmp();
+
+    // prefix
+    ast::ExprPointer parse_illegal();
+    ast::ExprPointer parse_group();
+
+    // // statement
+    // ast::StmtPointer parse_single();
+    // ast::StmtPointer parse_well();
+    // ast::StmtPointer parse_mov();
+
+    // // prefix
+    // ast::ExprPointer parse_reserved_word();
+    // ast::ExprPointer parse_illegal();
+    // ast::ExprPointer parse_not_end();
+    // ast::ExprPointer parse_prefix();
+    // ast::ExprPointer parse_float();
+    // ast::ExprPointer parse_integer();
+    // ast::ExprPointer parse_string();
+    // ast::ExprPointer parse_group();
+    // ast::ExprPointer parse_register();
+    // ast::ExprPointer parse_address();
+
+    // // infix
+    // ast::ExprPointer parse_infix(const ExprPointer& left);
+    // ast::ExprPointer parse_comma(const ExprPointer& left);
+    // ast::ExprPointer parse_colon(const ExprPointer& left);
+
+    // // postfix
+    // ast::ExprPointer parse_postfix(const ExprPointer& left);
 };
 
 } // namespace avs8086::parser

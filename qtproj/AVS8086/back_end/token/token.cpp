@@ -11,14 +11,9 @@ Token::Token(Type type, const QString& literal, int row, int column)
     : m_type(type), m_literal(literal), m_row(row), m_column(column)
 { }
 
+#if 0
 Token::Token(const Token& other)
-    : m_type(other.m_type)
-    , m_literal(other.m_literal)
-    , m_row(other.m_row)
-    , m_column(other.m_column)
-{ }
-
-Token::~Token()
+    : Token(other.m_type, other.m_literal, other.m_row, other.m_column)
 { }
 
 Token& Token::operator=(const Token& other)
@@ -32,6 +27,7 @@ Token& Token::operator=(const Token& other)
     }
     return *this;
 }
+#endif
 
 /* ========================================================================== */
 
@@ -70,6 +66,11 @@ int Token::column() const
     return m_column;
 }
 
+int Token::endColumn() const
+{
+    return m_column + m_literal.length();
+}
+
 QString Token::typeName() const
 {
     return typeName(m_type);
@@ -79,6 +80,7 @@ QString Token::typeName() const
 
 QString Token::typeName(Type type)
 {
+#if 0
     auto find = [type](const QList<const QMap<Token::Type, QString>*>& map) {
         for (const auto& m : map)
         {
@@ -86,38 +88,41 @@ QString Token::typeName(Type type)
             if (it != m->end())
                 return it.value();
         }
-        return QString("");
+        return QString("Illegal");
     };
-
     return find({&sm_typeNames, &sm_mnemonics_A, &sm_symbols_A});
+#endif
+    auto it = sm_typeNames.find(type);
+    if (it != sm_typeNames.end())
+        return it.value();
+    return sm_illegalName;
 }
 
-Token::Type Token::tokenType(const QChar& literal)
+Token::Type Token::type(const QChar& literal)
 {
-    auto it = sm_symbols_B.find(literal);
-    if (it != sm_symbols_B.end())
+    auto it = sm_singleSymbols.find(literal);
+    if (it != sm_singleSymbols.end())
         return it.value();
     return ILLEGAL;
 }
 
-Token::Type Token::tokenType(const QChar& l1, const QChar& l2)
+Token::Type Token::type(const QChar& l1, const QChar& l2)
 {
-    QString s(l1);
-    auto it = sm_symbols_C.find(s.append(l2));
-    if (it != sm_symbols_C.end())
+    auto it = sm_doubleSymbols.find(QString(l1) + l2);
+    if (it != sm_doubleSymbols.end())
         return it.value();
     return ILLEGAL;
 }
 
-Token::Type Token::tokenType(const QString& literal)
+Token::Type Token::type(const QString& literal)
 {
     if (literal.isEmpty())
     {
         return TOKEN_EOF;
     }
-    auto up(literal.toUpper());
-    auto& head = up.at(0);
-    auto& tail = up.at(up.length() - 1);
+    auto up = literal.toUpper();
+    auto head = up.at(0);
+    auto tail = up.at(up.length() - 1);
 
     if (head == ';')
     {
@@ -127,23 +132,10 @@ Token::Type Token::tokenType(const QString& literal)
     {
         return STRING;
     }
-    else if (sm_registers.contains(up))
-    {
-        return REGISTER;
-    }
-    else if (sm_makeNames.contains(up))
-    {
-        return MAKE_X;
-    }
-    else if (sm_loadNames.contains(up))
-    {
-        return LOAD_X;
-    }
-    else
-    {
-        // 判断数字
+    else if (head.isDigit())
+    { // 判断数字
         int num = textToInt(up);
-        if (num > 0)
+        if (num >= 0)
         {
             return INTEGER;
         }
@@ -155,23 +147,34 @@ Token::Type Token::tokenType(const QString& literal)
         {
             return FLOAT;
         }
-
+    }
+    else
+    {
+        // 判断运算符
+        if (up.length() == 1)
+        {
+            auto t = type(up.at(0));
+            if (t != ILLEGAL)
+                return t;
+        }
+        else if (up.length() == 2)
+        {
+            auto t = type(up.at(0), up.at(1));
+            if (t != ILLEGAL)
+                return t;
+        }
+#if 0
+        for (auto it = sm_setTypes.begin(); it != sm_setTypes.end(); it++)
+        {
+            if (it.key()->contains(up))
+                return it.value();
+        }
+#endif
         // 判断助记符
-        auto it = sm_mnemonics_B.find(up);
-        if (it != sm_mnemonics_B.end())
+        auto it = sm_mnemonics.find(up);
+        if (it != sm_mnemonics.end())
         {
             return it.value();
-        }
-        else
-        {
-            if (up.length() == 1)
-            {
-                return tokenType(up.at(0));
-            }
-            else if (up.length() == 2)
-            {
-                return tokenType(up.at(0), up.at(1));
-            }
         }
     }
     return ILLEGAL;
@@ -179,7 +182,9 @@ Token::Type Token::tokenType(const QString& literal)
 
 int Token::textToInt(const QString& numStr)
 {
-    static const QRegularExpression regex("^(0X|[0-9])([0-9A-F]*?)([HDOB])?$");
+    static const QRegularExpression regex(
+        "^(0X|[0-9A-F])([0-9A-F]*?)([HDOB])?$"
+    );
 
     QRegularExpressionMatch match = regex.match(numStr.toUpper());
 
@@ -209,7 +214,8 @@ int Token::textToInt(const QString& numStr)
                     suf = 2;
             }
         }
-        num = number.toInt(&ok, suf);
+        // num 为 uint, 负数用来表示失败状态
+        num = qAbs(number.toUInt(&ok, suf));
         if (ok)
             return num;
         return -2;
@@ -224,9 +230,5 @@ bool Token::textIsFloat(const QString& numStr)
     return ok;
 }
 
-int Token::findRegisters(const QString& reg)
-{
-    return sm_registers.indexOf(reg);
-}
-
 /* ========================================================================== */
+
