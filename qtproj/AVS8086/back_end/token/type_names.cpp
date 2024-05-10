@@ -1,13 +1,41 @@
-#include "token/token.h"
+#include "token.h"
 
 using namespace avs8086::token;
 
 const QString Token::sm_illegalName = "Illegal";
 
+const QHash<Token::Type, QString> Token::sm_contents = {
+    { ILLEGAL,              "Illegal: %1" },
+    { IDENTIFIER,           "Identifier: %1" },
+    { SREG,                 "SReg: %1" },
+    { REG8,                 "Reg8: %1" },
+    { REG16,                "Reg16: %1" },
+    { STRING,               "String: %1"},
+    { INTEGER,              "Integer: %1" },
+    { FLOAT,                "Float: %1" },
+    { MAKE_X,               "MAKE_X: %1" },
+    { LOAD_X,               "LOAD_X: %1" },
+    { ALLOCATE,             "Allocate: %1" },
+    { ANNOTATION,           "Annotation: %1" },
+};
+
 const QHash<Token::Type, QString> Token::sm_typeNames = {
+    { TOKEN_EOL,            "EOL" },
     { TOKEN_EOF,            "EOF" },
+
+    { IDENTIFIER,           "Identifier" },
+    { SREG,                 "SREG" },
+    { REG8,                 "REG8" },
+    { REG16,                "REG16" },
+    { STRING,               "String"},
+    { INTEGER,              "Integer" },
+    { FLOAT,                "Float" },
+    { MAKE_X,               "MAKE_X" },
+    { LOAD_X,               "LOAD_X" },
+    { ALLOCATE,             "Allocate" },
+    { ANNOTATION,           "Annotation" },
+
     { LINE_BREAK,           "Line Break \\" },
-    { ANNOTATION,           "Annotation ;" },
     { BIT_NOT,              "Bit Not ~" },
     { ASTERISK,             "Asterisk *" },
     { SLASH,                "Slash /" },
@@ -35,16 +63,6 @@ const QHash<Token::Type, QString> Token::sm_typeNames = {
     { RPAREN,               "Right Paren )" },
     { LSQUARE,              "Left Square [" },
     { RSQUARE,              "Right Square ]" },
-
-    { IDENTIFIER,           "Identifier" },
-    { REG8,                 "Register 8bit" },
-    { REG16,                "Register 16bit" },
-    { SREG,                 "Segment Register" },
-    { STRING,               "String"},
-    { INTEGER,              "Integer" },
-    { FLOAT,                "Float" },
-    { MAKE_X,               "MAKE_X" },
-    { LOAD_X,               "LOAD_X" },
 
     { MOV,                  "MOV" },
     { PUSH,                 "PUSH" },
@@ -166,7 +184,6 @@ const QHash<Token::Type, QString> Token::sm_typeNames = {
     { INCLUDE,              "INCLUDE" },
     { ORG,                  "ORG" },
     { EQU,                  "EQU" },
-    { DEFINE,                  "DEF" },
     { DUP,                  "DUP" },
 
     { PTR,                  "PTR" },
@@ -179,4 +196,8 @@ const QHash<Token::Type, QString> Token::sm_typeNames = {
     { SEGMENT,              "SEGMENT" },
     { ENDS,                 "ENDS" },
     { END,                  "END" },
+
+    { PROC,                 "PROC" },
+    { PROC_NEAR,            "PROC NEAR" },
+    { PROC_FAR,             "PROC FAR" },
 };

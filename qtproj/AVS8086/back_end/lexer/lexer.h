@@ -2,38 +2,50 @@
 #define LEXER_H
 
 #include "token/token.h"
+#include "service/infos.h"
 
 namespace avs8086::lexer {
 
 class Lexer
 {
 public:
-    Lexer();
-    Lexer(const QString& file, const QStringList& input = {});
+    Lexer() : m_eofToken(token::Token::TOKEN_EOF, "", 0, 0) { }
+
+    Lexer(const QString& file, const QStringList& input = {})
+    { scan(file, input); }
+
     ~Lexer() = default;
 
     void clear();
 
-    QString fileName() const;
-
-    /**
+    /*
      * @param input: 如果为空, 则读取文件进行扫描, 否则扫描 input;
-     */
+     * @param file: 需要解析的文件, 提示也是报错信息的目标
+    */
     void scan(const QString& file, const QStringList& input = {});
 
-    bool atEnd() const;
+    QString file() const { return m_file; }
+
+    bool isError() const { return !m_infos.empty(); }
+
+    InfoList infos() const { return m_infos; }
+
+    token::TokenList tokens() const { return m_tokens; }
+
+    bool atEnd() const { return m_tokenIt == m_tokens.count(); }
+
+    token::Token end() const { return m_eofToken; }
+
     token::Token next() const;
+
     token::Token first() const;
-    token::Token end() const;
-    QList<token::Token> tokens() const;
 
-    bool isError() const;
-    QStringList errorInfos() const;
-
-    static QString restore(const QList<token::Token>& tokens);
+    static QString restore(const token::TokenList& tokens);
 
 private:
-    void addErrorInfo(int row, int column, int len, const QString& info);
+    void addErrorInfo(const Position& pos, const QString& info);
+    void addErrorInfo(const token::Token& token, const QString& info);
+    void addErrorInfo(int row, int column, int length, const QString& info);
 
     void scan(const QStringList& input);
 
@@ -42,11 +54,11 @@ private:
 
 private:
     QString m_file;
-    QStringList m_errorInfos;
+    InfoList m_infos;
 
-    QList<token::Token> m_tokens;
+    mutable qsizetype m_tokenIt;
+    token::TokenList m_tokens;
     token::Token m_eofToken;
-    mutable int m_tokenIt;
 };
 
 } // namespace avs8086::lexer

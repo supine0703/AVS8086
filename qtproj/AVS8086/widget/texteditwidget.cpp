@@ -1,7 +1,7 @@
 #include "texteditwidget.h"
 #include "ui_texteditwidget.h"
 
-#include "json/json.h"
+#include "service/json.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 // #include "assembler/assembler.h"
@@ -101,13 +101,17 @@ void TextEditWidget::on_pushButton_7_clicked()
         QFile f(ui->lineEdit->text());
         if (f.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-            QString txt;
-            for (const auto& t : ui->textEdit->toPlainText().split("\n"))
-                txt.append(t.trimmed() + "\n");
-            txt.removeLast();
-            ui->textEdit->setPlainText(txt);
-            QTextStream out(&f);
-            out << txt;
+            if (!ui->textEdit->toPlainText().isEmpty())
+            {
+                QString txt;
+                for (const auto& t : ui->textEdit->toPlainText().split("\n"))
+                    txt.append(t.trimmed() + "\n"); // 去掉前后空白补上回车
+                if (txt.at(txt.length() - 2) == '\n')
+                    txt.removeLast();
+                ui->textEdit->setPlainText(txt);
+                QTextStream out(&f);
+                out << txt;
+            }
             f.close();
         }
         else
@@ -117,31 +121,38 @@ void TextEditWidget::on_pushButton_7_clicked()
     }
 }
 
+using namespace avs8086;
 using namespace avs8086::token;
 using namespace avs8086::lexer;
 using namespace avs8086::parser;
 // using namespace avs8086::assembler;
 // using namespace avs8086::vm;
 void TextEditWidget::on_pushButton_2_clicked()
-{
+{   
     Lexer l(ui->lineEdit->text());
     for (const auto& t : l.tokens())
-        qDebug() << t.row() << t.column() << ":" << t.typeName() << t.literal();
+        qDebug().noquote() << QString("[ %1, %2, %3 ] >> %4")
+            .arg(t.row(), 2).arg(t.column(), 2).arg(t.length(), 2).arg(t.content());
     auto lt(l.end());
-    qDebug() << lt.row() << lt.column() << ":" << lt.typeName() << lt.literal();
+    qDebug().noquote() << QString("[ %1, %2, %3 ] >> %4")
+        .arg(lt.row(), 2).arg(lt.column(), 2).arg(lt.length(), 2).arg(lt.content());
     // qDebug() << "error:";
-    // for (const auto& e : l.errorInfos())
-    //     qDebug() << e;
+    // for (const auto& e : l.infos())
+    //     qDebug() << e.typeName()
+    //              << e.position().row()
+    //              << e.position().column()
+    //              << e.position().length()
+    //              << e.value();
     // qDebug().noquote() << l.restore(l.tokens());
 
     Parser p(&l);
     auto root = p.newAST();
-    qDebug() << "errors:";
-    for (const auto& e : p.errorInfos())
-        qDebug() << e;
-    qDebug() << "warnings:";
-    for (const auto& e : p.warningInfos())
-        qDebug() << e;
+    for (const auto& e : p.infos())
+        qDebug() << e.typeName() << ": ("
+                 << e.position().row() << ","
+                 << e.position().column() << ","
+                 << e.position().length() << ") >"
+                 << e.value();
 
     // Assembler a(root);
     // a.compile();
@@ -166,7 +177,7 @@ void TextEditWidget::on_pushButton_2_clicked()
     // for (const auto& w : p.warningInfos())
     //     qDebug() << w;
 
-    tools::Json js;
+    Json js;
     js.setObject(root->json());
     js.saveToFile(DOCS_PATH"/ast.json");
     // qDebug() << js.getObject();

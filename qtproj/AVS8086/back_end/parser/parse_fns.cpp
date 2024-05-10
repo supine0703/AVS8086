@@ -1,12 +1,45 @@
-#include "parser/parser.h"
+#include "parser.h"
+#include "ast/expr_headers.h"
 
+using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
 const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::WELL,          &Parser::parse_well },          // #...#
-    { Token::IDENTIFIER,    &Parser::parse_identifier },    // identifier
-    { Token::JMP,           &Parser::parse_jmp },           // jmp
+    { Token::ALLOCATE,      &Parser::parse_allocate },      // allocate
+    { Token::JMP,           &Parser::parse_jmp },           // JMP
+    { Token::JNBE,          &Parser::parse_jx },            // JNBE
+    { Token::JAE,           &Parser::parse_jx },            // JAE,
+    { Token::JNB,           &Parser::parse_jx },            // JNB
+    { Token::JB,            &Parser::parse_jx },            // JB
+    { Token::JNAE,          &Parser::parse_jx },            // JNAE
+    { Token::JBE,           &Parser::parse_jx },            // JBE
+    { Token::JNA,           &Parser::parse_jx },            // JNA
+    { Token::JC,            &Parser::parse_jx },            // JC
+    { Token::JNC,           &Parser::parse_jx },            // JNC
+    { Token::JE,            &Parser::parse_jx },            // JE
+    { Token::JZ,            &Parser::parse_jx },            // JZ
+    { Token::JNE,           &Parser::parse_jx },            // JNE
+    { Token::JNZ,           &Parser::parse_jx },            // JNZ
+    { Token::JG,            &Parser::parse_jx },            // JG
+    { Token::JNLE,          &Parser::parse_jx },            // JNLE
+    { Token::JGE,           &Parser::parse_jx },            // JGE
+    { Token::JNL,           &Parser::parse_jx },            // JNL
+    { Token::JL,            &Parser::parse_jx },            // JL
+    { Token::JNGE,          &Parser::parse_jx },            // JNGE
+    { Token::JLE,           &Parser::parse_jx },            // JLE
+    { Token::JNG,           &Parser::parse_jx },            // JNG
+    { Token::JO,            &Parser::parse_jx },            // JO
+    { Token::JNO,           &Parser::parse_jx },            // JNO
+    { Token::JNP,           &Parser::parse_jx },            // JNP
+    { Token::JPO,           &Parser::parse_jx },            // JPO
+    { Token::JP,            &Parser::parse_jx },            // JP
+    { Token::JPE,           &Parser::parse_jx },            // JPE
+    { Token::JNS,           &Parser::parse_jx },            // JNS
+    { Token::JS,            &Parser::parse_jx },            // JS
+    { Token::JCXZ,          &Parser::parse_jx },            // JCXZ
+
     // { Token::MOV,         &Parser::parse_mov },       // mov
     // { Token::ADD,         &Parser::parse_mov },       // add
     // { Token::ADC,         &Parser::parse_mov },       // adc
@@ -53,11 +86,32 @@ const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     // { Token::LOCK,        &Parser::parse_single },    // LOCK
     // { Token::HLT,         &Parser::parse_single },    // HLT
     // { Token::NOP,         &Parser::parse_single },    // NOP
+};
 
+const QHash<Token::Type, Parser::post_parseFn> Parser::sm_post_parseFns = {
+    { Token::COLON,         &Parser::parse_define },
+    { Token::SEGMENT,       &Parser::parse_define },
+    { Token::ALLOCATE,      &Parser::parse_define },
 };
 
 const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
-    { Token::ILLEGAL,     &Parser::parse_illegal },       // illegal
+    { Token::ILLEGAL,       &Parser::parse_T<Illegal> },    // illegal
+
+    { Token::INTEGER,       &Parser::parse_value },         // integer
+    { Token::STRING,        &Parser::parse_value },         // string
+    { Token::FLOAT,         &Parser::parse_value },         // float
+
+    { Token::SREG,          &Parser::parse_T<Register> },   // sreg
+    { Token::REG8,          &Parser::parse_T<Register> },   // reg8
+    { Token::REG16,         &Parser::parse_T<Register> },   // reg16
+    { Token::MAKE_X,        &Parser::parse_T<Make_X> },     // make_x
+    { Token::LOAD_X,        &Parser::parse_T<Load_X> },     // load_x
+    { Token::BIT_NOT,       &Parser::parse_operator },      // ~x
+    { Token::PLUS,          &Parser::parse_operator },      // +x
+    { Token::MINUS,         &Parser::parse_operator },      // -x
+
+    { Token::LPAREN,        &Parser::parse_group },         // (
+
     // { Token::TOKEN_EOF,   &Parser::parse_not_end },       // eof
     // { Token::ANNOTATION,  &Parser::parse_not_end },       // ;
     // { Token::BIT_NOT,     &Parser::parse_prefix },        // ~x
@@ -66,7 +120,6 @@ const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
     // { Token::FLOAT,       &Parser::parse_float },         // float
     // { Token::INTEGER,     &Parser::parse_integer },       // integer
     // { Token::STRING,      &Parser::parse_string },        // string
-    // { Token::LPAREN,      &Parser::parse_group },         // (
 
     // { Token::REGISTER,    &Parser::parse_register },      // reg
     // { Token::LSQUARE,     &Parser::parse_address },       // [
@@ -75,23 +128,27 @@ const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
 };
 
 const QHash<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
-    // { Token::BIT_NOT,         &Parser::parse_infix },     // ~
-    // { Token::ASTERISK,        &Parser::parse_infix },     // *
-    // { Token::SLASH,           &Parser::parse_infix },     // /
-    // { Token::MODULO,          &Parser::parse_infix },     // %
-    // { Token::PLUS,            &Parser::parse_infix },     // +
-    // { Token::MINUS,           &Parser::parse_infix },     // -
-    // { Token::LEFT_SHIFT,      &Parser::parse_infix },     // <<
-    // { Token::RIGHT_SHIFT,     &Parser::parse_infix },     // >>
-    // { Token::BIT_AND,         &Parser::parse_infix },     // &
-    // { Token::BIT_XOR,         &Parser::parse_infix },     // ^
-    // { Token::BIT_OR,          &Parser::parse_infix },     // |
-    // { Token::LT,              &Parser::parse_infix },     // <
-    // { Token::GT,              &Parser::parse_infix },     // >
-    // { Token::LE,              &Parser::parse_infix },     // <=
-    // { Token::GE,              &Parser::parse_infix },     // >=
-    // { Token::EQ,              &Parser::parse_infix },     // ==
-    // { Token::NE,              &Parser::parse_infix },     // !=
+    { Token::ASSIGN,        &Parser::parse_T<Assign> },     // =
+    { Token::COMMA,         &Parser::parse_T<Comma> },      // ,
+    { Token::COLON,         &Parser::parse_T<Colon> },      // :
+    { Token::DUP,           &Parser::parse_dup },           // dup
+
+    { Token::ASTERISK,        &Parser::parse_operator },    // *
+    { Token::SLASH,           &Parser::parse_operator },    // /
+    { Token::MODULO,          &Parser::parse_operator },    // %
+    { Token::PLUS,            &Parser::parse_operator },    // +
+    { Token::MINUS,           &Parser::parse_operator },    // -
+    { Token::LEFT_SHIFT,      &Parser::parse_operator },    // <<
+    { Token::RIGHT_SHIFT,     &Parser::parse_operator },    // >>
+    { Token::BIT_AND,         &Parser::parse_operator },    // &
+    { Token::BIT_XOR,         &Parser::parse_operator },    // ^
+    { Token::BIT_OR,          &Parser::parse_operator },    // |
+    { Token::LT,              &Parser::parse_operator },    // <
+    { Token::GT,              &Parser::parse_operator },    // >
+    { Token::LE,              &Parser::parse_operator },    // <=
+    { Token::GE,              &Parser::parse_operator },    // >=
+    { Token::EQ,              &Parser::parse_operator },    // ==
+    { Token::NE,              &Parser::parse_operator },    // !=
 
     // { Token::COMMA,           &Parser::parse_comma },     // ,
     // { Token::COLON,           &Parser::parse_colon },     // :

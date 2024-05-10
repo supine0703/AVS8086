@@ -2,9 +2,57 @@
     "file": "D:/Leisure/Desktop/8086/AVS/test.txt",
     "statements": {
         "stmt 1": {
-            "instruction": "bx = 0\na",
-            "type": "Illegal"
+            "id": "b",
+            "op": "Colon :",
+            "type(stmt)": "Define"
+        },
+        "stmt 2": {
+            "call": "a",
+            "offset": 127,
+            "token": "jne",
+            "type(stmt)": "Illegal"
+        },
+        "stmt 3": {
+            "expr": {
+                "data": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "left": {
+                    "token": "Integer: 124",
+                    "type(expr)": "Value",
+                    "value": "0x7c"
+                },
+                "right": {
+                    "token": "Integer: 0",
+                    "type(expr)": "Value",
+                    "value": "0x00"
+                },
+                "token": "DUP",
+                "type(expr)": "DUP"
+            },
+            "id": "",
+            "op": "Allocate: db",
+            "type(stmt)": "Define"
+        },
+        "stmt 4": {
+            "call": "b",
+            "offset": -128,
+            "size": 2,
+            "type(stmt)": "Illegal"
+        },
+        "stmt 5": {
+            "expr": {
+                "token": "Integer: 1",
+                "type(expr)": "Value",
+                "value": "0x01"
+            },
+            "id": "",
+            "op": "Allocate: db",
+            "type(stmt)": "Define"
+        },
+        "stmt 6": {
+            "id": "a",
+            "op": "Colon :",
+            "type(stmt)": "Define"
         }
     },
-    "type": "Illegal"
+    "type(stmt)": "Program"
 }

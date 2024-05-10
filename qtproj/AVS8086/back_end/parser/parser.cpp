@@ -1,55 +1,28 @@
-#include "parser/parser.h"
+#include "parser.h"
 
+using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::lexer;
 using namespace avs8086::parser;
 
-
-Parser::Parser()
-    : Parser(nullptr)
-{ }
-
-Parser::Parser(Lexer* lexer)
-    : m_lexer(lexer)
-{ }
-
-Parser::~Parser()
-{ }
-
 /* ========================================================================== */
 
-void Parser::setLexer(Lexer* lexer)
+void Parser::clear()
 {
-    m_lexer = lexer;
+    m_err = false;
+    m_infos.clear();
 }
 
-Lexer* Parser::lexer() const
+QSharedPointer<Program> Parser::newAST()
 {
-    return m_lexer;
-}
-
-bool Parser::isError() const
-{
-    return !m_errorInfos.isEmpty();
-}
-
-QStringList Parser::errorInfos() const
-{
-    return m_errorInfos;
-}
-
-QStringList Parser::warningInfos() const
-{
-    return m_warningInfos;
-}
-
-QSharedPointer<avs8086::ast::Program> Parser::newAST()
-{
-    m_warningInfos.clear();
-    m_errorInfos.clear();
+    clear();
 
     if (m_lexer == nullptr)
         return nullptr;
+
+    m_err = m_lexer->isError();
+    if (m_err)
+        m_infos.insert(m_lexer->infos());
 
     fristToken();
     auto p = parse_program();
@@ -61,83 +34,9 @@ QSharedPointer<avs8086::ast::Program> Parser::newAST()
 
 /* ========================================================================== */
 
-void Parser::addWarningInfo(int row, int column, int len, const QString& info)
-{
-    m_warningInfos.append(
-        QString("[%1:(%3,%4,%5)]>%2")
-            .arg(m_lexer->fileName(), info).arg(row).arg(column).arg(len)
-    );
-}
-
-void Parser::addErrorInfo(int row, int column, int len, const QString& info)
-{
-    m_errorInfos.append(
-        QString("[%1:(%3,%4,%5)]>%2")
-            .arg(m_lexer->fileName(), info).arg(row).arg(column).arg(len)
-    );
-}
-
-void Parser::addExpectPeekTokenErrorInfo(const QList<token::Token::Type>& types)
-{
-    addExpectPeekTokenErrorInfo(types, peekToken());
-}
-
-void Parser::addExpectPeekTokenErrorInfo(
-    const QList<Token::Type>& types,  const token::Token& token)
-{
-    if (types.empty())
-        return;
-    QString expect = Token::typeName(types.at(0));
-    for (int i = 1, end = types.length(); i < end; i++)
-        expect += QString(",%1").arg(Token::typeName(types.at(i)));
-
-    QString but;
-    if (token.is(Token::TOKEN_EOF))
-        but = "but line break";
-    else
-    {
-        but = QString("got '%2: %3' instead")
-                  .arg(token.typeName(), token.literal());
-    }
-    addErrorInfo(
-        token.row(), token.column(), token.length(),
-        QString("expected this token to be '%1', %2").arg(expect, but)
-    );
-}
-
-void Parser::addExpectExpressionErrorInfo(
-    ast::Node::Type type, const ast::ExprPointer& expr)
-{
-
-}
-
-void Parser::addNoPrefixParseFnErrorInfo()
-{
-    const auto& token = currToken();
-    addErrorInfo(
-        token.row(), token.column(), token.length(),
-        QString("no prefix parse function for '%1': '%2'")
-            .arg(token.typeName(), token.literal())
-    );
-}
-
-void Parser::addReservedWordErrorInfo()
-{
-    const auto& token = currToken();
-    addErrorInfo(
-        token.row(), token.column(), token.length(),
-        QString("this is reserved word, unable to process '%1: %2'")
-            .arg(token.typeName(), token.literal())
-    );
-}
-
-/* ========================================================================== */
-
 void Parser::fristToken()
 {
-    if (m_lexer->isError())
-        m_errorInfos.append(m_lexer->errorInfos());
-
+#if 0
     m_tokens.append(m_lexer->first());
     while (currToken().is(Token::ANNOTATION))
     {
@@ -147,21 +46,28 @@ void Parser::fristToken()
     m_tokens.append(m_tokens.at(0));
     m_tokens.append(m_lexer->next());
     nextToken();
+#endif
+    m_tokens.resize(2, Token());
+    m_tokens.append(m_lexer->first());
+    nextToken();
+    // 尚未开始时, 第 0 个是无效的, 作为缓冲
 }
 
 void Parser::nextToken()
 {
     // 缓冲区去除注释
-    while (m_tokens.at(2).is(Token::ANNOTATION))
+    while (m_tokens.back().is(Token::ANNOTATION))
     {
-        m_tokens.pop_back();
+        m_tokens.removeLast();
         m_tokens.append(m_lexer->next());
     }
 
-    m_tokens.pop_front();
+    m_tokens.removeFirst();
+#if 1
+    m_tokens.append(m_lexer->next());
+#else
     int currRow = currToken().row();
     int nextRow = peekToken().row();
-
     if (currRow < nextRow)
     { // 行结束
         // 这里EOR使用 下一行行号, 这一列列号, 一个是为了作区分, 另一个是为了方便使用
@@ -172,77 +78,263 @@ void Parser::nextToken()
                 currToken().literal(),
                 nextRow,
                 currToken().column()
-            )
-        );
+                )
+            );
     }
     else
         m_tokens.append(m_lexer->next());
+#endif
 }
 
-const Token& Parser::currToken() const
+bool Parser::expectPeekToken(bool is, Token::Type type)
 {
-    return m_tokens.at(0);
-}
-
-const Token& Parser::peekToken() const
-{
-    return m_tokens.at(1);
-}
-
-bool Parser::expectPeekTokenNot(token::Token::Type type)
-{
-    if (peekToken().is(type))
+    if (is != peekToken().is(type))
         return false;
     nextToken();
     return true;
 }
 
-bool Parser::expectPeekTokenNot(const QList<token::Token::Type>& types)
+bool Parser::expectPeekToken(bool is, const QList<Token::Type>& types)
 {
     for (auto type : types)
         if (peekToken().is(type))
-            return false;
-    nextToken();
-    return true;
+        {
+            is &= true;
+            break;
+        }
+    if (is)
+        nextToken();
+    return is;
 }
 
-bool Parser::expectPeekToken(Token::Type type, bool addErr)
+#if 0
+bool Parser::expectExpression(Node::Type type, const ExprPointer& expr)
 {
-    if (!peekToken().is(type))
-    {
-        if (addErr)
-            addExpectPeekTokenErrorInfo({type});
-        return false;
-    }
-    nextToken();
-    return true;
+    if (expr->is(type))
+        return true;
+    addExpectExpressionErrorInfo({type}, expr);
+    return false;
 }
 
-bool Parser::expectPeekToken(const QList<Token::Type>& types, bool addErr)
+bool Parser::expectExpression(
+    const QList<Node::Type>& types, const ExprPointer& expr)
 {
     for (auto type : types)
-        if (expectPeekToken(type, false))
+        if (expr->is(type))
             return true;
-    if (addErr)
-        addExpectPeekTokenErrorInfo(types);
+    addExpectExpressionErrorInfo(types, expr);
     return false;
+}
+#endif
+
+Parser::Precedence Parser::precedence(Token::Type type)
+{
+    auto it = sm_precedences.find(type);
+    if (it != sm_precedences.end())
+        return it.value();
+    return LOWEST;
 }
 
 /* ========================================================================== */
 
-Parser::Precedence Parser::currTokenPrecedence()
+void Parser::defineId(const StmtPointer& stmt)
 {
-    return tokenPrecedence(currToken().type());
+    if (!currToken().is(Token::IDENTIFIER))
+    {
+        addExpectTokenErrorInfo(currToken(), {Token::IDENTIFIER});
+        return ;
+    }
+
+    if (m_idIts.contains(*currToken()))
+    {
+        addInfo(
+            Info::ERROR, currToken().position(),
+            "redefined identifier: " + *currToken()
+        );
+        return ;
+    }
+
+    m_idIts.insert(*currToken(), m_offsers.length());
+    m_ids.insert(m_offsers.length(), stmt);
+    m_offsers.append(m_currOffset);
+    m_currOffset = 0;
 }
 
-Parser::Precedence Parser::peekTokenPrecedence()
+void Parser::callId(const ast::StmtPointer& stmt)
 {
-    return tokenPrecedence(peekToken().type());
+    if (!currToken().is(Token::IDENTIFIER))
+    {
+        addExpectTokenErrorInfo(currToken(), {Token::IDENTIFIER});
+        return ;
+    }
+
+    m_calls.insert(m_offsers.length(), stmt);
+    m_offsers.append(m_currOffset);
+    m_currOffset = 0;
 }
 
-Parser::Precedence Parser::tokenPrecedence(Token::Type type)
+/* ========================================================================== */
+
+void Parser::addInfo(Info::Type type, const Position& pos, const QString& info)
 {
-    auto it = sm_precedences.find(type);
-    return it != sm_precedences.end() ? it.value() : LOWEST;
+    m_infos.insert({type, pos, info});
 }
+
+void Parser::addExpectTokenErrorInfo(
+    const Token& token, const QList<Token::Type>& types)
+{
+    if (types.isEmpty())
+    {
+        addInfo(
+            Info::ERROR, token.position(),
+            QString("expected this token to be not '%1'").arg(token.content())
+        );
+        return ;
+    }
+    QString expect = Token::typeName(types.at(0));
+    for (int i = 1, end = types.count(); i < end; i++)
+        expect += "," + Token::typeName(types.at(i));
+        // expect += QString(",%1").arg(Token::typeName(types.at(i)));
+
+    QString but;
+    if (token.is(Token::TOKEN_EOL) || token.is(Token::TOKEN_EOF))
+        but = "line break";
+    else
+    {
+        but = QString("got '%1' instead").arg(token.content());
+    }
+    addInfo(
+        Info::ERROR, token.position(),
+        QString("expected this token to be '%1', but %2").arg(expect, but)
+    );
+}
+
+void Parser::addExpectExprErrorInfo(
+    const ExprPointer& expr, const QList<Node::Type>& types)
+{
+    if (types.isEmpty())
+    {
+        addInfo(
+            Info::ERROR, expr->position(),
+            QString("expected this expression to be not '%1'")
+                .arg(expr->typeName())
+        );
+        return ;
+    }
+    QString expect = Node::typeName(types.at(0));
+    for (int i = 1, end = types.count(); i < end; i++)
+        expect += "," + Node::typeName(types.at(i));
+
+    QString but;
+    if (expr->is(Node::ILLEGAL) && expr->token().is(Token::TOKEN_EOL))
+    {
+        but = "line break";
+    }
+    else
+    {
+        but = QString("got '%1' instead").arg(Node::typeName(expr->type()));
+    }
+
+    addInfo(
+        Info::ERROR, expr->position(),
+        QString("expected this expression to be '%1', but %2").arg(expect, but)
+    );
+}
+
+void Parser::addExprDivideZeroErrorInfo(const ast::ExprPointer& expr)
+{
+    addInfo(
+        Info::ERROR, expr->position(),
+        "the expression has a division zero error"
+    );
+}
+
+void Parser::addExprCanNotBeUsedAsIntegerErrorInfo(const ExprPointer& expr)
+{
+    addInfo(
+        Info::ERROR, expr->position(),
+        "can only be used as integer if size of value less than 8 bytes"
+    );
+}
+
+void Parser::addExprVOverflowErrorInfo(const ExprPointer& expr, size_t max)
+{
+    addInfo(
+        Info::ERROR, expr->position(),
+        QString("expect value of expression between 0x0 and 0x%1, but: 0x%2")
+            .arg(QString::number(max, 16), show_Integer_hex(expr->bytes()))
+    );
+}
+
+void Parser::addExprUnableToEvaluateErrorInfo(const ExprPointer& expr)
+{
+    addInfo(
+        Info::ERROR, expr->position(),
+        "this expression unable to evaluate"
+    );
+}
+
+bool Parser::expectExprAbleToEvaluate(const ExprPointer& expr)
+{
+    bool unable = expr->unitDataSize() == 0;
+    if (unable)
+        addExprUnableToEvaluateErrorInfo(expr);
+    return !unable;
+}
+
+void Parser::addStmtCanNotBeExprErrorInfo()
+{
+    const auto& token = currToken();
+    addInfo(
+        Info::ERROR, token.position(),
+        QString("this is a statement: '%1', and can not be expression")
+            .arg(token.content())
+    );
+}
+
+void Parser::addNoPrefixParseFnErrorInfo()
+{
+    const auto& token = currToken();
+    if (sm_infix_parseFns.contains(token.type()))
+    {
+        addInfo(
+            Info::ERROR, token.position(),
+            QString("this token can not be profix '%1'").arg(token.content())
+        );
+    }
+    else
+    {
+        addNotYetSupportErrorInfo();
+    }
+}
+
+void Parser::addReservedWordErrorInfo()
+{
+    const auto& token = currToken();
+    addInfo(
+        Info::ERROR, token.position(),
+        QString("this is reserved word, unable to process '%1'")
+            .arg(token.content())
+    );
+}
+
+void Parser::addNotYetSupportErrorInfo()
+{
+    const auto& token = currToken();
+    addInfo(
+        Info::ERROR, token.position(),
+        QString("Not yet support parsing the token '%1'")
+            .arg(token.content())
+    );
+}
+
+void Parser::addJmpOverflowErrorInfo(const Position& pos, int min, int max)
+{
+    addInfo(
+        Info::ERROR, pos,
+        QString("jmp range should be: %1 and %2").arg(min).arg(max)
+    );
+}
+
+/* ========================================================================== */
 

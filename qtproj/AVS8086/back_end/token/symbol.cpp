@@ -1,8 +1,9 @@
-#include "token/token.h"
+#include "token.h"
 
 using namespace avs8086::token;
 
 const QHash<QString, Token::Type> Token::sm_singleSymbols = {
+    { "\n",             TOKEN_EOL },
     { "",               TOKEN_EOF },
     { ";",              ANNOTATION },
     { "~",              BIT_NOT },

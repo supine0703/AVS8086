@@ -1,4 +1,5 @@
-#include "node.h"
+#include "ast/expr_headers.h"
+#include "ast/stmt_headers.h"
 
 using namespace avs8086::ast;
 
@@ -6,11 +7,26 @@ using namespace avs8086::ast;
 
 /* ========================================================================== */
 
-#include "ast/nodes/program.h"
-JSON(Program)
+JSON(Expression)
 {
     QJsonObject js;
-    js["type"] = typeName();
+    js["type(expr)"] = typeName();
+    js["token"] = m_token.content();
+    return js;
+}
+
+JSON(Statement)
+{
+    QJsonObject js;
+    js["type(stmt)"] = typeName();
+    return js;
+}
+
+/* ========================================================================== */
+
+JSON(Program)
+{
+    QJsonObject js = Statement::json();
     js["file"] = m_file;
 #if 0
     QJsonObject symbols;
@@ -26,9 +42,9 @@ JSON(Program)
 js["symbols"] = symbols;
 #endif
     QJsonObject stmts;
-    for (int i = 0; i < m_statements.length(); i++)
+    for (int i = 0; i < m_stmts.count(); i++)
     {
-        const auto& s = m_statements.at(i);
+        const auto& s = m_stmts.at(i);
         stmts[QString("stmt %1").arg(i + 1)] = s->json();
     }
     js["statements"] = stmts;
@@ -37,75 +53,116 @@ js["symbols"] = symbols;
 
 /* ========================================================================== */
 
-#include "ast/nodes/expression_statement.h"
 JSON(ExpressionStatement)
 {
-    QJsonObject js;
-    js["type"] = typeName();
-    js["statement"] = m_expression->json();
+    QJsonObject js = Statement::json();
+    js["statement"] = m_expr->json();
     return js;
 }
 
 /* ========================================================================== */
 
-#include "ast/nodes/illegal.h"
 JSON(Illegal)
 {
-    QJsonObject js;
-    js["type"] = typeName();
-    js["tokenType"] = m_token.typeName();
-    js["token"] = m_token.literal();
+    QJsonObject js = Expression::json();
     return js;
 }
 
 /* ========================================================================== */
 
-#include "ast/nodes/well.h"
 JSON(Well)
 {
-    QJsonObject js;
-    js["type"] = typeName();
-    js["instruction"] = m_instruction;
+    QJsonObject js = Statement::json();
+    js["expr"] = m_expr->json();
     return js;
 }
 
 /* ========================================================================== */
 
-#include "ast/nodes/identifier.h"
 JSON(Variable)
 {
     QJsonObject js;
+    js["type"] = typeName();
+    return js;
+}
 
+JSON(Segment)
+{
+    QJsonObject js;
+    js["type"] = typeName();
+    return js;
+}
+
+JSON(Label)
+{
+    QJsonObject js;
     js["type"] = typeName();
     return js;
 }
 
 /* ========================================================================== */
 
+JSON(Value)
+{
+    QJsonObject js = Expression::json();
+    js["value"] = "0x" + QString(show_Integer_hex(m_value));
+    return js;
+}
 
-
-/* ========================================================================== */
-
-
-
-/* ========================================================================== */
-
-
-
-/* ========================================================================== */
-
-
-
-/* ========================================================================== */
-
-
+JSON(Float)
+{
+    QJsonObject js = Expression::json();
+    return js;
+}
 
 /* ========================================================================== */
 
-
+JSON(Infix)
+{
+    QJsonObject js = Expression::json();
+    js["left"] = m_left->json();
+    js["right"] = m_right->json();
+    return js;
+}
 
 /* ========================================================================== */
 
+JSON(Register)
+{
+    QJsonObject js = Expression::json();
+    return js;
+}
+
+/* ========================================================================== */
+
+JSON(Make_X)
+{
+    QJsonObject js = Expression::json();
+    js["MAKE"] = m_value;
+    return js;
+}
+
+/* ========================================================================== */
+
+JSON(Load_X)
+{
+    QJsonObject js = Expression::json();
+    return js;
+}
+
+/* ========================================================================== */
+
+JSON(Assign)
+{
+    QJsonObject js;
+    js["type(expr)"] = typeName();
+    js["op"] = *m_token;
+    js["left"] = m_left->json();
+    js["right"] = m_right->json();
+    return js;
+}
+
+/* ========================================================================== */
 
 
 /* ========================================================================== */

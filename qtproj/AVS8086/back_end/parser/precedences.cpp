@@ -1,9 +1,10 @@
-#include "parser/parser.h"
+#include "parser.h"
 
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
 const QHash<Token::Type, Parser::Precedence> Parser::sm_precedences = {
+    { Token::LSQUARE,           ADDRESS },      // []
     { Token::ASTERISK,          PRODUCT },      // *
     { Token::SLASH,             PRODUCT },      // /
     { Token::MODULO,            PRODUCT },      // %
@@ -22,6 +23,7 @@ const QHash<Token::Type, Parser::Precedence> Parser::sm_precedences = {
     { Token::BIT_OR,            LOGIC },        // |
     { Token::COMMA,             COMMA },        // ,
     { Token::COLON,             ASSIGN },       // :
-    { Token::LSQUARE,           ADDRESS },      // []
+    { Token::ASSIGN,            ASSIGN },       // =
+    { Token::DUP,               ASSIGN },
 };
 

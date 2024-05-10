@@ -1,7 +1,7 @@
-#ifndef H
-#define H
+#ifndef TOKEN_H
+#define TOKEN_H
 
-#include <QSet>
+#include "service/position.h"
 
 namespace avs8086::token {
 
@@ -9,8 +9,10 @@ class Token
 {
 public:
     enum Type {
-        TOKEN_EOF = -1,     // eof
-        ILLEGAL,            // illegal
+        TOKEN_EOL = -2,     // eol: end of line
+        TOKEN_EOF = -1,     // eof: end of file
+
+        ILLEGAL = 0,        // illegal
         ILLEGAL_INTEGER,    // illegal integer
 
         MAKE_X,             // make_
@@ -192,7 +194,7 @@ public:
 
 
         INCLUDE,            // INCLUDE
-        DEFINE,             // DB DW DD DQ DT
+        ALLOCATE,           // DB DW DD DQ DT
         ORG,                // ORG
         EQU,                // EQU  
         DUP,
@@ -207,48 +209,87 @@ public:
         SEGMENT,
         ENDS,
         END,
+
+        PROC,
+        PROC_NEAR,
+        PROC_FAR,
     };
 
 public:
-    Token();
-    Token(Type type, const QString& literal, int row, int column);
+    Token() : m_type(ILLEGAL) { }
+
+    Token(Type type, const QString& literal, int row, int column)
+        : m_type(type)
+        , m_literal(literal)
+        , m_position(row, column, literal.length())
+    { }
+
     ~Token() = default;
-#if 0
-    Token(const Token& other);
-    Token& operator=(const Token& other);
-#endif
 
-    void resetType(Type type);
+    void resetType(Type type) { m_type = type; }
 
-    bool is(Type type) const;
-    Type type() const;
-    QString literal() const;
-    int length() const;
-    int row() const;
-    int column() const;
-    int endColumn() const;
+    bool is(Type type) const { return m_type == type; }
 
-    QString typeName() const;
+    Type type() const { return m_type; }
+
+    QString literal() const { return m_literal; }
+
+    Position position() const { return m_position; }
+
+    Position::Value positionValue() const { return m_position.value(); }
+
+    int length() const { return m_position.length(); }
+
+    int row() const { return m_position.row(); }
+
+    int column() const { return m_position.column(); }
+
+    int endColumn() const { return m_position.column() + m_position.length(); }
+
+    QString typeName() const { return typeName(m_type); }
+
+    QString operator*() const { return m_literal; }
+
+    QString content() const;
+
     static QString typeName(Type type);
     static Type type(const QChar& literal);
-    static Type type(const QChar& l1, const QChar& l2);
+    static Type type(const QChar& literal1, const QChar& literal2);
     static Type type(const QString& literal);
 
     static bool textIsFloat(const QString& numStr);
 
-    static int textToInt(const QString& numStr); // -1: 不是数字, -2: 数字不合法
+    // 0: 不是数字, -1: 数字不合法, 1: 可;
+    static int textIsInteger(const QString& numStr, size_t* num = nullptr);
+
+    size_t toInt(bool* ok = nullptr) const
+    {
+        size_t n = 0;
+        if (ok != nullptr)
+            *ok = (textIsInteger(m_literal, &n) == 1);
+        else
+            textIsInteger(m_literal, &n);
+        return n;
+    }
 
 
 private:
     Type m_type;
     QString m_literal;
+    Position m_position;
+
+#if 0
+    /**
+     * @m_row, @m_column
+     * QPlainTextEdit 的行列号返回 int, 所以这里存储用 int
+    */
     int m_row;
     int m_column;
+#endif
 
-
-    static const QHash<Type, QString> sm_typeNames;
     static const QString sm_illegalName;
-
+    static const QHash<Type, QString> sm_contents;
+    static const QHash<Type, QString> sm_typeNames;
     static const QHash<QString, Type> sm_singleSymbols;
     static const QHash<QString, Type> sm_doubleSymbols;
     static const QHash<QString, Type> sm_mnemonics;
@@ -261,11 +302,12 @@ private:
     static const QSet<QString> sm_reg8s;
     static const QSet<QString> sm_reg16s;
     static const QSet<QString> sm_defs;
-
     static const QHash<const QSet<QString>*, Type> sm_setTypes;
 #endif
 };
 
+using TokenList = QList<Token>;
+
 } // namespace avs8086::token
 
-#endif // H
+#endif // TOKEN_H

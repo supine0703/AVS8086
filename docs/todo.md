@@ -1,5 +1,19 @@
 # TODO
-- 报错改为 QMap ?
+- `lexer`增加维护`Position`和`Token`之间关系的类
+  - 需要维护相对`Position`和绝对`Position`
+  - 可以使用`pos, type, string`三元组进行维护, 
+    - `pos`为相对`Position`
+    - 使用`QList`维护
+  - 可以设置两个缓冲区, 维护绝对`Position`的和相对`Position`的`Token`
+    - 输出时如果缓冲区为空遍历生成
+    - 不为空则直接输出缓冲区
+  - `Lexer`维护, 在重新分析之前清空
+  - 作用是非常方便去进行***格式化***操作
+
+
+# 已完成
+- 报错改为 QMap, QHash
+
 
 # ui界面修改问题
 - 部分内容无法正常高亮如: make指令

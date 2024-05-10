@@ -1,47 +1,14 @@
-#include "token/token.h"
+#include "token.h"
 
 using namespace avs8086::token;
-
-#if 0
-const QSet<QString> Token::sm_makes = {
-    "MAKE_BIN", "MAKE_COM", "MAKE_EXE",
-};
-
-const QSet<QString> Token::sm_loads = {
-    "LOAD_SEGMENT", "LOAD_OFFSET",
-};
-
-const QSet<QString> Token::sm_sregs = {
-    "ES", "CS", "SS", "DS",
-};
-
-const QSet<QString> Token::sm_reg8s = {
-    "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH",
-};
-
-const QSet<QString> Token::sm_reg16s = {
-    "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI", "IP",
-};
-
-const QSet<QString> Token::sm_defs = {
-    "DB", "DW", "DD", "DQ", "DT",
-};
-
-const QHash<const QSet<QString>*, Token::Type> Token::sm_setTypes = {
-    { &sm_makes,            MAKE_X },
-    { &sm_loads,            LOAD_X },
-    { &sm_sregs,            SREG },
-    { &sm_reg8s,            REG8 },
-    { &sm_reg16s,           REG16 },
-    { &sm_defs,             DEF },
-};
-#endif
 
 const QHash<QString, Token::Type> Token::sm_mnemonics = {
 #if 1
     { "MAKE_BIN",           MAKE_X },
     { "MAKE_COM",           MAKE_X },
     { "MAKE_EXE",           MAKE_X },
+    { "LOAD_SEGMENT",       LOAD_X },
+    { "LOAD_OFFSET",        LOAD_X },
     { "ES",                 SREG },
     { "CS",                 SREG },
     { "SS",                 SREG },
@@ -63,11 +30,11 @@ const QHash<QString, Token::Type> Token::sm_mnemonics = {
     { "SI",                 REG16 },
     { "DI",                 REG16 },
     { "IP",                 REG16 },
-    { "DB",                 DEFINE },
-    { "DW",                 DEFINE },
-    { "DD",                 DEFINE },
-    { "DQ",                 DEFINE },
-    { "DT",                 DEFINE },
+    { "DB",                 ALLOCATE },
+    { "DW",                 ALLOCATE },
+    { "DD",                 ALLOCATE },
+    { "DQ",                 ALLOCATE },
+    { "DT",                 ALLOCATE },
 #endif
     { "MOV",                MOV },
     { "PUSH",               PUSH },
@@ -189,6 +156,7 @@ const QHash<QString, Token::Type> Token::sm_mnemonics = {
     { "INCLUDE",            INCLUDE },
     { "ORG",                ORG },
     { "EQU",                EQU },
+    { "DUP",                DUP },
 
     { "PTR",                PTR },
     { "SHORT",              SHORT },
@@ -200,4 +168,43 @@ const QHash<QString, Token::Type> Token::sm_mnemonics = {
     { "SEGMENT",            SEGMENT },
     { "ENDS",               ENDS },
     { "END",                END },
+
+    { "PROC",               PROC }, // PROC NEAR/FAR
 };
+
+/* ========================================================================== */
+
+#if 0
+const QSet<QString> Token::sm_makes = {
+    "MAKE_BIN", "MAKE_COM", "MAKE_EXE",
+};
+
+const QSet<QString> Token::sm_loads = {
+    "LOAD_SEGMENT", "LOAD_OFFSET",
+};
+
+const QSet<QString> Token::sm_sregs = {
+    "ES", "CS", "SS", "DS",
+};
+
+const QSet<QString> Token::sm_reg8s = {
+    "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH",
+};
+
+const QSet<QString> Token::sm_reg16s = {
+    "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI", "IP",
+};
+
+const QSet<QString> Token::sm_defs = {
+    "DB", "DW", "DD", "DQ", "DT",
+};
+
+const QHash<const QSet<QString>*, Token::Type> Token::sm_setTypes = {
+    { &sm_makes,            MAKE_X },
+    { &sm_loads,            LOAD_X },
+    { &sm_sregs,            SREG },
+    { &sm_reg8s,            REG8 },
+    { &sm_reg16s,           REG16 },
+    { &sm_defs,             DEF },
+};
+#endif

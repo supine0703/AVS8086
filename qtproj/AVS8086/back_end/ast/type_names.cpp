@@ -3,24 +3,47 @@
 using namespace avs8086::ast;
 
 const QHash<Node::Type, QString> Node::sm_typeNames = {
-    { INTEGER,                 "Integer" },
-    // { STRING,                  "String" },
+    { NODE_EOL,                 "EOL" },
+
+    // value
+    { DUP,                      "DUP"   },
+    { VALUE,                    "Value" },
+    { FLOAT,                    "Float" },
+    { OPERATOR,                 "Operator" },
+    { IDENTIFIER,               "Identifier" },
+
+    { PROGRAM,                  "Program" },
+    { WELL,                     "'#'Instruction" },
+    { DEFINE,                   "Define" },
+
+    // expression
+    { COMMA,                    "Comma" },
+    { COMMA_ARRAY,              "Comma Array" },
+
+    { REGISTER,                 "Register" },
+
+    { MAKE_X,                   "MAKE_X" },
+    { ASSIGN,                   "Assign" },
+
+    { INFIX,                    "Infix" },
+
+
 
     // { PREFIX,                  "Prefix" },
-    // { INFIX,                   "Infix" },
+
 
     // { COMMA,                   "',' comma"},
     // { COLON,                   "':'label or reg"},
 
     // { LABEL,                   "Label" },
-    // { REGISTER,                "Register" },
+
     // { ADDRESS,                 "[Address]"},
 
-    // { PROGRAM,                 "Program" },
+
     // { EXPRESSION_STATEMENT,    "Expression Statement" },
     // { MULTIPLE_STATEMENT,      "Multiple statement" },
 
-    // { WELL,                    "'#' Instruction" },
+
     // { SINGLE,                  "Single Instruction" },
     // { MOV,                     "MOV" },
 };

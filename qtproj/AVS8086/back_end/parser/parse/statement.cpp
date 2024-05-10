@@ -1,5 +1,5 @@
 #include "parser/parser.h"
-#include "ast/nodes/expression_statement.h"
+#include "ast/stmts/expression_statement.h"
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
@@ -8,27 +8,35 @@ using namespace avs8086::parser;
 
 StmtPointer Parser::parse_statement()
 {
-    if (currToken().is(Token::ILLEGAL))
+    Q_ASSERT(!currToken().is(Token::TOKEN_EOF));
+    if (currToken().is(Token::ILLEGAL) || currToken().is(Token::TOKEN_EOL))
         return StmtPointer(nullptr);
     StmtPointer s;
-    auto it = sm_stmt_parseFns.find(currToken().type());
-    if (it != sm_stmt_parseFns.end())
-        s = (this->*it.value())();
+    auto c_it = sm_stmt_parseFns.find(currToken().type());
+    if (c_it != sm_stmt_parseFns.end())
+        s = (this->*c_it.value())();
     else
     {
-        int row = currToken().row();
-        int col = currToken().column();
-        s = parse_expression_statement();
-        int len = currToken().column() - col;
-        addErrorInfo(row, col, len, "can not be used expression statement");
+        auto p_it = sm_post_parseFns.find(peekToken().type());
+        if (p_it != sm_post_parseFns.end())
+            s = (this->*p_it.value())();
+        else
+        {
+            auto e = parse_expression();
+            addInfo(
+                Info::ERROR, e->position(),
+                "can not use expression as statement"
+            );
+            s = StmtPointer(new ExpressionStatement(e));
+        }
     }
     return s;
 }
 
 StmtPointer Parser::parse_expression_statement()
 {
-    StmtPointer s = QSharedPointer<ExpressionStatement>(
-        new ExpressionStatement(parse_expression())
-    );
+    auto e = parse_expression();
+    // Q_ASSERT(!e.isNull());
+    StmtPointer s(new ExpressionStatement(e));
     return s;
 }
