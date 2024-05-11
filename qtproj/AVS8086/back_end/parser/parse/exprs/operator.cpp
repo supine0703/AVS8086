@@ -80,6 +80,9 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
     auto right = parse_expression(p);
     QSharedPointer<Operator> e(new Operator(token, left, right));
 
+    // 寄存器可以作为加号的表达式
+
+
     if (!(expectExprAbleToEvaluate(left) && expectExprAbleToEvaluate(right)))
     {
         return e;

@@ -15,7 +15,7 @@ public:
         CS = 0x2e, // 0010 1110
         SS = 0x36, // 0011 0110
         DS = 0x3e, // 0011 1110
-        /* mod(2b) = 11 00 w(1b) r/m(reg)(3b)*/
+        /* mod(2b) = 11, 00, w(1b), r/m(reg)(3b)*/
         AL = 0xc0, CL, DL, BL, AH, CH, DH, BH, // 0xc0-0xc7
         AX = 0xc8, CX, DX, BX, SP, BP, SI, DI, // 0xc8-0xcf
     };
@@ -23,9 +23,8 @@ public:
     Register(const token::Token& token)
         : Expression(REGISTER, token)
     {
-        auto it = sm_regId.find((*token).toUpper());
-        Q_ASSERT(it != sm_regId.end());
-        m_id = it.value();
+        Q_ASSERT(sm_regId.contains((*token).toUpper()));
+        m_id = sm_regId.value((*token).toUpper());
     }
 
     virtual QJsonObject json() const override;
@@ -38,6 +37,13 @@ private:
     Id m_id;
 
     static const QHash<QString, Id> sm_regId;
+};
+
+/* ========================================================================== */
+
+class regUnion : public Expression
+{
+
 };
 
 } // namespace avs8086::ast

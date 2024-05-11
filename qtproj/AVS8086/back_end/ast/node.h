@@ -59,8 +59,7 @@ public:
         ADDRESS,    // []
 
         PROGRAM,
-        EXPRESSION_STATEMENT,
-        MULTIPLE_STATEMENT,
+        EXPR_STMT,
 
         ASSIGN,
         MAKE_X,

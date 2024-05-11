@@ -75,7 +75,6 @@ StmtPointer Parser::parse_allocate()
     }
 
     m_currOffset += d->m_expr->dataSize();
-    qDebug() << m_currOffset;
 
     return d;
 }

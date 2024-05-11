@@ -94,6 +94,8 @@ protected:
     Value(Type type, const token::Token& token) : Expression(type, token) { }
 };
 
+/* ========================================================================== */
+
 class Float : public Expression
 {
 public:

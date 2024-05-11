@@ -154,8 +154,10 @@ private:
     // statement
     ast::StmtPointer parse_well();
     ast::StmtPointer parse_allocate();
+    ast::StmtPointer parse_mov();
     ast::StmtPointer parse_jmp();
     ast::StmtPointer parse_jx();
+    ast::StmtPointer parse_single();
 
     // post statement
     ast::StmtPointer parse_define();
@@ -163,9 +165,10 @@ private:
     // prefix
     template <class T>
     ast::ExprPointer parse_T();
-    ast::ExprPointer parse_group();
     ast::ExprPointer parse_value();
     ast::ExprPointer parse_operator();
+    ast::ExprPointer parse_group();
+    ast::ExprPointer parse_address();
 
     // infix
     template <class T>

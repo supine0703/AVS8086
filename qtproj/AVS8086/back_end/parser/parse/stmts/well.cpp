@@ -19,8 +19,10 @@ StmtPointer Parser::parse_well()
     nextToken();
     if (currToken().is(Token::WELL))
     {
-        addInfo(Info::WARNING, Position{row, col, currToken().endColumn()},
-                "the two '#' are empty");
+        addInfo(
+            Info::WARNING, {row, col, currToken().endColumn() - col},
+            "the two '#' are empty"
+        );
         return StmtPointer(new Well);
     }
 
@@ -28,8 +30,10 @@ StmtPointer Parser::parse_well()
 
     if (peekToken().is(Token::TOKEN_EOL))
     {
-        addInfo(Info::ERROR, {row, col, currToken().endColumn() - col},
-                "'#' is not close on this line");
+        addInfo(
+            Info::ERROR, {row, col, currToken().endColumn() - col},
+            "'#' is not close on this line"
+        );
     }
     else if (!expectPeekToken(true, Token::WELL))
     {
@@ -82,7 +86,6 @@ StmtPointer Parser::parse_well()
                 auto i = v->integer();
                 if (v->unitDataSize() > 2 || i < 0)
                 {
-                    qDebug() << i;
                     addExprVOverflowErrorInfo(ar, 0xffff);
                 }
                 else

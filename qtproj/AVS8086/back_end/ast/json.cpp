@@ -79,29 +79,6 @@ JSON(Well)
 
 /* ========================================================================== */
 
-JSON(Variable)
-{
-    QJsonObject js;
-    js["type"] = typeName();
-    return js;
-}
-
-JSON(Segment)
-{
-    QJsonObject js;
-    js["type"] = typeName();
-    return js;
-}
-
-JSON(Label)
-{
-    QJsonObject js;
-    js["type"] = typeName();
-    return js;
-}
-
-/* ========================================================================== */
-
 JSON(Value)
 {
     QJsonObject js = Expression::json();
@@ -112,16 +89,6 @@ JSON(Value)
 JSON(Float)
 {
     QJsonObject js = Expression::json();
-    return js;
-}
-
-/* ========================================================================== */
-
-JSON(Infix)
-{
-    QJsonObject js = Expression::json();
-    js["left"] = m_left->json();
-    js["right"] = m_right->json();
     return js;
 }
 

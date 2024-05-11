@@ -77,6 +77,8 @@ inline QJsonObject Jmp::json() const
     return js;
 }
 
+/* ========================================================================== */
+
 class Jx : public Statement
 {
     friend class avs8086::parser::Parser;

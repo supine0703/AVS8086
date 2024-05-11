@@ -8,17 +8,27 @@
         },
         "stmt 2": {
             "call": "a",
-            "offset": 127,
+            "offset": 3,
             "token": "jne",
-            "type(stmt)": "Illegal"
+            "type(stmt)": "JX"
         },
         "stmt 3": {
             "expr": {
-                "data": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "data": "",
                 "left": {
-                    "token": "Integer: 124",
-                    "type(expr)": "Value",
-                    "value": "0x7c"
+                    "left": {
+                        "token": "Integer: 124",
+                        "type(expr)": "Value",
+                        "value": "0x7c"
+                    },
+                    "op": "+",
+                    "right": {
+                        "token": "Right Paren )",
+                        "type(expr)": "Illegal"
+                    },
+                    "token": "Plus +",
+                    "type(expr)": "Operator",
+                    "value": "0x"
                 },
                 "right": {
                     "token": "Integer: 0",
@@ -34,9 +44,9 @@
         },
         "stmt 4": {
             "call": "b",
-            "offset": -128,
+            "offset": -4,
             "size": 2,
-            "type(stmt)": "Illegal"
+            "type(stmt)": "JMP"
         },
         "stmt 5": {
             "expr": {
@@ -52,6 +62,14 @@
             "id": "a",
             "op": "Colon :",
             "type(stmt)": "Define"
+        },
+        "stmt 7": {
+            "token": "nop",
+            "type(stmt)": "Single Instruction"
+        },
+        "stmt 8": {
+            "token": "aaa",
+            "type(stmt)": "Single Instruction"
         }
     },
     "type(stmt)": "Program"

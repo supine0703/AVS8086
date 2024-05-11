@@ -3,47 +3,31 @@
 using namespace avs8086::ast;
 
 const QHash<Node::Type, QString> Node::sm_typeNames = {
-    { NODE_EOL,                 "EOL" },
+    { NODE_EOL,         "EOL" },
 
     // value
-    { DUP,                      "DUP"   },
-    { VALUE,                    "Value" },
-    { FLOAT,                    "Float" },
-    { OPERATOR,                 "Operator" },
-    { IDENTIFIER,               "Identifier" },
+    { DUP,              "DUP"   },
+    { VALUE,            "Value" },
+    { FLOAT,            "Float" },
+    { OPERATOR,         "Operator" },
+    { IDENTIFIER,       "Identifier" },
 
-    { PROGRAM,                  "Program" },
-    { WELL,                     "'#'Instruction" },
-    { DEFINE,                   "Define" },
+    { PROGRAM,          "Program" },
+    { WELL,             "'#'Instruction" },
+    { SINGLE,           "Single Instruction" },
+    { DEFINE,           "Define" },
+    { JMP,              "JMP" },
+    { JX,               "JX" },
+    { MOV,              "MOV" },
 
     // expression
-    { COMMA,                    "Comma" },
-    { COMMA_ARRAY,              "Comma Array" },
+    { COMMA,            "Comma" },
+    { COMMA_ARRAY,      "Comma Array" },
 
-    { REGISTER,                 "Register" },
+    { REGISTER,         "Register" },
 
-    { MAKE_X,                   "MAKE_X" },
-    { ASSIGN,                   "Assign" },
+    { MAKE_X,           "MAKE_X" },
+    { ASSIGN,           "Assign" },
 
-    { INFIX,                    "Infix" },
-
-
-
-    // { PREFIX,                  "Prefix" },
-
-
-    // { COMMA,                   "',' comma"},
-    // { COLON,                   "':'label or reg"},
-
-    // { LABEL,                   "Label" },
-
-    // { ADDRESS,                 "[Address]"},
-
-
-    // { EXPRESSION_STATEMENT,    "Expression Statement" },
-    // { MULTIPLE_STATEMENT,      "Multiple statement" },
-
-
-    // { SINGLE,                  "Single Instruction" },
-    // { MOV,                     "MOV" },
+    { EXPR_STMT,        "Expression Statement" },
 };

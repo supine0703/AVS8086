@@ -11,7 +11,7 @@ class ExpressionStatement : public Statement
 public:
     ExpressionStatement() : ExpressionStatement(ExprPointer(nullptr)) { }
     ExpressionStatement(const ExprPointer& expr)
-        : Statement(EXPRESSION_STATEMENT), m_expr(expr)
+        : Statement(EXPR_STMT), m_expr(expr)
     { }
     ~ExpressionStatement() { }
 

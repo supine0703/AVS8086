@@ -1,21 +1,22 @@
 #include "parser/parser.h"
 
+
 using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::lexer;
 using namespace avs8086::parser;
 
-ExprPointer Parser::parse_group()
+ExprPointer Parser::parse_address()
 {
     int row = currToken().row();
     int col = currToken().column();
 
     nextToken();
-    if (currToken().is(Token::RPAREN))
+    if (currToken().is(Token::RSQUARE))
     {
         addInfo(
             Info::ERROR, {row, col, currToken().endColumn() - col},
-            "empty in '()'"
+            "empty in '[]'"
         );
         return parse_illegal(currToken());
     }
@@ -25,13 +26,14 @@ ExprPointer Parser::parse_group()
     if (peekToken().is(Token::TOKEN_EOL))
     {
         addInfo(
-            Info::ERROR, {row, col, currToken().column() - col},
-            "'(' is not close on this line"
+            Info::ERROR, {row, col, currToken().endColumn() - col},
+            "'[' is not close on this line"
         );
     }
-    else if (!expectPeekToken(true, Token::RPAREN))
+    else if (!expectPeekToken(true, Token::RSQUARE))
     {
-        addExpectTokenErrorInfo(peekToken(), {Token::RPAREN});
+        addExpectTokenErrorInfo(peekToken(), {Token::RSQUARE});
     }
-    return e;
+
+
 }
