@@ -12,7 +12,7 @@ public:
         const token::Token& token,
         const ExprPointer& left,
         const ExprPointer& right,
-        int unitSize,
+        int unitSize = 0,
         int count = 0)
         : Array(DUP, token, unitSize)
         , m_left(left)

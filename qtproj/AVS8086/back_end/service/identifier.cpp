@@ -88,3 +88,5 @@ QList<Identifier> IdentifierList::list() const
     return m_list;
 }
 #endif
+
+/* ========================================================================== */

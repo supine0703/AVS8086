@@ -35,7 +35,7 @@ public:
 
     lexer::Lexer* lexer() const { return m_lexer; }
 
-    bool isError() const { return m_err; }
+    bool isError() const { return m_error; }
 
     InfoList infos() const { return m_infos; }
 
@@ -84,7 +84,7 @@ private:
 private:
     int m_currUnitSize = 0; // 和 allocate 相关
 
-    QList<int> m_offsers;
+    QList<int> m_offsets;
     QHash<QString, int> m_idIts;
     QHash<int, ast::StmtPointer> m_ids;
     QHash<int, ast::StmtPointer> m_calls;
@@ -100,6 +100,8 @@ private:
     */
     void addInfo(Info::Type type, const Position& pos, const QString& info);
 
+    bool haveInfo(Info::Type type, const Position& p, const Position& ep);
+
     void addExpectTokenErrorInfo(
         const token::Token& token, const QList<token::Token::Type>& types = {}
     ); // 如果为空则表示不应是本身的类型
@@ -109,20 +111,30 @@ private:
     );
 
     void addExprDivideZeroErrorInfo(const ast::ExprPointer& expr);
-    void addExprCanNotBeUsedAsIntegerErrorInfo(const ast::ExprPointer& expr);
+    void addExprCannotBeUsedAsIntegerErrorInfo(const ast::ExprPointer& expr);
     void addExprVOverflowErrorInfo(const ast::ExprPointer& expr, size_t max);
     void addExprUnableToEvaluateErrorInfo(const ast::ExprPointer& expr);
     bool expectExprAbleToEvaluate(const ast::ExprPointer& expr);
+    void addExpectCommaCountErrorInfo(
+        const ast::ExprPointer& expr, int expect, int have
+    );
 
-    void addStmtCanNotBeExprErrorInfo();
+    void addStmtCannotBeExprErrorInfo();
     void addNoPrefixParseFnErrorInfo();
-    void addReservedWordErrorInfo();
     void addNotYetSupportErrorInfo();
+    void addReservedWordWarningInfo();
+
+    void addCSCannotBeModifiedErrorInfo(const ast::ExprPointer& expr);
+    void addIPCannotBeModifiedErrorInfo(const ast::ExprPointer& expr);
+    void addSRegCannotBeModifiedErrorInfo(const ast::ExprPointer& expr);
+    void addCannotGetValueFromIPErrorInfo(const ast::ExprPointer& expr);
+    void addSRegTogeterErrorInfo(const ast::ExprPointer& expr);
+    void addRegDoNotMatchErrorInfo(const ast::ExprPointer& expr);
 
     void addJmpOverflowErrorInfo(const Position& pos, int min, int max);
 
 private:
-    bool m_err = false;
+    bool m_error = false;
     InfoList m_infos;
     QHash<QString, QList<int>> m_wellInstructions;
 
@@ -155,6 +167,12 @@ private:
     ast::StmtPointer parse_well();
     ast::StmtPointer parse_allocate();
     ast::StmtPointer parse_mov();
+    ast::StmtPointer parse_push_pop();
+    ast::StmtPointer parse_xchg();
+    ast::StmtPointer parse_lxx();
+    ast::StmtPointer parse_logical_bit();
+    ast::StmtPointer parse_logical_not();
+    ast::StmtPointer parse_logical_shift();
     ast::StmtPointer parse_jmp();
     ast::StmtPointer parse_jx();
     ast::StmtPointer parse_single();
@@ -178,31 +196,6 @@ private:
 
     // other
     ast::ExprPointer parse_commaArray(const ast::ExprPointer& comma);
-
-    // // statement
-    // ast::StmtPointer parse_single();
-    // ast::StmtPointer parse_well();
-    // ast::StmtPointer parse_mov();
-
-    // // prefix
-    // ast::ExprPointer parse_reserved_word();
-    // ast::ExprPointer parse_illegal();
-    // ast::ExprPointer parse_not_end();
-    // ast::ExprPointer parse_prefix();
-    // ast::ExprPointer parse_float();
-    // ast::ExprPointer parse_integer();
-    // ast::ExprPointer parse_string();
-    // ast::ExprPointer parse_group();
-    // ast::ExprPointer parse_register();
-    // ast::ExprPointer parse_address();
-
-    // // infix
-    // ast::ExprPointer parse_infix(const ast::ExprPointer& left);
-    // ast::ExprPointer parse_comma(const ast::ExprPointer& left);
-    // ast::ExprPointer parse_colon(const ast::ExprPointer& left);
-
-    // // postfix
-    // ast::ExprPointer parse_postfix(const ast::ExprPointer& left);
 };
 
 template<class T>

@@ -8,8 +8,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_well()
 {
@@ -65,7 +66,7 @@ StmtPointer Parser::parse_well()
             }
             else
             {
-                key = r->value();
+                key = r->str();
             }
         }
         else if (al->is(Node::LOAD_X))
@@ -76,21 +77,21 @@ StmtPointer Parser::parse_well()
         if (!key.isEmpty())
         {
             auto ar = a->right();
-            if (ar->unitDataSize() == 0)
+            if (expectExprAbleToEvaluate(ar))
             {
-                addExprUnableToEvaluateErrorInfo(ar);
-            }
-            else
-            {
-                auto v = assert_dynamic_cast<Value>(ar);
-                auto i = v->integer();
-                if (v->unitDataSize() > 2 || i < 0)
+                auto v = ar.dynamicCast<Value>();
+                if (!v.isNull())
                 {
-                    addExprVOverflowErrorInfo(ar, 0xffff);
-                }
-                else
-                {
-                    value = QString("%1").arg(i, 4, 16, QChar('0'));
+                    bool ok;
+                    auto i = v->integer(&ok);
+                    if (!ok || i > 0xffff)
+                    {
+                        addExprVOverflowErrorInfo(ar, 0xffff);
+                    }
+                    else
+                    {
+                        value = QString("%1").arg(i, 4, 16, QChar('0'));
+                    }
                 }
             }
         }
@@ -129,6 +130,8 @@ StmtPointer Parser::parse_well()
     return StmtPointer(new Well(e, key, value));
 }
 
+/* ========================================================================== */
+
 #if 0
 StmtPointer Parser::parse_well()
 {
@@ -163,7 +166,7 @@ StmtPointer Parser::parse_well()
     QString instruction = Lexer::restore(tokens);
     QString key, value;
 
-    if (tokens.count() == 1 && tokens.at(0).is(Token::MAKE_X))
+    if (tokens.size() == 1 && tokens.at(0).is(Token::MAKE_X))
     {
         key = tokens.at(0).literal().left(5).toUpper();
         value = tokens.at(0).literal().right(3);
@@ -176,7 +179,7 @@ StmtPointer Parser::parse_well()
         case Token::SREG:
         case Token::REG8:
         case Token::REG16:
-            if (tokens.count() == 3)
+            if (tokens.size() == 3)
             {
                 if (!tokens.at(1).is(Token::ASSIGN))
                 {
@@ -250,3 +253,5 @@ StmtPointer Parser::parse_well()
     return StmtPointer(new Well(instruction, key, value));
 }
 #endif
+
+/* ========================================================================== */

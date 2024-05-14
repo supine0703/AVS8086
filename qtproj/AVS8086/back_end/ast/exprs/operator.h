@@ -28,6 +28,9 @@ public:
 
     virtual QJsonObject json() const override;
 
+    virtual Position pos() const override
+    { return m_left->pos() + m_right->pos(); }
+
 private:
     ExprPointer m_left;
     ExprPointer m_right;

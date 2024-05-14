@@ -3,8 +3,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_jmp()
 {
@@ -18,9 +19,14 @@ StmtPointer Parser::parse_jmp()
 
 StmtPointer Parser::parse_jx()
 {
-    StmtPointer s(new Jx(currToken(), peekToken()));
+    auto jx = Jx::NEW(currToken().type());
+    Q_ASSERT(!jx.isNull());
+
+    jx->m_id = peekToken();
+    jx->m_pos = currToken().pos() + peekToken().pos();
     nextToken();
-    callId(s);
-    return s;
+    callId(jx);
+    return jx;
 }
 
+/* ========================================================================== */

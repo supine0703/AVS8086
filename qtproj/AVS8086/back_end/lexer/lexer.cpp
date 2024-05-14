@@ -70,7 +70,7 @@ QString Lexer::restore(const TokenList& tokens)
     QString s = *firstT;
     int r = firstT.row();
     int c = firstT.endColumn();
-    for (int i = 1, end = tokens.count(); i < end; i++)
+    for (int i = 1, end = tokens.size(); i < end; i++)
     {
         auto& t = tokens.at(i);
         Q_ASSERT(!t.is(Token::TOKEN_EOF));
@@ -106,7 +106,7 @@ void Lexer::addErrorInfo(const Position& pos, const QString& info)
 void Lexer::addErrorInfo(const Token& token, const QString& info)
 {
     addErrorInfo(
-        token.position(), QString("%1: %2").arg(info, *token)
+        token.pos(), QString("%1: %2").arg(info, *token)
     );
 }
 
@@ -132,12 +132,12 @@ void Lexer::scan(const QStringList& input)
 
     auto addIdError = [this](const Token& token) {
         addErrorInfo(
-            token, "identifier first char can not be 0-9"
+            token, "identifier first char cannot be 0-9"
         );
     };
 
     auto setId = [this, addIdError, &labels](int row) {
-        auto i = m_tokens.count();
+        auto i = m_tokens.size();
         if (i == 0)
             return ;
         while (m_tokens.at(--i).is(Token::LINE_BREAK))
@@ -171,7 +171,7 @@ void Lexer::scan(const QStringList& input)
             Token::Type type = Token::type(tokenTxt);
             if (type == Token::ILLEGAL || type == Token::ILLEGAL_INTEGER)
             {
-                illIndex.append(m_tokens.count());
+                illIndex.append(m_tokens.size());
             }
             else if (type == Token::SEGMENT || type == Token::ALLOCATE)
             { // 定义 段, 值, 过程
@@ -197,7 +197,7 @@ void Lexer::scan(const QStringList& input)
     };
 
     // 逐个扫描分离出 token
-    const int end_r = input.length();
+    const int end_r = input.size();
     for (int row = 0; row < end_r; row++)
     {
         int _r = row + 1;
@@ -245,7 +245,7 @@ void Lexer::scan(const QStringList& input)
                     else if (len == 0)
                     { // 空串
                         // TODO: translate
-                        addErrorInfo(_r, _c, 2, "string can not be empty");
+                        addErrorInfo(_r, _c, 2, "string cannot be empty");
                     }
                 }
             }
@@ -368,7 +368,7 @@ QString Lexer::fileName() const
 
 bool Lexer::atEnd() const
 {
-    return m_tokenIt == m_tokens.count();
+    return m_tokenIt == m_tokens.size();
 }
 
 Token Lexer::next() const
@@ -405,3 +405,4 @@ QStringList Lexer::errorInfos() const
 }
 #endif
 
+/* ========================================================================== */

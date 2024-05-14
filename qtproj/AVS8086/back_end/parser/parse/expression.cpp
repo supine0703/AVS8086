@@ -2,8 +2,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 ExprPointer Parser::parse_expression(Precedence precedence)
 {
@@ -16,7 +17,7 @@ ExprPointer Parser::parse_expression(Precedence precedence)
     if (sm_stmt_parseFns.contains(currToken().type())
         || sm_post_parseFns.contains(currToken().type()))
     {
-        addStmtCanNotBeExprErrorInfo();
+        addStmtCannotBeExprErrorInfo();
         return parse_illegal(currToken());
     }
 
@@ -48,3 +49,4 @@ ExprPointer Parser::parse_expression(Precedence precedence)
     return e;
 }
 
+/* ========================================================================== */

@@ -4,8 +4,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_define()
 {
@@ -74,7 +75,7 @@ StmtPointer Parser::parse_define()
             }
             else
             {
-                // addErrorInfo(row, col, len, "can not define null variable");
+                // addErrorInfo(row, col, len, "cannot define null variable");
             }
             break;
         default:
@@ -94,3 +95,5 @@ StmtPointer Parser::parse_define()
     }
     return s;
 #endif
+
+/* ========================================================================== */

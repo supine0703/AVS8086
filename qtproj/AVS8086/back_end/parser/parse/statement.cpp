@@ -3,8 +3,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_statement()
 {
@@ -24,14 +25,16 @@ StmtPointer Parser::parse_statement()
         {
             auto e = parse_expression();
             addInfo(
-                Info::ERROR, e->position(),
-                "can not use expression as statement"
+                Info::ERROR, e->pos(),
+                "cannot use expression as statement"
             );
             s = StmtPointer(new ExpressionStatement(e));
         }
     }
     return s;
 }
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_expression_statement()
 {
@@ -40,3 +43,5 @@ StmtPointer Parser::parse_expression_statement()
     StmtPointer s(new ExpressionStatement(e));
     return s;
 }
+
+/* ========================================================================== */

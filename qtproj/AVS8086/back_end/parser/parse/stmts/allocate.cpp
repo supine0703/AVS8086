@@ -4,8 +4,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 StmtPointer Parser::parse_allocate()
 {
@@ -25,7 +26,9 @@ StmtPointer Parser::parse_allocate()
 
     if (!expectPeekToken(false, Token::TOKEN_EOL))
     { // 不能没有右值, 遇到换行报错返回
-        addExpectExprErrorInfo(parse_illegal(peekToken()), {Node::COMMA});
+        addExpectExprErrorInfo(
+            parse_illegal(peekToken()), {Node::VALUE, Node::DUP, Node::COMMA}
+        );
         return d;
     }
 
@@ -61,6 +64,10 @@ StmtPointer Parser::parse_allocate()
             addExpectExprErrorInfo(e, {Node::COMMA, Node::DUP, Node::VALUE});
             return d;
         }
+        if (!expectExprAbleToEvaluate(e))
+        {
+            return d;
+        }
         // 检查数据长度
         if (v->unitDataSize() > m_currUnitSize)
         {
@@ -78,3 +85,5 @@ StmtPointer Parser::parse_allocate()
 
     return d;
 }
+
+/* ========================================================================== */

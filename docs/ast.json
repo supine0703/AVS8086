@@ -2,74 +2,12 @@
     "file": "D:/Leisure/Desktop/8086/AVS/test.txt",
     "statements": {
         "stmt 1": {
-            "id": "b",
-            "op": "Colon :",
-            "type(stmt)": "Define"
+            "code": "8d04",
+            "type(stmt)": "Illegal"
         },
         "stmt 2": {
-            "call": "a",
-            "offset": 3,
-            "token": "jne",
-            "type(stmt)": "JX"
-        },
-        "stmt 3": {
-            "expr": {
-                "data": "",
-                "left": {
-                    "left": {
-                        "token": "Integer: 124",
-                        "type(expr)": "Value",
-                        "value": "0x7c"
-                    },
-                    "op": "+",
-                    "right": {
-                        "token": "Right Paren )",
-                        "type(expr)": "Illegal"
-                    },
-                    "token": "Plus +",
-                    "type(expr)": "Operator",
-                    "value": "0x"
-                },
-                "right": {
-                    "token": "Integer: 0",
-                    "type(expr)": "Value",
-                    "value": "0x00"
-                },
-                "token": "DUP",
-                "type(expr)": "DUP"
-            },
-            "id": "",
-            "op": "Allocate: db",
-            "type(stmt)": "Define"
-        },
-        "stmt 4": {
-            "call": "b",
-            "offset": -4,
-            "size": 2,
-            "type(stmt)": "JMP"
-        },
-        "stmt 5": {
-            "expr": {
-                "token": "Integer: 1",
-                "type(expr)": "Value",
-                "value": "0x01"
-            },
-            "id": "",
-            "op": "Allocate: db",
-            "type(stmt)": "Define"
-        },
-        "stmt 6": {
-            "id": "a",
-            "op": "Colon :",
-            "type(stmt)": "Define"
-        },
-        "stmt 7": {
-            "token": "nop",
-            "type(stmt)": "Single Instruction"
-        },
-        "stmt 8": {
-            "token": "aaa",
-            "type(stmt)": "Single Instruction"
+            "code": "c55d01",
+            "type(stmt)": "Illegal"
         }
     },
     "type(stmt)": "Program"

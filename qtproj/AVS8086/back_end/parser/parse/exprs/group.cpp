@@ -2,19 +2,19 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 ExprPointer Parser::parse_group()
 {
-    int row = currToken().row();
-    int col = currToken().column();
+    auto t_pos = currToken().pos();
 
     nextToken();
     if (currToken().is(Token::RPAREN))
     {
         addInfo(
-            Info::ERROR, {row, col, currToken().endColumn() - col},
+            Info::ERROR, t_pos + currToken().pos(),
             "empty in '()'"
         );
         return parse_illegal(currToken());
@@ -25,7 +25,7 @@ ExprPointer Parser::parse_group()
     if (peekToken().is(Token::TOKEN_EOL))
     {
         addInfo(
-            Info::ERROR, {row, col, currToken().column() - col},
+            Info::ERROR, t_pos + currToken().pos(),
             "'(' is not close on this line"
         );
     }
@@ -35,3 +35,5 @@ ExprPointer Parser::parse_group()
     }
     return e;
 }
+
+/* ========================================================================== */

@@ -149,9 +149,9 @@ void TextEditWidget::on_pushButton_2_clicked()
     auto root = p.newAST();
     for (const auto& e : p.infos())
         qDebug() << e.typeName() << ": ("
-                 << e.position().row() << ","
-                 << e.position().column() << ","
-                 << e.position().length() << ") >"
+                 << e.pos().row() << ","
+                 << e.pos().column() << ","
+                 << e.pos().length() << ") >"
                  << e.value();
 
     // Assembler a(root);

@@ -26,6 +26,7 @@ private:
     { // 传入假设自身大小为零的偏移
         if (m_offset == offset)
             return ;
+        m_codes.clear();
 #if 0
         for (auto it = sm_sizeMax.begin(); it != sm_sizeMax.end(); it++)
         {
@@ -36,22 +37,35 @@ private:
             }
         }
 #else
-        if (-0x7f < offset && offset <= 0x7f)
+        if (-0x7f <= offset && offset < 0x7f)
         {
             m_size = 2;
+            if (offset < 0)
+            {
+                offset--;
+            }
+            m_codes.append(0xeb);
+            m_codes.append(static_cast<char>(offset & 0xff));
         }
-        else if (-0x7ffe < offset && offset <= 0x7fff)
+        else if (-0x7ffe <= offset && offset < 0x7fff)
         {
             m_size = 3;
+            if (offset < 0)
+            {
+                offset -= 2;
+            }
+            m_codes.append(0xe9);
+            m_codes.append(static_cast<char>(offset & 0xff));
+            m_codes.append(static_cast<char>((offset >> 8) & 0xff));
         }
         else
         {
             m_size = 5;
+            m_codes.append(0xea);
         }
-        m_offset = (offset < 0) ? (offset - m_size) : (offset);
+        m_offset = offset;
 #endif
     }
-
 
     token::Token m_id;
     int m_size;
@@ -81,14 +95,68 @@ inline QJsonObject Jmp::json() const
 
 class Jx : public Statement
 {
+    using Pointer = QSharedPointer<Jx>;
+    friend class avs8086::parser::Parser;
+public:
+    ~Jx() = default;
+
+    virtual QJsonObject json() const override;
+
+    static Pointer NEW(token::Token::Type type)
+    {
+        auto it = sm_constructors.find(type);
+        if (it != sm_constructors.end())
+        {
+            return (*sm_constructors.value(type))();
+        }
+        return Pointer(nullptr);
+    }
+
+private:
+    bool setOffset(int offset)
+    {
+        m_offset = offset;
+        m_codes.clear();
+        m_codes.append(m_code);
+        m_codes.append(static_cast<char>(offset & 0xff));
+        return (-0x80 <= offset) && (offset <= 0x7f);
+    }
+
+    token::Token m_id;
+    Position m_pos;
+    int m_offset;
+    int8_t m_code;
+
+    typedef Pointer (*constructor)(void);
+    static const QHash<token::Token::Type, constructor> sm_constructors;
+
+    Jx(Type type, int8_t code) : Statement(type), m_code(code) { }
+};
+
+inline QJsonObject Jx::json() const
+{
+    QJsonObject js = Statement::json();
+    js["call"] = *m_id;
+    js["offset"] = m_offset;
+    return js;
+}
+
+/* ========================================================================== */
+
+#if 0
+class Jx : public Statement
+{
     friend class avs8086::parser::Parser;
 public:
     Jx(const token::Token& token, const token::Token& id)
         : Statement(JX)
         , m_id(id)
-        , m_literal(*token)
-        , m_pos(id.row(), token.column(), id.endColumn() - token.column())
-    { }
+        , m_literal((*token).toUpper())
+        , m_pos(token.pos() + id.pos())
+    {
+        Q_ASSERT(sm_toCodes.contains(token.type()));
+        m_codes.append(sm_toCodes.value(token.type()));
+    }
 
     ~Jx() = default;
 
@@ -98,6 +166,7 @@ private:
     bool setOffset(int offset)
     {
         m_offset = offset;
+        m_codes.append(static_cast<char>(offset & 0xff));
         return -0x80 <= offset && offset <= 0x7f;
     }
 
@@ -105,6 +174,11 @@ private:
     QString m_literal;
     Position m_pos;
     int m_offset;
+
+    static const QHash<token::Token::Type, char> sm_toCodes;
+
+    typedef QSharedPointer<Jx> (*constructor)(const token::Token&);
+    static const QHash<token::Token::Type, constructor> sm_constructors;
 };
 
 inline QJsonObject Jx::json() const
@@ -115,6 +189,7 @@ inline QJsonObject Jx::json() const
     js["offset"] = m_offset;
     return js;
 }
+#endif
 
 } // namespace avs8086::ast
 

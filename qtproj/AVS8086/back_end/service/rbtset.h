@@ -17,6 +17,14 @@ class RBTSet
 public:
     RBTSet() = default;
 
+    RBTSet(std::initializer_list<T> list)
+    {
+        for (auto& p : list)
+        {
+            insert(p);
+        }
+    }
+
     ~RBTSet() = default;
 
     void clear() { m_map.clear(); }
@@ -83,7 +91,7 @@ public:
 
         iterator& operator++() { ++i; return *this; }
 
-        iterator& operator--() {  --i; return *this; }
+        iterator& operator--() { --i; return *this; }
 
         iterator operator++(int) { auto r = *this; ++i; return r; }
 

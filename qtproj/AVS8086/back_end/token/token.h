@@ -8,7 +8,7 @@ namespace avs8086::token {
 class Token
 {
 public:
-    enum Type {
+    enum Type  {
         TOKEN_EOL = -2,     // eol: end of line
         TOKEN_EOF = -1,     // eof: end of file
 
@@ -221,7 +221,7 @@ public:
     Token(Type type, const QString& literal, int row, int column)
         : m_type(type)
         , m_literal(literal)
-        , m_position(row, column, literal.length())
+        , m_pos(row, column, literal.length())
     { }
 
     ~Token() = default;
@@ -234,17 +234,17 @@ public:
 
     QString literal() const { return m_literal; }
 
-    Position position() const { return m_position; }
+    Position pos() const { return m_pos; }
 
-    Position::Value positionValue() const { return m_position.value(); }
+    Position::Value posValue() const { return m_pos.value(); }
 
-    int length() const { return m_position.length(); }
+    int row() const { return m_pos.row(); }
 
-    int row() const { return m_position.row(); }
+    int column() const { return m_pos.column(); }
 
-    int column() const { return m_position.column(); }
+    int length() const { return m_pos.length(); }
 
-    int endColumn() const { return m_position.column() + m_position.length(); }
+    int endColumn() const { return m_pos.endColumn(); }
 
     QString typeName() const { return typeName(m_type); }
 
@@ -276,7 +276,7 @@ public:
 private:
     Type m_type;
     QString m_literal;
-    Position m_position;
+    Position m_pos;
 
 #if 0
     /**

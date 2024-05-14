@@ -36,7 +36,7 @@ class Node
     Node& operator=(const Node&) = delete;
 
 public:
-    enum Type {
+    enum Type  {
         NODE_EOL = -2,
         ILLEGAL = 0,
 
@@ -48,14 +48,15 @@ public:
 
         WELL,       // #...#
         DEFINE,
-        JMP,
-        JX,
+
+        SINGLE,
 
         COMMA,      // ,
         COMMA_ARRAY,
         COLON,      // :
 
         REGISTER,   // reg
+        REG_UNION,  // reg union
         ADDRESS,    // []
 
         PROGRAM,
@@ -65,8 +66,102 @@ public:
         MAKE_X,
         LOAD_X,
 
-        SINGLE,
         MOV,
+        PUSH,
+        POP,
+        XCHG,
+        LEA,
+        LDS,
+        LES,
+
+        NOT,
+        AND,
+        OR,
+        XOR,
+        TEST,
+        SAL,
+        SAR,
+        SHL,
+        SHR,
+        ROL,
+        ROR,
+        RCL,
+        RCR,
+
+        XLAT,
+        LAHF,
+        SAHF,
+        PUSHF,
+        POPF,
+        CBW,
+        CWD,
+        AAA,
+        DAA,
+        AAS,
+        DAS,
+        INTO,
+        IRET,
+        REP,
+        REPE,
+        REPZ,
+        REPNE,
+        REPNZ,
+        MOVSB,
+        MOVSW,
+        CMPSB,
+        CMPSW,
+        SCASB,
+        SCASW,
+        LODSB,
+        LODSW,
+        STOSB,
+        STOSW,
+        CLC,
+        STC,
+        CMC,
+        CLD,
+        STD,
+        CLI,
+        STI,
+        WAIT,
+        LOCK,
+        HLT,
+        NOP,
+        AAM,
+        AAD,
+
+        JMP,
+        JO,
+        JNO,
+        JB,
+        JC,
+        JNAE,
+        JAE,
+        JNB,
+        JNC,
+        JE,
+        JZ,
+        JNE,
+        JNZ,
+        JBE,
+        JNA,
+        JA,
+        JNBE,
+        JS,
+        JNS,
+        JP,
+        JPE,
+        JNP,
+        JPO,
+        JL,
+        JNGE,
+        JGE,
+        JNL,
+        JLE,
+        JNG,
+        JG,
+        JNLE,
+        JCXZ,
     };
 
 protected:
@@ -102,6 +197,8 @@ class Statement : public Node
 protected:
     Statement(Type type) : Node(type) { }
 
+    QByteArray m_codes;
+
 public:
     virtual ~Statement() = default;
 
@@ -109,6 +206,10 @@ public:
 
     virtual void addIn(const StmtPointer& s, QList<StmtPointer>& stmts)
     { stmts.append(s); }
+
+    virtual QByteArray codes() const { return m_codes; }
+
+    qsizetype length() const { return m_codes.length(); }
 };
 
 /* ========================================================================== */
@@ -116,11 +217,11 @@ public:
 class Expression : public Node
 {
 protected:
-    // Expression(Type type) : Node(type) { }
-
     Expression(Type type, const token::Token& token)
         : Node(type), m_token(token)
     { }
+
+    token::Token m_token;
 
 public:
     virtual ~Expression() = default;
@@ -135,13 +236,10 @@ public:
 
     virtual int unitDataSize() const { return 0; } // 可以用来判断是否可求值
 
-    virtual Position position() const { return m_token.position(); }
+    virtual Position pos() const { return m_token.pos(); }
 
     virtual void addIn(const ExprPointer& e, QList<ExprPointer>& exprs)
     { exprs.append(e); }
-
-protected:
-    token::Token m_token;
 };
 
 } // namespace avs8086::ast

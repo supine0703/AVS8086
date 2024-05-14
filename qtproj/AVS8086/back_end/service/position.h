@@ -43,6 +43,16 @@ public:
         : m_value({row, column, length})
     { }
 
+#if 0
+    Position(const Position& left, const Position& right)
+        : m_value({
+            (Q_ASSERT(left.row() == right.row()), left.row()),
+            (Q_ASSERT(left.column() < right.column()), left.column()),
+            right.endColumn() - left.column()
+        })
+    { }
+#endif
+
     ~Position() = default;
 
     int row() const { return m_value.row; }
@@ -51,7 +61,16 @@ public:
 
     int length() const { return m_value.length; }
 
+    int endColumn() const { return m_value.column + m_value.length; }
+
     Value value() const { return m_value; }
+
+    friend Position operator+(const Position& left, const Position& right)
+    {
+        Q_ASSERT(left.m_value.row == right.m_value.row);
+        Q_ASSERT(left.m_value.column < right.m_value.column);
+        return {left.row(), left.column(), right.endColumn() - left.column()};
+    }
 
 #if 0
 #if 0
@@ -78,7 +97,7 @@ public:
 
     friend auto operator<=>(const Position&, const Position&) = default;
 
-    friend size_t qHash(const Position& key, size_t seed = 0)
+    friend auto qHash(const Position& key, size_t seed = 0)
     {
         return qHashMulti(
             seed, key.m_value.row, key.m_value.column, key.m_value.length

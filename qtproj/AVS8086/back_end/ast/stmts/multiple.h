@@ -1,13 +1,18 @@
-#ifndef SINGLE_H
-#define SINGLE_H
+#ifndef LXX_H
+#define LXX_H
 
 #include "ast/node.h"
 
+namespace avs8086::parser {
+class Parser;
+} // namespace avs8086::parser
+
 namespace avs8086::ast {
 
-class Single : public Statement
+class Multiple : public Statement
 {
-    using Pointer = QSharedPointer<Single>;
+    using Pointer = QSharedPointer<Multiple>;
+    friend class avs8086::parser::Parser;
 public:
     static Pointer NEW(token::Token::Type type)
     {
@@ -19,19 +24,19 @@ public:
         return Pointer(nullptr);
     }
 
-    ~Single() = default;
+    ~Multiple() = default;
 
 private:
+    ExprPointer m_expr;
+
     typedef Pointer (*constructor)(void);
     static const QHash<token::Token::Type, constructor> sm_constructors;
 
-    Single(Type type, int8_t code) : Statement(type) { m_codes.append(code); }
-
-    Single(Type type, std::initializer_list<uint8_t> codes)
+    Multiple(Type type, std::initializer_list<uint8_t> codes)
         : Statement(type)
     { m_codes.append(codes); }
 };
 
 } // namespace avs8086::ast
 
-#endif // SINGLE_H
+#endif // LXX_H

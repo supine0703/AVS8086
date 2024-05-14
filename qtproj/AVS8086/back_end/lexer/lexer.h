@@ -32,7 +32,7 @@ public:
 
     token::TokenList tokens() const { return m_tokens; }
 
-    bool atEnd() const { return m_tokenIt == m_tokens.count(); }
+    bool atEnd() const { return m_tokenIt == m_tokens.size(); }
 
     token::Token end() const { return m_eofToken; }
 

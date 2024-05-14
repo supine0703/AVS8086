@@ -21,3 +21,5 @@ const QHash<Info::Type, QString> Info::sm_typeNames = {
     { WARNING,          "Warning" },
     { ERROR,            "Error" },
 };
+
+/* ========================================================================== */

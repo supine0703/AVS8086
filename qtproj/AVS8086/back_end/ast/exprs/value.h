@@ -17,10 +17,10 @@ public:
         : Expression(VALUE, token)
     {
         do
-        {   m_value.append(integer & 0xff);
+        {   m_value.append(static_cast<char>(integer & 0xff));
             integer >>= 8;
         } while (integer != 0);
-        m_unitDataSize = m_value.length();
+        m_unitDataSize = m_value.size();
     }
 
     Value(const token::Token& token, const QByteArray& bytes)
@@ -41,6 +41,7 @@ public:
 
     size_t integer(bool* ok = nullptr) const
     {
+        Q_ASSERT(m_unitDataSize != 0);
         bool okey = m_value.size() < 8;
         if (ok != nullptr)
             *ok = okey;

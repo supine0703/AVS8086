@@ -4,8 +4,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 ExprPointer Parser::parse_dup(const ExprPointer& left)
 {
@@ -15,7 +16,7 @@ ExprPointer Parser::parse_dup(const ExprPointer& left)
     if (!expectPeekToken(true, Token::LPAREN))
     {
         addExpectTokenErrorInfo(peekToken(), {Token::LPAREN});
-        return ExprPointer(new Dup(token, left, parse_illegal(Token()), 0));
+        return ExprPointer(new Dup(token, left, parse_illegal(Token())));
     }
 
     auto right = parse_expression(p);
@@ -29,23 +30,28 @@ ExprPointer Parser::parse_dup(const ExprPointer& left)
 
     if (!expectExprAbleToEvaluate(right))
     {
-        return ExprPointer(new Dup(token, left, right, 0));
+        return ExprPointer(new Dup(token, left, right));
     }
 
     auto lve = left.dynamicCast<Value>();
     if (lve.isNull())
     {
         addExpectExprErrorInfo(left, {Node::VALUE});
-        return ExprPointer(new Dup(token, left, parse_illegal(Token()), 0));
+        return ExprPointer(new Dup(token, left, right));
+    }
+    if (!expectExprAbleToEvaluate(left))
+    {
+        return ExprPointer(new Dup(token, left, right));
     }
 
     bool ok;
     auto count = lve->integer(&ok);
-
     if (!ok)
     {
-        addExprCanNotBeUsedAsIntegerErrorInfo(left);
+        addExprCannotBeUsedAsIntegerErrorInfo(left);
     }
 
     return ExprPointer(new Dup(token, left, right, m_currUnitSize, count));
 }
+
+/* ========================================================================== */

@@ -5,17 +5,41 @@ using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
+/* ========================================================================== */
+
 const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::WELL,          &Parser::parse_well },          // #...#
     { Token::ALLOCATE,      &Parser::parse_allocate },      // allocate
 
     { Token::MOV,           &Parser::parse_mov },           // MOV
-    // { Token::ADD,           &Parser::parse_add },           // ADD
-    // { Token::ADC,           &Parser::parse_adc },           // ADC
+    { Token::PUSH,          &Parser::parse_push_pop },      // PUSH
+    { Token::POP,           &Parser::parse_push_pop },      // POP
+    { Token::XCHG,          &Parser::parse_xchg },          // XCHG
+    { Token::LEA,           &Parser::parse_lxx },           // LEA
+    { Token::LDS,           &Parser::parse_lxx },           // LDS
+    { Token::LES,           &Parser::parse_lxx },           // LES
+
+    // { Token::IN,            &Parser::parse_reserved_word }, // IN
+    // { Token::OUT,           &Parser::parse_reserved_word }, // OUT
+
+    { Token::NOT,           &Parser::parse_logical_not },   // NOT
+    { Token::AND,           &Parser::parse_logical_bit },   // AND
+    { Token::OR,            &Parser::parse_logical_bit },   // OR
+    { Token::XOR,           &Parser::parse_logical_bit },   // XOR
+    { Token::TEST,          &Parser::parse_logical_bit },   // TEST
+    { Token::SAL,           &Parser::parse_logical_shift }, // SAL
+    { Token::SAR,           &Parser::parse_logical_shift }, // SAR
+    { Token::SHL,           &Parser::parse_logical_shift }, // SHL
+    { Token::SHR,           &Parser::parse_logical_shift }, // SHR
+    { Token::ROL,           &Parser::parse_logical_shift }, // ROL
+    { Token::ROR,           &Parser::parse_logical_shift }, // ROR
+    { Token::RCL,           &Parser::parse_logical_shift }, // RCL
+    { Token::RCR,           &Parser::parse_logical_shift }, // RCR
 
     { Token::JMP,           &Parser::parse_jmp },           // JMP
     { Token::JNBE,          &Parser::parse_jx },            // JNBE
-    { Token::JAE,           &Parser::parse_jx },            // JAE,
+    { Token::JA,            &Parser::parse_jx },            // JA
+    { Token::JAE,           &Parser::parse_jx },            // JAE
     { Token::JNB,           &Parser::parse_jx },            // JNB
     { Token::JB,            &Parser::parse_jx },            // JB
     { Token::JNAE,          &Parser::parse_jx },            // JNAE
@@ -58,7 +82,6 @@ const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::DAS,           &Parser::parse_single },        // DAS
     { Token::AAM,           &Parser::parse_single },        // AAM
     { Token::AAD,           &Parser::parse_single },        // AAD
-    { Token::AND,           &Parser::parse_single },        // AND
     { Token::INTO,          &Parser::parse_single },        // INTO
     { Token::IRET,          &Parser::parse_single },        // IRET
     { Token::REP,           &Parser::parse_single },        // REP
@@ -89,11 +112,15 @@ const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::NOP,           &Parser::parse_single },        // NOP
 };
 
+/* ========================================================================== */
+
 const QHash<Token::Type, Parser::post_parseFn> Parser::sm_post_parseFns = {
     { Token::COLON,         &Parser::parse_define },
     { Token::SEGMENT,       &Parser::parse_define },
     { Token::ALLOCATE,      &Parser::parse_define },
 };
+
+/* ========================================================================== */
 
 const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
     { Token::ILLEGAL,       &Parser::parse_T<Illegal> },    // illegal
@@ -129,6 +156,8 @@ const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
     // { Token::LOCK,        &Parser::parse_reserved_word }, // lock
 };
 
+/* ========================================================================== */
+
 const QHash<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
     { Token::ASSIGN,        &Parser::parse_T<Assign> },     // =
     { Token::COMMA,         &Parser::parse_T<Comma> },      // ,
@@ -156,3 +185,4 @@ const QHash<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
     // { Token::COLON,           &Parser::parse_colon },     // :
 };
 
+/* ========================================================================== */

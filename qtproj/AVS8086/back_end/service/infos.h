@@ -40,7 +40,7 @@ private:
 #endif
         friend auto operator<=>(const Key&, const Key&) = default;
 
-        friend size_t qHash(const Key& key, size_t seed = 0)
+        friend auto qHash(const Key& key, size_t seed = 0)
         { return qHashMulti(seed, key.m_type, qHash(key.m_pos)); }
 
     private:
@@ -69,7 +69,7 @@ public:
 
     Type type() const { return m_key.m_type; }
 
-    Position position() const { return m_key.m_pos; }
+    Position pos() const { return m_key.m_pos; }
 
     QString value() const { return m_value; }
 

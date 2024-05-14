@@ -2,8 +2,9 @@
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 QSharedPointer<Program> Parser::parse_program()
 {
@@ -17,15 +18,20 @@ QSharedPointer<Program> Parser::parse_program()
 
         if (!stmt.isNull())
         {
+            int i = p->m_stmts.size();
             stmt->addIn(stmt, p->m_stmts);
+            while (i < p->m_stmts.size())
+            {
+                m_currOffset += p->m_stmts.at(i++)->length();
+            }
 #if 0
             int row = currToken().row();
             auto it = m_infos.lowerBound({Info::ERROR, {row, 0, 0}, ""});
-            bool err = ((it != m_infos.end()) && (it->position().row() == row));
+            bool err = ((it != m_infos.end()) && (it->pos().row() == row));
             if (!lineEnd && !err)
             {
                 // TODO: translate
-                addInfo(Info::WARNING, peekToken().position(),
+                addInfo(Info::WARNING, peekToken().pos(),
                         "should only one statement on one line");
             }
 #endif
@@ -36,3 +42,5 @@ QSharedPointer<Program> Parser::parse_program()
     p->m_err = isError();
     return p;
 }
+
+/* ========================================================================== */

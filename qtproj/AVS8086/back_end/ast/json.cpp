@@ -19,6 +19,10 @@ JSON(Statement)
 {
     QJsonObject js;
     js["type(stmt)"] = typeName();
+    if (!m_codes.isEmpty())
+    {
+        js["code"] = QString::fromUtf8(m_codes.toHex());
+    }
     return js;
 }
 
@@ -42,10 +46,9 @@ JSON(Program)
 js["symbols"] = symbols;
 #endif
     QJsonObject stmts;
-    for (int i = 0; i < m_stmts.count(); i++)
+    for (int i = 0; i < m_stmts.size(); i++)
     {
-        const auto& s = m_stmts.at(i);
-        stmts[QString("stmt %1").arg(i + 1)] = s->json();
+        stmts[QString("stmt %1").arg(i + 1)] = m_stmts.at(i)->json();
     }
     js["statements"] = stmts;
     return js;

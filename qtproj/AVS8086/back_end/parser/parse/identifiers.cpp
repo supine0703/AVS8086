@@ -5,8 +5,9 @@
 using namespace avs8086;
 using namespace avs8086::ast;
 using namespace avs8086::token;
-using namespace avs8086::lexer;
 using namespace avs8086::parser;
+
+/* ========================================================================== */
 
 const QHash<Token::Type, Identifier::Type> Parser::sm_idTypes = {
     { Token::COLON,     Identifier::LABEL },
@@ -15,31 +16,41 @@ const QHash<Token::Type, Identifier::Type> Parser::sm_idTypes = {
     { Token::PROC_FAR,  Identifier::FAR },
 };
 
+/* ========================================================================== */
+
 void Parser::parse_idTable()
 {
-    if (parse_idTable(m_idTable, -1, m_offsers.count() - 1, 0, 0xfffff))
+    if (m_offsets.size() == 0)
+        return;
+    if (parse_idTable(m_idTable, -1, m_offsets.size() - 1, 0, 0xfffff))
         ;
     for (const auto& [offset, s] : m_lastCalls)
-    {
-        if (s->is(Node::JX))
-        {
-            auto jx = assert_dynamic_cast<Jx>(s);
-            auto id = m_idTable.find(*(jx->m_id));
-            Q_ASSERT(id != m_idTable.end());
-            if (!jx->setOffset(id->offset() - offset))
-            {
-                addJmpOverflowErrorInfo(jx->m_pos, -128, 127);
-            }
-        }
-        else if (s->is(Node::JMP))
+    { // 最后在计算地址, 包括 jmp far, jx
+        if (s->is(Node::JMP))
         {
             auto jmp = assert_dynamic_cast<Jmp>(s);
             auto id = m_idTable.find(*(jmp->m_id));
             Q_ASSERT(id != m_idTable.end());
             jmp->setOffset(id->offset() - offset);
         }
+        else
+        {
+            auto jx = s.dynamicCast<Jx>();
+            if (!jx.isNull())
+            {
+                auto id = m_idTable.find(*(jx->m_id));
+                Q_ASSERT(id != m_idTable.end());
+                if (!jx->setOffset(id->offset() - offset))
+                {
+                    addJmpOverflowErrorInfo(jx->m_pos, -128, 127);
+                }
+            }
+        }
     }
+    m_currOffset = 0;
 }
+
+/* ========================================================================== */
 
 bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
 {
@@ -50,7 +61,7 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
 
     for (int i = begin + 1; i <= end; i++)
     {
-        differ += m_offsers.at(i);
+        differ += m_offsets.at(i);
         auto it = m_ids.find(i);
         if (it != m_ids.end())
         { // 定义
@@ -72,7 +83,7 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
         { // 调用
             Q_ASSERT(m_calls.contains(i));
             auto s = m_calls.value(i);
-            if (s->is(Node::JX))
+            if (can_dynamic_cast<Jx>(s))
             {
                 differ += 2;
                 m_lastCalls.append({offset + differ, s});
@@ -84,7 +95,7 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
                 auto id = table.find(*(jmp->m_id));
                 if (id != table.end())
                 { // 向前寻找
-                    jmp->setOffset(id->offset() - (offset + differ));
+                    jmp->setOffset(id->offset() - (offset + differ + 1));
                     differ += jmp->m_size;
                 }
                 else
@@ -108,6 +119,7 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
                     }
                     id = table.find(*(jmp->m_id));
                     Q_ASSERT(id != table.end());
+                    Q_ASSERT(id->offset() - (offset + differ) >= 0);
                     jmp->setOffset(id->offset() - (offset + differ));
                 }
             }
@@ -120,3 +132,5 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
     t.swap(table);
     return true;
 }
+
+/* ========================================================================== */

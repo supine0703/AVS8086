@@ -3,6 +3,8 @@
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
+/* ========================================================================== */
+
 const QHash<Token::Type, Parser::Precedence> Parser::sm_precedences = {
     { Token::LSQUARE,           ADDRESS },      // []
     { Token::ASTERISK,          PRODUCT },      // *
@@ -27,3 +29,4 @@ const QHash<Token::Type, Parser::Precedence> Parser::sm_precedences = {
     { Token::DUP,               ASSIGN },
 };
 
+/* ========================================================================== */
