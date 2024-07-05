@@ -43,7 +43,7 @@ inline QJsonObject Dup::json() const
     QJsonObject js = Expression::json();
     js["left"] = m_left->json();
     js["right"] = m_right->json();
-    js["data"] = QString(show_Integer_hex(bytes()));
+    js["data"] = QString(show_integer_hex(bytes()));
     return js;
 }
 

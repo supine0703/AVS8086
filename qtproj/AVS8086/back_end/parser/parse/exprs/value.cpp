@@ -20,10 +20,13 @@ ExprPointer Parser::parse_value()
     {
         return ExprPointer(new Value(currToken(), currToken().toInt()));
     }
+#if 0
     if (type != Token::STRING)
     {
         Q_ASSERT_X(false, "Parser::parse_value", "value type error");
     }
+#endif
+    Q_ASSERT(type == Token::STRING);
 
     // 字符串转义
     static QHash<char, char> s_escapeTable = {
@@ -39,7 +42,7 @@ ExprPointer Parser::parse_value()
         R"(|x0*[0-9a-fA-F]{1,2}|u0*[0-9a-fA-F]{1,4})$)"
     );
 
-    QString str = (*currToken()).mid(1, currToken().length() - 2);
+    auto str = QStringView(*currToken()).mid(1, currToken().length() - 2);
     auto e_it = s_all.globalMatch(str);
     QByteArray bytes;
     int last_i = 0;
@@ -79,16 +82,15 @@ ExprPointer Parser::parse_value()
             continue;
         }
         // 正确转义
-        auto s = match.captured(1);
+        auto s = match.capturedView(1);
         if (s.startsWith('x'))
         {
-            s.removeFirst();
+            s = s.last(s.size() - 1);
             bytes.append(static_cast<char>(s.toUShort(nullptr, 16) & 0xff));
         }
         else if (s.startsWith('u'))
         {
-            s.removeFirst();
-            auto code = s.toUShort(nullptr, 16);
+            auto code = s.last(s.size() - 1).toUShort(nullptr, 16);
             bytes.append(static_cast<char>(code & 0xff));
             bytes.append(static_cast<char>((code >> 8) & 0xff));
         }

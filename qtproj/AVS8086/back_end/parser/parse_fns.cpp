@@ -27,14 +27,14 @@ const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::OR,            &Parser::parse_logical_bit },   // OR
     { Token::XOR,           &Parser::parse_logical_bit },   // XOR
     { Token::TEST,          &Parser::parse_logical_bit },   // TEST
-    { Token::SAL,           &Parser::parse_logical_shift }, // SAL
-    { Token::SAR,           &Parser::parse_logical_shift }, // SAR
-    { Token::SHL,           &Parser::parse_logical_shift }, // SHL
-    { Token::SHR,           &Parser::parse_logical_shift }, // SHR
-    { Token::ROL,           &Parser::parse_logical_shift }, // ROL
-    { Token::ROR,           &Parser::parse_logical_shift }, // ROR
-    { Token::RCL,           &Parser::parse_logical_shift }, // RCL
-    { Token::RCR,           &Parser::parse_logical_shift }, // RCR
+    { Token::SAL,           &Parser::parse_shift }, // SAL
+    { Token::SAR,           &Parser::parse_shift }, // SAR
+    { Token::SHL,           &Parser::parse_shift }, // SHL
+    { Token::SHR,           &Parser::parse_shift }, // SHR
+    { Token::ROL,           &Parser::parse_shift }, // ROL
+    { Token::ROR,           &Parser::parse_shift }, // ROR
+    { Token::RCL,           &Parser::parse_shift }, // RCL
+    { Token::RCR,           &Parser::parse_shift }, // RCR
 
     { Token::JMP,           &Parser::parse_jmp },           // JMP
     { Token::JNBE,          &Parser::parse_jx },            // JNBE
@@ -68,6 +68,11 @@ const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
     { Token::JNS,           &Parser::parse_jx },            // JNS
     { Token::JS,            &Parser::parse_jx },            // JS
     { Token::JCXZ,          &Parser::parse_jx },            // JCXZ
+    { Token::LOOP,          &Parser::parse_jx },            // LOOP
+    { Token::LOOPZ,         &Parser::parse_jx },            // LOOPZ
+    { Token::LOOPE,         &Parser::parse_jx },            // LOOPE
+    { Token::LOOPNZ,        &Parser::parse_jx },            // LOOPNZ
+    { Token::LOOPNE,        &Parser::parse_jx },            // LOOPNE
 
     { Token::XLAT,          &Parser::parse_single },        // XLAT
     { Token::LAHF,          &Parser::parse_single },        // LAHF
@@ -161,28 +166,25 @@ const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
 const QHash<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
     { Token::ASSIGN,        &Parser::parse_T<Assign> },     // =
     { Token::COMMA,         &Parser::parse_T<Comma> },      // ,
-    { Token::COLON,         &Parser::parse_T<Colon> },      // :
+    { Token::COLON,         &Parser::parse_colon },         // :
     { Token::DUP,           &Parser::parse_dup },           // dup
 
-    { Token::ASTERISK,        &Parser::parse_operator },    // *
-    { Token::SLASH,           &Parser::parse_operator },    // /
-    { Token::MODULO,          &Parser::parse_operator },    // %
-    { Token::PLUS,            &Parser::parse_operator },    // +
-    { Token::MINUS,           &Parser::parse_operator },    // -
-    { Token::LEFT_SHIFT,      &Parser::parse_operator },    // <<
-    { Token::RIGHT_SHIFT,     &Parser::parse_operator },    // >>
-    { Token::BIT_AND,         &Parser::parse_operator },    // &
-    { Token::BIT_XOR,         &Parser::parse_operator },    // ^
-    { Token::BIT_OR,          &Parser::parse_operator },    // |
-    { Token::LT,              &Parser::parse_operator },    // <
-    { Token::GT,              &Parser::parse_operator },    // >
-    { Token::LE,              &Parser::parse_operator },    // <=
-    { Token::GE,              &Parser::parse_operator },    // >=
-    { Token::EQ,              &Parser::parse_operator },    // ==
-    { Token::NE,              &Parser::parse_operator },    // !=
-
-    // { Token::COMMA,           &Parser::parse_comma },     // ,
-    // { Token::COLON,           &Parser::parse_colon },     // :
+    { Token::ASTERISK,      &Parser::parse_operator },      // *
+    { Token::SLASH,         &Parser::parse_operator },      // /
+    { Token::MODULO,        &Parser::parse_operator },      // %
+    { Token::PLUS,          &Parser::parse_operator },      // +
+    { Token::MINUS,         &Parser::parse_operator },      // -
+    { Token::LEFT_SHIFT,    &Parser::parse_operator },      // <<
+    { Token::RIGHT_SHIFT,   &Parser::parse_operator },      // >>
+    { Token::BIT_AND,       &Parser::parse_operator },      // &
+    { Token::BIT_XOR,       &Parser::parse_operator },      // ^
+    { Token::BIT_OR,        &Parser::parse_operator },      // |
+    { Token::LT,            &Parser::parse_operator },      // <
+    { Token::GT,            &Parser::parse_operator },      // >
+    { Token::LE,            &Parser::parse_operator },      // <=
+    { Token::GE,            &Parser::parse_operator },      // >=
+    { Token::EQ,            &Parser::parse_operator },      // ==
+    { Token::NE,            &Parser::parse_operator },      // !=
 };
 
 /* ========================================================================== */

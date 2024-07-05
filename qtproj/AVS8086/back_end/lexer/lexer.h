@@ -6,6 +6,14 @@
 
 namespace avs8086::lexer {
 
+class ScanInterface
+{
+public:
+    virtual ~ScanInterface() = default;
+
+    virtual QStringList readFile() = 0;
+};
+
 class Lexer
 {
 public:
@@ -17,6 +25,9 @@ public:
     ~Lexer() = default;
 
     void clear();
+
+    void scan(const QString& file, ScanInterface* scanner);
+
 
     /*
      * @param input: 如果为空, 则读取文件进行扫描, 否则扫描 input;

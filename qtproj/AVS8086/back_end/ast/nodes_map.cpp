@@ -49,6 +49,7 @@ const QHash<QList<uint8_t>, uint8_t> Address::sm_toCodes = {
 /* ========================================================================== */
 
 #include "ast/stmts/jmp.h"
+#if 0
 const QHash<Token::Type, Jx::constructor> Jx::sm_constructors = {
     { Token::JO,    []() { return Pointer(new Jx(JO,   0x70)); } },
     { Token::JNO,   []() { return Pointer(new Jx(JNO,  0x71)); } },
@@ -82,8 +83,8 @@ const QHash<Token::Type, Jx::constructor> Jx::sm_constructors = {
     { Token::JNLE,  []() { return Pointer(new Jx(JNLE, 0x7f)); } },
     { Token::JCXZ,  []() { return Pointer(new Jx(JCXZ, 0xe3)); } },
 };
-#if 0
-const QHash<Token::Type, char> Jx::sm_toCodes = {
+#else
+const QHash<Token::Type, char> Jx::sm_codes = {
     { Token::JO,        0x70 },
     { Token::JNO,       0x71 },
     { Token::JB,        0x72 },
@@ -115,31 +116,49 @@ const QHash<Token::Type, char> Jx::sm_toCodes = {
     { Token::JG,        0x7f },
     { Token::JNLE,      0x7f },
     { Token::JCXZ,      0xe3 },
+    { Token::LOOP,      0xe2 },
+    { Token::LOOPZ,     0xe1 },
+    { Token::LOOPE,     0xe1 },
+    { Token::LOOPNZ,    0xe0 },
+    { Token::LOOPNE,    0xe0 },
 };
 #endif
 
 /* ========================================================================== */
 
-#include "ast/stmts/multiple.h"
-const QHash<Token::Type, Multiple::constructor> Multiple::sm_constructors = {
-    { Token::LEA,   []() { return Pointer(new Multiple(LEA, 0x8d)); } },
-    { Token::LDS,   []() { return Pointer(new Multiple(LDS, 0xc5)); } },
-    { Token::LES,   []() { return Pointer(new Multiple(LES, 0xc4)); } },
-
-    { Token::NOT,   []() { return Pointer(new Multiple(NOT, 0xf6)); } },
-    { Token::SAL,   []() { return Pointer(new Multiple(SAL, 0xc4)); } },
-    { Token::SAR,   []() { return Pointer(new Multiple(SAR, 0xc4)); } },
-    { Token::SHL,   []() { return Pointer(new Multiple(SHL, 0xc4)); } },
-    { Token::SHR,   []() { return Pointer(new Multiple(SHR, 0xc4)); } },
-    { Token::ROL,   []() { return Pointer(new Multiple(ROL, 0xc4)); } },
-    { Token::ROR,   []() { return Pointer(new Multiple(ROR, 0xc4)); } },
-    { Token::RCL,   []() { return Pointer(new Multiple(RCL, 0xc4)); } },
-    { Token::RCR,   []() { return Pointer(new Multiple(RCR, 0xc4)); } },
+#include "ast/stmts/lxx.h"
+const QHash<Token::Type, Lxx::Code> Lxx::sm_codes = {
+    { Token::LEA,   LEA },
+    { Token::LDS,   LDS },
+    { Token::LES,   LES },
 };
+#if 0
+const QHash<Token::Type, Multiple::constructor> Multiple::sm_constructors = {
+    { Token::LEA,  []() { return Pointer(new Multiple(LEA,  { 0x8d })); } },
+    { Token::LDS,  []() { return Pointer(new Multiple(LDS,  { 0xc5 })); } },
+    { Token::LES,  []() { return Pointer(new Multiple(LES,  { 0xc4 })); } },
+
+    { Token::NOT,  []() { return Pointer(new Multiple(NOT,  {0xf6, 0x10})); } },
+    { Token::SAL,  []() { return Pointer(new Multiple(SAL,  {0xd0, 0x20})); } },
+    { Token::SAR,  []() { return Pointer(new Multiple(SAR,  {0xd0, 0x38})); } },
+    { Token::SHL,  []() { return Pointer(new Multiple(SHL,  {0xd0, 0x20})); } },
+    { Token::SHR,  []() { return Pointer(new Multiple(SHR,  {0xd0, 0x28})); } },
+    { Token::ROL,  []() { return Pointer(new Multiple(ROL,  {0xd0, 0x00})); } },
+    { Token::ROR,  []() { return Pointer(new Multiple(ROR,  {0xd0, 0x01})); } },
+    { Token::RCL,  []() { return Pointer(new Multiple(RCL,  {0xd0, 0x10})); } },
+    { Token::RCR,  []() { return Pointer(new Multiple(RCR,  {0xd0, 0x11})); } },
+
+    { Token::MUL,  []() { return Pointer(new Multiple(MUL,  {0xd0, 0x00})); } },
+    { Token::IMUL, []() { return Pointer(new Multiple(IMUL, {0xd0, 0x01})); } },
+    { Token::DIV,  []() { return Pointer(new Multiple(DIV,  {0xd0, 0x10})); } },
+    { Token::IDIV, []() { return Pointer(new Multiple(IDIV, {0xd0, 0x11})); } },
+};
+#endif
 
 /* ========================================================================== */
 
 #include "ast/stmts/single.h"
+#if 0
 const QHash<Token::Type, Single::constructor> Single::sm_constructors = {
     { Token::XLAT,  []() { return Pointer(new Single(XLAT,  0xd7)); } },
     { Token::LAHF,  []() { return Pointer(new Single(LAHF,  0x9f)); } },
@@ -184,55 +203,65 @@ const QHash<Token::Type, Single::constructor> Single::sm_constructors = {
     { Token::AAM,   []() { return Pointer(new Single(AAM, {0xd4,0x0a})); } },
     { Token::AAD,   []() { return Pointer(new Single(AAD, {0xd5,0x0a})); } },
 };
-#if 0
-const QHash<Token::Type, char> Single::sm_singleCodes = {
-    { Token::XLAT,      0xd7 },     // XLAT
-    { Token::LAHF,      0x9f },     // LAHF
-    { Token::SAHF,      0x9e },     // SAHF
-    { Token::PUSHF,     0x9c },     // PUSHF
-    { Token::POPF,      0x9d },     // POPF
-    { Token::CBW,       0x98 },     // CBW
-    { Token::CWD,       0x99 },     // CWD
-    { Token::AAA,       0x37 },     // AAA
-    { Token::DAA,       0x27 },     // DAA
-    { Token::AAS,       0x3f },     // AAS
-    { Token::DAS,       0x2f },     // DAS
-    { Token::INTO,      0xce },     // INTO
-    { Token::IRET,      0xcf },     // IRET
-    { Token::REP,       0xf3 },     // REP
-    { Token::REPE,      0xf3 },     // REPE
-    { Token::REPZ,      0xf3 },     // REPZ
-    { Token::REPNE,     0xf2 },     // REPNE
-    { Token::REPNZ,     0xf2 },     // REPNZ
-    { Token::MOVSB,     0xa4 },     // MOVSB
-    { Token::MOVSW,     0xa5 },     // MOVSW
-    { Token::CMPSB,     0xa6 },     // CMPSB
-    { Token::CMPSW,     0xa7 },     // CMPSW
-    { Token::SCASB,     0xae },     // SCASB
-    { Token::SCASW,     0xaf },     // SCASW
-    { Token::LODSB,     0xac },     // LODSB
-    { Token::LODSW,     0xad },     // LODSW
-    { Token::STOSB,     0xaa },     // STOSB
-    { Token::STOSW,     0xab },     // STOSW
-    { Token::CLC,       0xf8 },     // CLC
-    { Token::STC,       0xf9 },     // STC
-    { Token::CMC,       0xf5 },     // CMC
-    { Token::CLD,       0xfc },     // CLD
-    { Token::STD,       0xfc },     // STD
-    { Token::CLI,       0xfa },     // CLI
-    { Token::STI,       0xfb },     // STI
-    { Token::WAIT,      0x9b },     // WAIT
-    { Token::LOCK,      0xf0 },     // LOCK
-    { Token::HLT,       0xf4 },     // HLT
-    { Token::NOP,       0x90 },     // NOP
-};
-const QHash<Token::Type, QPair<char, char>> Single::sm_doubleCodes = {
-    { Token::AAM,       { 0xd4, 0x0a } },     // AAM
-    { Token::AAD,       { 0xd5, 0x0a } },     // AAD
+#else
+const QHash<Token::Type, Single::initByteList> Single::sm_codes = {
+    { Token::XLAT,      { 0xd7 } },         // XLAT
+    { Token::LAHF,      { 0x9f } },         // LAHF
+    { Token::SAHF,      { 0x9e } },         // SAHF
+    { Token::PUSHF,     { 0x9c } },         // PUSHF
+    { Token::POPF,      { 0x9d } },         // POPF
+    { Token::CBW,       { 0x98 } },         // CBW
+    { Token::CWD,       { 0x99 } },         // CWD
+    { Token::AAA,       { 0x37 } },         // AAA
+    { Token::DAA,       { 0x27 } },         // DAA
+    { Token::AAS,       { 0x3f } },         // AAS
+    { Token::DAS,       { 0x2f } },         // DAS
+    { Token::INTO,      { 0xce } },         // INTO
+    { Token::IRET,      { 0xcf } },         // IRET
+    { Token::REP,       { 0xf3 } },         // REP
+    { Token::REPE,      { 0xf3 } },         // REPE
+    { Token::REPZ,      { 0xf3 } },         // REPZ
+    { Token::REPNE,     { 0xf2 } },         // REPNE
+    { Token::REPNZ,     { 0xf2 } },         // REPNZ
+    { Token::MOVSB,     { 0xa4 } },         // MOVSB
+    { Token::MOVSW,     { 0xa5 } },         // MOVSW
+    { Token::CMPSB,     { 0xa6 } },         // CMPSB
+    { Token::CMPSW,     { 0xa7 } },         // CMPSW
+    { Token::SCASB,     { 0xae } },         // SCASB
+    { Token::SCASW,     { 0xaf } },         // SCASW
+    { Token::LODSB,     { 0xac } },         // LODSB
+    { Token::LODSW,     { 0xad } },         // LODSW
+    { Token::STOSB,     { 0xaa } },         // STOSB
+    { Token::STOSW,     { 0xab } },         // STOSW
+    { Token::CLC,       { 0xf8 } },         // CLC
+    { Token::STC,       { 0xf9 } },         // STC
+    { Token::CMC,       { 0xf5 } },         // CMC
+    { Token::CLD,       { 0xfc } },         // CLD
+    { Token::STD,       { 0xfc } },         // STD
+    { Token::CLI,       { 0xfa } },         // CLI
+    { Token::STI,       { 0xfb } },         // STI
+    { Token::WAIT,      { 0x9b } },         // WAIT
+    { Token::LOCK,      { 0xf0 } },         // LOCK
+    { Token::HLT,       { 0xf4 } },         // HLT
+    { Token::NOP,       { 0x90 } },         // NOP
+    { Token::AAM,       { 0xd4, 0x0a } },   // AAM
+    { Token::AAD,       { 0xd5, 0x0a } },   // AAD
 };
 #endif
 
 /* ========================================================================== */
+
+#include "ast/stmts/shift.h"
+const QHash<Token::Type, Shift::Code> Shift::sm_codes = {
+    { Token::SAL,           SAL }, // SAL
+    { Token::SAR,           SAR }, // SAR
+    { Token::SHL,           SHL }, // SHL
+    { Token::SHR,           SHR }, // SHR
+    { Token::ROL,           ROL }, // ROL
+    { Token::ROR,           ROR }, // ROR
+    { Token::RCL,           RCL }, // RCL
+    { Token::RCR,           RCR }, // RCR
+};
 
 /* ========================================================================== */
 

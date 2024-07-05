@@ -1,14 +1,336 @@
 {
     "file": "D:/Leisure/Desktop/8086/AVS/test.txt",
-    "statements": {
-        "stmt 1": {
-            "code": "8d04",
-            "type(stmt)": "Illegal"
+    "statements": [
+        {
+            "stmt 1": {
+                "code": "b8d204",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "bytes": "06d204",
+                            "expr": {
+                                "token": "Integer: 1234",
+                                "type(expr)": "Value",
+                                "value": "0x04d2"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "LEA",
+                "type(stmt)": "Instruction"
+            }
         },
-        "stmt 2": {
-            "code": "c55d01",
-            "type(stmt)": "Illegal"
+        {
+            "stmt 2": {
+                "code": "8d973412",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: dx",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "bytes": "873412",
+                            "expr": {
+                                "expr": {
+                                    "token": "Integer: 0x1234",
+                                    "type(expr)": "Value",
+                                    "value": "0x1234"
+                                },
+                                "reg 1": {
+                                    "token": "Reg16: bx",
+                                    "type(expr)": "Register"
+                                },
+                                "token": "Plus +",
+                                "type(expr)": "Register Union"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "LEA",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 3": {
+                "code": "c4063412",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "bytes": "063412",
+                            "expr": {
+                                "token": "Integer: 0x1234",
+                                "type(expr)": "Value",
+                                "value": "0x1234"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "LES",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 4": {
+                "code": "c45f0c",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: bx",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "bytes": "470c",
+                            "expr": {
+                                "expr": {
+                                    "token": "Integer: 12",
+                                    "type(expr)": "Value",
+                                    "value": "0x0c"
+                                },
+                                "reg 1": {
+                                    "token": "Reg16: bx",
+                                    "type(expr)": "Register"
+                                },
+                                "token": "Plus +",
+                                "type(expr)": "Register Union"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "LES",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 5": {
+                "code": "c54e22",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: cx",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "bytes": "4622",
+                            "expr": {
+                                "expr": {
+                                    "token": "Integer: 34",
+                                    "type(expr)": "Value",
+                                    "value": "0x22"
+                                },
+                                "reg 1": {
+                                    "token": "Reg16: bp",
+                                    "type(expr)": "Register"
+                                },
+                                "token": "Plus +",
+                                "type(expr)": "Register Union"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "LDS",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 6": {
+                "id": "a",
+                "op": "Colon :",
+                "type(stmt)": "Define"
+            }
+        },
+        {
+            "stmt 7": {
+                "code": "93",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "token": "Reg16: bx",
+                            "type(expr)": "Register"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "XCHG",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 8": {
+                "code": "90",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "XCHG",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 9": {
+                "code": "93",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg16: bx",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "token": "Reg16: ax",
+                            "type(expr)": "Register"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "XCHG",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 10": {
+                "code": "86c8",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "token": "Reg8: cl",
+                            "type(expr)": "Register"
+                        },
+                        "expr 2": {
+                            "token": "Reg8: al",
+                            "type(expr)": "Register"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "XCHG",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 11": {
+                "code": "eb09",
+                "instruction": "JMP",
+                "jmp": "b",
+                "offset": 9,
+                "size": 2,
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 12": {
+                "code": "ebf7",
+                "instruction": "JMP",
+                "jmp": "a",
+                "offset": -9,
+                "size": 2,
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 13": {
+                "code": "0e",
+                "expr": {
+                    "token": "SReg: cs",
+                    "type(expr)": "Register"
+                },
+                "instruction": "PUSH",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 14": {
+                "code": "1f",
+                "expr": {
+                    "token": "SReg: ds",
+                    "type(expr)": "Register"
+                },
+                "instruction": "POP",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 15": {
+                "code": "2ec707d204",
+                "expr": {
+                    "expressions": {
+                        "expr 1": {
+                            "bytes": "2e07",
+                            "expr": {
+                                "token": "Reg16: bx",
+                                "type(expr)": "Register"
+                            },
+                            "segment": {
+                                "token": "SReg: cs",
+                                "type(expr)": "Register"
+                            },
+                            "token": "Left Square [",
+                            "type(expr)": "Address"
+                        },
+                        "expr 2": {
+                            "token": "Integer: 1234",
+                            "type(expr)": "Value",
+                            "value": "0x04d2"
+                        }
+                    },
+                    "token": "Comma ,",
+                    "type(expr)": "Comma"
+                },
+                "instruction": "MOV",
+                "type(stmt)": "Instruction"
+            }
+        },
+        {
+            "stmt 16": {
+                "id": "b",
+                "op": "Colon :",
+                "type(stmt)": "Define"
+            }
         }
-    },
+    ],
     "type(stmt)": "Program"
 }

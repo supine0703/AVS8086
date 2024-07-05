@@ -29,12 +29,13 @@ ExprPointer Parser::parse_operator()
         return e;
     }
 
-    auto ve = right.dynamicCast<Value>();
-    if (ve.isNull())
+    if (!right->is(Node::VALUE))
     {
         addExpectExprErrorInfo(right, {Node::VALUE});
         return e;
     }
+
+    auto ve = assert_dynamic_cast<Value>(right);
 
     bool ok;
     auto value = ve->integer(&ok);
@@ -60,9 +61,7 @@ ExprPointer Parser::parse_operator()
         Q_ASSERT_X(false, "Parser::parse_operator", "type of operator error");
     }
 
-    auto tmp = Value(Token(), value);
-    e->m_unitDataSize = tmp.unitDataSize();
-    e->m_value = tmp.bytes();
+    e.reset(new Operator(*e, value));
     return e;
 }
 
@@ -81,41 +80,43 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
 
     auto le = left;
     auto re = parse_expression(p);
-    QSharedPointer<Operator> e(new Operator(token, le, re));
+    QSharedPointer<Operator> op_e(new Operator(token, le, re));
 
-    auto parse_op = [this, &token](const QSharedPointer<Operator>& op) {
-        const auto& l = op->m_left;
-        const auto& r = op->m_right;
+    auto parse_op = [this, &token](QSharedPointer<Operator>& op) {
+        auto l = op->left();
+        auto r = op->right();
+
         if (!(expectExprAbleToEvaluate(l) && expectExprAbleToEvaluate(r)))
         {
-            return ;
+            return;
         }
 
-        auto lve = l.dynamicCast<Value>();
-        if (lve.isNull())
+        if (!l->is(Node::VALUE))
         {
             addExpectExprErrorInfo(l, {Node::VALUE});
-            return ;
+            return;
         }
-        auto rve = r.dynamicCast<Value>();
-        if (rve.isNull())
+        if (!r->is(Node::VALUE))
         {
             addExpectExprErrorInfo(r, {Node::VALUE});
-            return ;
+            return;
         }
+
+        auto lve = assert_dynamic_cast<Value>(l);
+        auto rve = assert_dynamic_cast<Value>(r);
 
         bool ok;
         auto lv = lve->integer(&ok);
         if (!ok)
         {
             addExprCannotBeUsedAsIntegerErrorInfo(l);
-            return ;
+            return;
         }
         auto rv = rve->integer(&ok);
         if (!ok)
         {
             addExprCannotBeUsedAsIntegerErrorInfo(r);
-            return ;
+            return;
         }
 
         int size = qMax(l->dataSize(), r->dataSize());
@@ -126,7 +127,7 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
 #define CASE_V(T, OP, F) case T: value = (lv OP rv) & limit; F; break;
 #define CASE_DIV_V(T, OP) \
     case T: \
-        if (rv == 0) { addExprDivideZeroErrorInfo(op); return ; } \
+        if (rv == 0) { addExprDivideZeroErrorInfo(op); return; } \
         value = (lv OP rv) & limit; \
         break;
 
@@ -152,18 +153,14 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
             Q_ASSERT_X(false, "Parser::parse_operator", "operator type error");
         }
 
-        auto tmp = Value(Token(), value);
-        op->m_unitDataSize = tmp.unitDataSize();
-        op->m_value = tmp.bytes();
+        op.reset(new Operator(*op, value));
     };
 
     // 寄存器可以作为加号的表达式
-    if (re->is(Node::REG_UNION) || re->is(Node::REGISTER))
+    if ((re->is(Node::REG_UNION) || re->is(Node::REGISTER))
+        && !le->is(Node::REG_UNION))
     { // REG_UNION 优先级更高
-        if (!le->is(Node::REG_UNION))
-        {
-            le.swap(re);
-        }
+        le.swap(re);
     }
 
     if (le->is(Node::REG_UNION))
@@ -171,7 +168,7 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
         if (!token.is(Token::PLUS))
         {
             addExpectTokenErrorInfo(token, {Token::PLUS});
-            return e;
+            return op_e;
         }
 
         auto l_ru = assert_dynamic_cast<RegUnion>(le);
@@ -180,17 +177,16 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
         {
             auto r_ru  = assert_dynamic_cast<RegUnion>(re);
             l_ru->unite(r_ru);
-            if (l_ru->m_expr.isNull())
+            if (!l_ru->hasExpr())
             {
-                l_ru->resetExpr(r_ru->m_expr);
+                l_ru->resetExpr(r_ru->expr());
             }
-            else if (!r_ru->m_expr.isNull())
+            else if (r_ru->hasExpr())
             {
                 QSharedPointer<Operator> op(
-                    new Operator(token, l_ru->m_expr, r_ru->m_expr)
+                    new Operator(token, l_ru->expr(), r_ru->expr())
                 );
-                parse_op(op);
-                if (expectExprAbleToEvaluate(op))
+                if (expectExprAbleToEvaluate((parse_op(op), op)))
                 {
                     l_ru->resetExpr(op);
                 }
@@ -200,37 +196,35 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
         {
             l_ru->insert(assert_dynamic_cast<Register>(re));
         }
-        else
+        else if (re->is(Node::VALUE))
         {
-            auto rve = re.dynamicCast<Value>();
-            if (rve.isNull())
-            { // 不能仅判断可求值性, 必须是 value 或 operator
-                addExpectExprErrorInfo(
-                    re, {Node::VALUE, Node::REGISTER, Node::REG_UNION}
-                );
-                return e;
-            }
-            if (l_ru->m_expr.isNull())
-            {
-                l_ru->resetExpr(re);
-            }
-            else
+            if (l_ru->hasExpr())
             {
                 QSharedPointer<Operator> op(
-                    new Operator(token, l_ru->m_expr, re)
+                    new Operator(token, l_ru->expr(), re)
                 );
                 l_ru->resetExpr((parse_op(op), op));
             }
-            return l_ru;
+            else
+            {
+                l_ru->resetExpr(re);
+            }
         }
-        return l_ru;
+        else
+        {
+            addExpectExprErrorInfo(
+                re, {Node::VALUE, Node::REGISTER, Node::REG_UNION}
+            );
+            return op_e;
+        }
+        return le;
     }
     else if (le->is(Node::REGISTER))
     { // right: reg, value
         if (!token.is(Token::PLUS))
         {
             addExpectTokenErrorInfo(token, {Token::PLUS});
-            return e;
+            return op_e;
         }
 
         if (re->is(Node::REGISTER))
@@ -240,26 +234,25 @@ ExprPointer Parser::parse_operator(const ExprPointer& left)
             ru->insert(assert_dynamic_cast<Register>(le));
             return ru;
         }
-        else
+        else if (re->is(Node::VALUE))
         {
-            auto rve = re.dynamicCast<Value>();
-            if (rve.isNull())
-            { // 不能仅判断可求值性, 必须是 value 或 operator
-                addExpectExprErrorInfo(re, {Node::VALUE, Node::REGISTER});
-                return e;
-            }
             if (!expectExprAbleToEvaluate(re))
             {
-                return e;
+                return op_e;
             }
             QSharedPointer<RegUnion> ru(new RegUnion(token));
             ru->resetExpr(re);
             ru->insert(assert_dynamic_cast<Register>(le));
             return ru;
         }
+        else
+        {
+            addExpectExprErrorInfo(re, {Node::VALUE, Node::REGISTER});
+            return op_e;
+        }
     }
 
-    return (parse_op(e), e); // else 不包含寄存器
+    return (parse_op(op_e), op_e); // else 不包含寄存器
 }
 
 /* ========================================================================== */

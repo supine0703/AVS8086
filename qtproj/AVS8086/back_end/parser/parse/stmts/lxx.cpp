@@ -1,6 +1,7 @@
 #include "parser/parser.h"
-#include "ast/stmts/multiple.h"
+#include "ast/stmts/lxx.h"
 #include "ast/exprs/comma.h"
+#include "ast/exprs/address.h"
 #include "ast/exprs/register.h"
 
 using namespace avs8086::ast;
@@ -11,18 +12,18 @@ using namespace avs8086::parser;
 
 StmtPointer Parser::parse_lxx()
 {
-    auto lxx = Multiple::NEW(currToken().type());
-    Q_ASSERT(!lxx.isNull());
+    auto lxx = Lxx::Pointer(new Lxx(currToken().type()));
 
     if (!expectPeekToken(false, Token::TOKEN_EOL))
     {
-        lxx->m_expr = parse_illegal(peekToken());
-        addExpectExprErrorInfo(lxx->m_expr);
+        auto eol = parse_illegal(peekToken());
+        lxx->resetExpr(eol);
+        addExpectExprErrorInfo(eol);
         return lxx;
     }
 
     auto e = parse_expression();
-    lxx->m_expr = e;
+    lxx->resetExpr(e);
 
     if (!e->is(Node::COMMA))
     {
@@ -32,15 +33,15 @@ StmtPointer Parser::parse_lxx()
 
     auto comma = assert_dynamic_cast<Comma>(e);
 
-    if (comma->m_exprs.size() != 2)
+    if (comma->exprCount() != 2)
     {
-        addExpectCommaCountErrorInfo(comma, 2, comma->m_exprs.size());
+        addExpectCommaCountErrorInfo(comma, 2, comma->exprCount());
         return lxx;
     }
 
     // LXX reg, addr
-    auto e1 = comma->m_exprs.at(0);
-    auto e2 = comma->m_exprs.at(1);
+    auto e1 = comma->at(0);
+    auto e2 = comma->at(1);
 
     if (!e1->is(Node::REGISTER))
     {
@@ -50,9 +51,9 @@ StmtPointer Parser::parse_lxx()
 
     auto reg = assert_dynamic_cast<Register>(e1);
 
-    if (!reg->m_token.is(Token::REG16))
+    if (!reg->token().is(Token::REG16))
     {
-        addExpectTokenErrorInfo(reg->m_token, {Token::REG16});
+        addExpectTokenErrorInfo(reg->token(), {Token::REG16});
         return lxx;
     }
 
@@ -67,8 +68,18 @@ StmtPointer Parser::parse_lxx()
         return lxx;
     }
 
+    if (lxx->isLEA() && assert_dynamic_cast<Address>(e2)->is(Address::_16))
+    { // 优化 lea reg, [imme] -> mov reg, imme
+        lxx->set_reg_imme(reg->reg(), e2->bytes());
+    }
+    else
+    {
+        lxx->set_m_reg(e2->bytes(), reg->reg());
+    }
+#if 0
     lxx->m_codes.append(e2->bytes());
     lxx->m_codes[1] |= (reg->m_id & 0x07) << 3;
+#endif
 
     return lxx;
 }

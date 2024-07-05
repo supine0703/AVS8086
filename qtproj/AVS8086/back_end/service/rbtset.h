@@ -7,6 +7,8 @@ template <class T>
 class RBTSet
 {
     struct DummyValue {
+        friend bool operator==(const DummyValue&, const DummyValue&)
+        { return true; }
 #if 0
         friend auto operator<=>(const DummyValue&, const DummyValue&) = default;
 #endif

@@ -1,10 +1,30 @@
 #ifndef SINGLE_H
 #define SINGLE_H
 
-#include "ast/node.h"
+#include "ast/stmts/instruction.h"
 
 namespace avs8086::ast {
 
+class Single : public Instruction
+{
+public:
+    using Pointer = QSharedPointer<Single>;
+
+    Single(token::Token::Type type)
+        : Instruction(type)
+    {
+        Q_ASSERT(sm_codes.contains(type));
+        m_code.append(sm_codes.value(type));
+    }
+
+    ~Single() = default;
+
+private:
+    using initByteList = std::initializer_list<uint8_t>;
+    static const QHash<token::Token::Type, initByteList> sm_codes;
+};
+
+#if 0
 class Single : public Statement
 {
     using Pointer = QSharedPointer<Single>;
@@ -31,7 +51,7 @@ private:
         : Statement(type)
     { m_codes.append(codes); }
 };
-
+#endif
 } // namespace avs8086::ast
 
 #endif // SINGLE_H

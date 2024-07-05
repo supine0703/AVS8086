@@ -22,11 +22,11 @@ ExprPointer Parser::parse_commaArray(const ExprPointer& comma)
         {
             ERR;
         }
-        if (can_dynamic_cast<Value>(e))
+        if (e->is(Node::VALUE))
         {
             if (e->unitDataSize() > qMin(m_currUnitSize, 8))
             {
-                addExprVOverflowErrorInfo(e, max);
+                addValueOverflowErrorInfo(e, max);
                 ERR;
             }
         }

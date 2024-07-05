@@ -17,7 +17,7 @@ QSharedPointer<Program> Parser::newAST()
     clear();
 
     if (m_lexer == nullptr)
-        return nullptr;
+        return QSharedPointer<Program>(nullptr);
 
     m_error = m_lexer->isError();
     m_infos.insert(m_lexer->infos());
@@ -94,15 +94,21 @@ bool Parser::expectPeekToken(bool is, Token::Type type)
 
 bool Parser::expectPeekToken(bool is, const QList<Token::Type>& types)
 {
+    bool match = false;
     for (auto type : types)
+    {
         if (peekToken().is(type))
         {
-            is &= true;
+            match = true;
             break;
         }
-    if (is)
+    }
+    if (is == match)
+    {
         nextToken();
-    return is;
+        return true;
+    }
+    return false;
 }
 
 #if 0
@@ -140,7 +146,7 @@ void Parser::defineId(const StmtPointer& stmt)
     if (!currToken().is(Token::IDENTIFIER))
     {
         addExpectTokenErrorInfo(currToken(), {Token::IDENTIFIER});
-        return ;
+        return;
     }
 
     if (m_idIts.contains(*currToken()))
@@ -149,7 +155,7 @@ void Parser::defineId(const StmtPointer& stmt)
             Info::ERROR, currToken().pos(),
             "redefined identifier: " + *currToken()
         );
-        return ;
+        return;
     }
 
     m_idIts.insert(*currToken(), m_offsets.size());
@@ -163,7 +169,7 @@ void Parser::callId(const ast::StmtPointer& stmt)
     if (!currToken().is(Token::IDENTIFIER))
     {
         addExpectTokenErrorInfo(currToken(), {Token::IDENTIFIER});
-        return ;
+        return;
     }
 
     m_calls.insert(m_offsets.size(), stmt);
@@ -198,7 +204,7 @@ void Parser::addExpectTokenErrorInfo(
             QString("expected this token to be not '%1', but '%2'")
                 .arg(token.typeName(), *token)
         );
-        return ;
+        return;
     }
     QString expect = Token::typeName(types.at(0));
     for (int i = 1, end = types.size(); i < end; i++)
@@ -228,7 +234,7 @@ void Parser::addExpectExprErrorInfo(
             QString("expected this expression to be not '%1'")
                 .arg(expr->typeName())
         );
-        return ;
+        return;
     }
     QString expect = Node::typeName(types.at(0));
     for (int i = 1, end = types.size(); i < end; i++)
@@ -266,12 +272,19 @@ void Parser::addExprCannotBeUsedAsIntegerErrorInfo(const ExprPointer& expr)
     );
 }
 
-void Parser::addExprVOverflowErrorInfo(const ExprPointer& expr, size_t max)
+void Parser::addValueOverflowErrorInfo(const ExprPointer& expr, size_t max)
 {
     addInfo(
         Info::ERROR, expr->pos(),
         QString("expect value of expression between 0x0 and 0x%1, but: 0x%2")
-            .arg(QString::number(max, 16), show_Integer_hex(expr->bytes()))
+            .arg(QString::number(max, 16), show_integer_hex(expr->bytes()))
+    );
+}
+
+void Parser::addValueOnlyBeErrorInfo(const ast::ExprPointer& expr, size_t v)
+{
+    addInfo(
+        Info::ERROR, expr->pos(), QString("this value only be %1").arg(v)
     );
 }
 

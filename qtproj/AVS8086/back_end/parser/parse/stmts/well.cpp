@@ -57,7 +57,7 @@ StmtPointer Parser::parse_well()
         if (al->is(Node::REGISTER))
         {
             auto r = assert_dynamic_cast<Register>(al);
-            if (r->regType() == Token::REG8)
+            if (r->token().is(Token::REG8))
             {
                 static const QList<Token::Type> s_stopType = {
                     Token::LOAD_X, Token::SREG, Token::REG16,
@@ -66,7 +66,7 @@ StmtPointer Parser::parse_well()
             }
             else
             {
-                key = r->str();
+                key = *(r->token());
             }
         }
         else if (al->is(Node::LOAD_X))
@@ -77,22 +77,23 @@ StmtPointer Parser::parse_well()
         if (!key.isEmpty())
         {
             auto ar = a->right();
-            if (expectExprAbleToEvaluate(ar))
+            if (ar->is(Node::VALUE))
             {
-                auto v = ar.dynamicCast<Value>();
-                if (!v.isNull())
+                auto v = assert_dynamic_cast<Value>(ar);
+                bool ok;
+                auto i = v->integer(&ok);
+                if (!ok || i > 0xffff)
                 {
-                    bool ok;
-                    auto i = v->integer(&ok);
-                    if (!ok || i > 0xffff)
-                    {
-                        addExprVOverflowErrorInfo(ar, 0xffff);
-                    }
-                    else
-                    {
-                        value = QString("%1").arg(i, 4, 16, QChar('0'));
-                    }
+                    addValueOverflowErrorInfo(ar, 0xffff);
                 }
+                else
+                {
+                    value = QString("%1").arg(i, 4, 16, QChar('0'));
+                }
+            }
+            else
+            {
+                addExpectExprErrorInfo(ar, {Node::VALUE});
             }
         }
     }

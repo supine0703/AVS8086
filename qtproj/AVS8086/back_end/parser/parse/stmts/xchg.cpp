@@ -29,77 +29,91 @@ StmtPointer Parser::parse_xchg()
 
     auto comma = assert_dynamic_cast<Comma>(e);
 
-    if (comma->m_exprs.size() != 2)
+    if (comma->exprCount() != 2)
     {
-        addExpectCommaCountErrorInfo(comma, 2, comma->m_exprs.size());
+        addExpectCommaCountErrorInfo(comma, 2, comma->exprCount());
         return xchg;
     }
 
     // XCHG e1, e2
-    auto e1 = comma->m_exprs.at(0);
-    auto e2 = comma->m_exprs.at(1);
+    auto e1 = comma->at(0);
+    auto e2 = comma->at(1);
 
     if (e1->is(Node::REGISTER))
-    {
+    { // reg, ...
         auto reg1 = assert_dynamic_cast<Register>(e1);
-        bool word = reg1->m_id & 0x08;
-        if (reg1->m_token.is(Token::SREG))
+
+        if (reg1->isSegReg())
         {
             addSRegCannotBeModifiedErrorInfo(e1);
             return xchg;
         }
-        if (reg1->m_id == Register::IP)
+        if (reg1->is(Register::IP))
         {
             addIPCannotBeModifiedErrorInfo(e1);
             return xchg;
         }
 
         if (e2->is(Node::REGISTER))
-        {
+        { // reg, reg
             auto reg2 = assert_dynamic_cast<Register>(e2);
-            if (reg2->m_token.is(Token::SREG))
+            if (reg2->isSegReg())
             {
                 addSRegCannotBeModifiedErrorInfo(e2);
                 return xchg;
             }
-            if (reg2->m_id == Register::IP)
+            if (reg2->is(Register::IP))
             {
                 addIPCannotBeModifiedErrorInfo(e2);
                 return xchg;
             }
-            if (reg1->m_token.type() != reg2->m_token.type())
+            if (reg1->token().type() != reg2->token().type())
             {
                 addRegDoNotMatchErrorInfo(comma);
                 return xchg;
             }
 
-            if (reg1->m_id == Register::AX)
-            {
+            // 对 AX 优化
+            if (reg1->is(Register::AX))
+            {  // reg, ax
+                xchg->set_ax_reg(reg2->reg());
+#if 0
                 xchg->m_codes.append(Xchg::AX_REG | (reg2->m_id & 0x07));
+#endif
             }
-            else if (reg2->m_id == Register::AX)
-            {
+            else if (reg2->is(Register::AX))
+            { // ax, reg
+                xchg->set_ax_reg(reg1->reg());
+#if 0
                 xchg->m_codes.append(Xchg::AX_REG | (reg1->m_id & 0x07));
+#endif
             }
             else
-            {
+            { // reg, r
+                xchg->set_r_reg(reg1->word(), reg2->mod_rm(), reg1->reg());
+#if 0
+                bool word = reg1->word();
                 xchg->m_codes.append(Xchg::RM_REG | word);
                 // 右边作为 r/m
                 xchg->m_codes.append(
                     ((reg1->m_id & 0x07) << 3) | (reg2->m_id & 0xf7)
                 );
+#endif
             }
         }
         else if (e2->is(Node::ADDRESS))
-        {
+        { // reg, mem
             if (!expectExprAbleToEvaluate(e2))
             {
                 return xchg;
             }
 
+            xchg->set_m_reg(reg1->word(), e2->bytes(), reg1->reg());
+#if 0
             xchg->m_codes.append(Xchg::RM_REG | word);
             xchg->m_codes.append(e2->bytes());
             xchg->m_codes[1] |= (reg1->m_id & 0x07) << 3;
+#endif
         }
         else
         {
@@ -107,19 +121,22 @@ StmtPointer Parser::parse_xchg()
         }
     }
     else if (e1->is(Node::ADDRESS))
-    {
+    { // mem, ...
         if (!expectExprAbleToEvaluate(e1))
         {
             return xchg;
         }
 
         if (e2->is(Node::REGISTER))
-        {
+        { // mem, reg
             auto reg2 = assert_dynamic_cast<Register>(e2);
+            xchg->set_m_reg(reg2->word(), e1->bytes(), reg2->reg());
+#if 0
             bool word = reg2->m_id & 0x08;
             xchg->m_codes.append(Xchg::RM_REG | word);
             xchg->m_codes.append(e1->bytes());
             xchg->m_codes[1] |= (reg2->m_id & 0x07) << 3;
+#endif
         }
         else
         {

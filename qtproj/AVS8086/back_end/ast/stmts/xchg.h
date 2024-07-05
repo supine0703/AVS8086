@@ -1,27 +1,30 @@
 #ifndef XCHG_H
 #define XCHG_H
 
-#include "ast/node.h"
-
-namespace avs8086::parser {
-class Parser;
-} // namespace avs8086::parser
+#include "ast/stmts/instruction_extend.h"
 
 namespace avs8086::ast {
 
-class Xchg : public Statement
+class Xchg : public Instruction, private InstructionExtend
 {
-    friend class avs8086::parser::Parser;
 public:
-    Xchg(const ExprPointer& expr) : Statement(XCHG), m_expr(expr) { }
+    Xchg(const ExprPointer& expr) : Instruction(token::Token::XCHG, expr) { }
 
     ~Xchg() = default;
 
-    virtual QJsonObject json() const override;
+    void set_ax_reg(uint8_t reg)
+    {
+        m_code.clear();
+        m_code.append(AX_REG | reg);
+    }
+
+    void set_r_reg(bool w, uint8_t r, uint8_t reg)
+    { InstructionExtend::set_r_reg(RM_REG | w, r, reg); }
+
+    void set_m_reg(bool w, const QByteArray& m, uint8_t reg)
+    { set_rm_reg(RM_REG | w, m, reg); }
 
 private:
-    ExprPointer m_expr;
-
     enum Code : uint8_t {
         // 对称的 没有左右关系
         RM_REG = 0x86,   // | w , mod reg r/m
@@ -29,12 +32,6 @@ private:
     };
 };
 
-inline QJsonObject Xchg::json() const
-{
-    QJsonObject js = Statement::json();
-    js["expr"] = m_expr->json();
-    return js;
-}
 
 } // namespace avs8086::ast
 

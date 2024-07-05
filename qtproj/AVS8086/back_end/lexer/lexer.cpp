@@ -17,6 +17,19 @@ void Lexer::clear()
     m_eofToken = Token(Token::TOKEN_EOF, "", 0, 0);
 }
 
+void Lexer::scan(const QString& file, ScanInterface* scanner)
+{
+    clear();
+    m_file = file;
+
+    auto input = scanner->readFile();
+
+    if (!input.isEmpty())
+    {
+        scan(input);
+    }
+}
+
 void Lexer::scan(const QString& file, const QStringList& input)
 {
     clear();
@@ -24,7 +37,7 @@ void Lexer::scan(const QString& file, const QStringList& input)
     if (!input.isEmpty())
     {
         scan(input);
-        return ;
+        return;
     }
     if (!m_file.isEmpty())
     {
@@ -33,7 +46,7 @@ void Lexer::scan(const QString& file, const QStringList& input)
         {
             // TODO: translate
             addErrorInfo({0, 0, 0}, "file open false: " + inFile.errorString());
-            return ;
+            return;
         }
         QTextStream in(&inFile);
         QStringList f_input;
@@ -120,7 +133,7 @@ void Lexer::addErrorInfo(int row, int column, int length, const QString& info)
 void Lexer::scan(const QStringList& input)
 {
     if (isError() || input.isEmpty())
-        return ;
+        return;
 
     bool addEOL = false;
     QString tokenTxt;
@@ -139,7 +152,7 @@ void Lexer::scan(const QStringList& input)
     auto setId = [this, addIdError, &labels](int row) {
         auto i = m_tokens.size();
         if (i == 0)
-            return ;
+            return;
         while (m_tokens.at(--i).is(Token::LINE_BREAK))
             ; // 跳过所有 '\'
         auto& last(m_tokens[i]);

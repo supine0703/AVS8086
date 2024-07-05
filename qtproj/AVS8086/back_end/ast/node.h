@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include "token/token.h"
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QSharedPointer>
 
@@ -21,7 +22,7 @@ inline bool can_dynamic_cast(const QSharedPointer<T>& src)
     return !ptr.isNull();
 }
 
-inline QByteArray show_Integer_hex(const QByteArray& bytes)
+inline QByteArray show_integer_hex(const QByteArray& bytes)
 {
     auto tmp = bytes;
     std::reverse(tmp.begin(), tmp.end()); // 小端存储, 要颠倒
@@ -32,32 +33,34 @@ inline QByteArray show_Integer_hex(const QByteArray& bytes)
 
 class Node
 {
+    Node(Node&&) = delete;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
 public:
-    enum Type  {
+    /**
+     * 表达式分为可求值和不可求值
+     * 可求值: VALUE, DUP, OPERATOR, REGISTER, ADDRESS, COMMA_ARRAY
+     * 不可求值: FLOAT(不支持), IDENTIFIER, REG_UNION, COMMA, ILLEGAL
+    */
+    enum Type {
         NODE_EOL = -2,
         ILLEGAL = 0,
 
+        ILLEGAL_VALUE,
         DUP,
-        VALUE,      // integer string
-        FLOAT,      // float
+        VALUE,      // integer, string
         OPERATOR,   // * / % + - & ^ | << >> = > >= < <= == !=; ~x +x -x
+        FLOAT,      // float
         IDENTIFIER,
 
-        WELL,       // #...#
-        DEFINE,
-
-        SINGLE,
-
-        COMMA,      // ,
-        COMMA_ARRAY,
-        COLON,      // :
-
         REGISTER,   // reg
-        REG_UNION,  // reg union
+        REG_UNION,  // reg union : reg(s) + value
         ADDRESS,    // []
+
+        COMMA_ARRAY,
+        COMMA,      // ,
+        COLON,      // :
 
         PROGRAM,
         EXPR_STMT,
@@ -66,102 +69,11 @@ public:
         MAKE_X,
         LOAD_X,
 
-        MOV,
-        PUSH,
-        POP,
-        XCHG,
-        LEA,
-        LDS,
-        LES,
+        WELL,       // #...#
+        DEFINE,
+        SINGLE,
 
-        NOT,
-        AND,
-        OR,
-        XOR,
-        TEST,
-        SAL,
-        SAR,
-        SHL,
-        SHR,
-        ROL,
-        ROR,
-        RCL,
-        RCR,
-
-        XLAT,
-        LAHF,
-        SAHF,
-        PUSHF,
-        POPF,
-        CBW,
-        CWD,
-        AAA,
-        DAA,
-        AAS,
-        DAS,
-        INTO,
-        IRET,
-        REP,
-        REPE,
-        REPZ,
-        REPNE,
-        REPNZ,
-        MOVSB,
-        MOVSW,
-        CMPSB,
-        CMPSW,
-        SCASB,
-        SCASW,
-        LODSB,
-        LODSW,
-        STOSB,
-        STOSW,
-        CLC,
-        STC,
-        CMC,
-        CLD,
-        STD,
-        CLI,
-        STI,
-        WAIT,
-        LOCK,
-        HLT,
-        NOP,
-        AAM,
-        AAD,
-
-        JMP,
-        JO,
-        JNO,
-        JB,
-        JC,
-        JNAE,
-        JAE,
-        JNB,
-        JNC,
-        JE,
-        JZ,
-        JNE,
-        JNZ,
-        JBE,
-        JNA,
-        JA,
-        JNBE,
-        JS,
-        JNS,
-        JP,
-        JPE,
-        JNP,
-        JPO,
-        JL,
-        JNGE,
-        JGE,
-        JNL,
-        JLE,
-        JNG,
-        JG,
-        JNLE,
-        JCXZ,
+        INSTRUCTION,
     };
 
 protected:
@@ -192,28 +104,6 @@ using ExprPointer = QSharedPointer<class Expression>;
 
 /* ========================================================================== */
 
-class Statement : public Node
-{
-protected:
-    Statement(Type type) : Node(type) { }
-
-    QByteArray m_codes;
-
-public:
-    virtual ~Statement() = default;
-
-    virtual QJsonObject json() const override;
-
-    virtual void addIn(const StmtPointer& s, QList<StmtPointer>& stmts)
-    { stmts.append(s); }
-
-    virtual QByteArray codes() const { return m_codes; }
-
-    qsizetype length() const { return m_codes.length(); }
-};
-
-/* ========================================================================== */
-
 class Expression : public Node
 {
 protected:
@@ -241,6 +131,45 @@ public:
     virtual void addIn(const ExprPointer& e, QList<ExprPointer>& exprs)
     { exprs.append(e); }
 };
+
+inline QJsonObject Expression::json() const
+{
+    QJsonObject js;
+    js["type(expr)"] = typeName();
+    js["token"] = m_token.content();
+    return js;
+}
+
+/* ========================================================================== */
+
+class Statement : public Node
+{
+protected:
+    Statement(Type type) : Node(type) { }
+
+public:
+    virtual ~Statement() = default;
+
+    virtual QJsonObject json() const override;
+
+    virtual void addIn(const StmtPointer& s, QList<StmtPointer>& stmts)
+    { stmts.append(s); }
+
+    virtual QByteArray code() const { return QByteArray(); }
+
+    virtual qsizetype codeSize() const { return 0; }
+};
+
+inline QJsonObject Statement::json() const
+{
+    QJsonObject js;
+    js["type(stmt)"] = typeName();
+    if (codeSize() != 0)
+    {
+        js["code"] = QString::fromUtf8(code().toHex());
+    }
+    return js;
+}
 
 } // namespace avs8086::ast
 

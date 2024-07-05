@@ -33,17 +33,13 @@ ExprPointer Parser::parse_dup(const ExprPointer& left)
         return ExprPointer(new Dup(token, left, right));
     }
 
-    auto lve = left.dynamicCast<Value>();
-    if (lve.isNull())
+    if (!left->is(Node::VALUE))
     {
         addExpectExprErrorInfo(left, {Node::VALUE});
         return ExprPointer(new Dup(token, left, right));
     }
-    if (!expectExprAbleToEvaluate(left))
-    {
-        return ExprPointer(new Dup(token, left, right));
-    }
 
+    auto lve = assert_dynamic_cast<Value>(left);
     bool ok;
     auto count = lve->integer(&ok);
     if (!ok)

@@ -2,7 +2,6 @@
 #define ILLEGAL_H
 
 #include "ast/node.h"
-#include "token/token.h"
 
 namespace avs8086::ast {
 

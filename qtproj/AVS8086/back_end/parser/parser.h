@@ -112,7 +112,8 @@ private:
 
     void addExprDivideZeroErrorInfo(const ast::ExprPointer& expr);
     void addExprCannotBeUsedAsIntegerErrorInfo(const ast::ExprPointer& expr);
-    void addExprVOverflowErrorInfo(const ast::ExprPointer& expr, size_t max);
+    void addValueOverflowErrorInfo(const ast::ExprPointer& expr, size_t max);
+    void addValueOnlyBeErrorInfo(const ast::ExprPointer& expr, size_t v);
     void addExprUnableToEvaluateErrorInfo(const ast::ExprPointer& expr);
     bool expectExprAbleToEvaluate(const ast::ExprPointer& expr);
     void addExpectCommaCountErrorInfo(
@@ -172,7 +173,7 @@ private:
     ast::StmtPointer parse_lxx();
     ast::StmtPointer parse_logical_bit();
     ast::StmtPointer parse_logical_not();
-    ast::StmtPointer parse_logical_shift();
+    ast::StmtPointer parse_shift();
     ast::StmtPointer parse_jmp();
     ast::StmtPointer parse_jx();
     ast::StmtPointer parse_single();
@@ -193,6 +194,7 @@ private:
     ast::ExprPointer parse_T(const ast::ExprPointer& left);
     ast::ExprPointer parse_operator(const ast::ExprPointer& left);
     ast::ExprPointer parse_dup(const ast::ExprPointer& left);
+    ast::ExprPointer parse_colon(const ast::ExprPointer& left);
 
     // other
     ast::ExprPointer parse_commaArray(const ast::ExprPointer& comma);

@@ -25,24 +25,32 @@ void Parser::parse_idTable()
     if (parse_idTable(m_idTable, -1, m_offsets.size() - 1, 0, 0xfffff))
         ;
     for (const auto& [offset, s] : m_lastCalls)
-    { // 最后在计算地址, 包括 jmp far, jx
-        if (s->is(Node::JMP))
-        {
-            auto jmp = assert_dynamic_cast<Jmp>(s);
-            auto id = m_idTable.find(*(jmp->m_id));
-            Q_ASSERT(id != m_idTable.end());
-            jmp->setOffset(id->offset() - offset);
+    { // 最后在计算地址, 包括 jmp far, jmp ...(ptr), jx
+        auto jb = assert_dynamic_cast<JmpBase>(s);
+        auto id = m_idTable.find(jb->label());
+        Q_ASSERT(id != m_idTable.end());
+        if (jb->labelSize() == 5)
+        { // jmp far
+            if (!jb->setSegOffset(0, id->offset()))
+            {
+                Q_ASSERT_X("false", "Parser::parse_idTable", "jmp far error");
+            }
         }
         else
-        {
-            auto jx = s.dynamicCast<Jx>();
-            if (!jx.isNull())
+        { // jx, jmp short, jmp near ptr
+            if (!jb->setOffset(id->offset() - offset))
             {
-                auto id = m_idTable.find(*(jx->m_id));
-                Q_ASSERT(id != m_idTable.end());
-                if (!jx->setOffset(id->offset() - offset))
+                if (jb->labelSize() == 2)
                 {
-                    addJmpOverflowErrorInfo(jx->m_pos, -128, 127);
+                    addJmpOverflowErrorInfo(jb->pos(), -128, 127);
+                }
+                else if (jb->labelSize() == 3)
+                {
+                    addJmpOverflowErrorInfo(jb->pos(), -32769, 32767);
+                }
+                else
+                {
+                    Q_ASSERT_X(false, "Parser::parse_idTable", "");
                 }
             }
         }
@@ -83,25 +91,31 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
         { // 调用
             Q_ASSERT(m_calls.contains(i));
             auto s = m_calls.value(i);
-            if (can_dynamic_cast<Jx>(s))
+            auto jb = s.dynamicCast<JmpBase>();
+            if (!jb.isNull())
             {
-                differ += 2;
-                m_lastCalls.append({offset + differ, s});
-                continue;
-            }
-            else if (s->is(Node::JMP))
-            {
-                auto jmp = assert_dynamic_cast<Jmp>(s);
-                auto id = table.find(*(jmp->m_id));
+                if (jb->labelSize() != 0)
+                { // jx, jmp ...(ptr)
+                    // TODO: jmp far
+                    Q_ASSERT(jb->labelSize() != 5);
+                    differ += jb->labelSize();
+                    m_lastCalls.append({offset + differ, s});
+                    continue;
+                }
+                // jmp
+                auto id = table.find(jb->label());
                 if (id != table.end())
                 { // 向前寻找
-                    jmp->setOffset(id->offset() - (offset + differ + 1));
-                    differ += jmp->m_size;
+                    Q_ASSERT(
+                        jb->setOffset(id->offset() - (offset + differ + 1))
+                    );
+                    jb->setOffset(id->offset() - (offset + differ + 1));
+                    differ += jb->labelSize();
                 }
                 else
                 { // 向后寻找
-                    Q_ASSERT(m_idIts.contains(*(jmp->m_id)));
-                    auto id_i = m_idIts.value(*(jmp->m_id));
+                    Q_ASSERT(m_idIts.contains(jb->label()));
+                    auto id_i = m_idIts.value(jb->label());
                     int tmp = offset + differ;
                     if (parse_idTable(table, i, id_i, tmp + 2, 0x7f))
                     {
@@ -115,17 +129,28 @@ bool Parser::parse_idTable(IdTable& t, int begin, int end, int offset, int max)
                     {
                         differ += 5;
                         m_lastCalls.append({offset + differ, s});
-                        continue;
                     }
-                    id = table.find(*(jmp->m_id));
+                    id = table.find(jb->label());
                     Q_ASSERT(id != table.end());
                     Q_ASSERT(id->offset() - (offset + differ) >= 0);
-                    jmp->setOffset(id->offset() - (offset + differ));
+                    Q_ASSERT(
+                        jb->setOffset(id->offset() - (offset + differ))
+                        || jb->labelSize() == 5
+                    );
+                    jb->setOffset(id->offset() - (offset + differ));
                 }
+            }
+            else
+            {
+                // TODO: call, ret
+                Q_ASSERT_X(false, "Parser::parse_idTable", "not jmp");
             }
         }
         if (differ > max)
+        {
+            qDebug() << differ;
             return false;
+        }
     }
 
     m_currOffset = offset + differ;

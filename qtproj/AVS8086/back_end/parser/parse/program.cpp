@@ -22,7 +22,7 @@ QSharedPointer<Program> Parser::parse_program()
             stmt->addIn(stmt, p->m_stmts);
             while (i < p->m_stmts.size())
             {
-                m_currOffset += p->m_stmts.at(i++)->length();
+                m_currOffset += p->m_stmts.at(i++)->codeSize();
             }
 #if 0
             int row = currToken().row();

@@ -13,30 +13,27 @@ StmtPointer Parser::parse_push_pop()
     Q_ASSERT(currToken().is(Token::PUSH) || currToken().is(Token::POP));
     bool isPush = currToken().is(Token::PUSH);
 
-    auto pp =
-        isPush
-            ? QSharedPointer<PushPop>(new Push)
-            : QSharedPointer<PushPop>(new Pop);
+    auto pp(isPush ? PushPop::Pointer(new Push) : PushPop::Pointer(new Pop));
 
     if (!expectPeekToken(false, Token::TOKEN_EOL))
     {
         auto eol = parse_illegal(peekToken());
         addExpectExprErrorInfo(eol);
-        pp->m_expr = eol;
+        pp->resetExpr(eol);
         return pp;
     }
 
     auto e = parse_expression();
-    pp->m_expr = e;
+    pp->resetExpr(e);
 
     if (e->is(Node::REGISTER))
     {
         auto reg = assert_dynamic_cast<Register>(e);
-        if (reg->m_token.is(Token::REG8))
+        if (reg->token().is(Token::REG8))
         {
-            addExpectTokenErrorInfo(reg->m_token); // cannot be reg8
+            addExpectTokenErrorInfo(reg->token()); // cannot be reg8
         }
-        else if (reg->m_id == Register::IP)
+        else if (reg->is(Register::IP))
         {
             if (isPush)
             { // push
@@ -47,20 +44,20 @@ StmtPointer Parser::parse_push_pop()
                 addIPCannotBeModifiedErrorInfo(e);
             }
         }
-        else if (reg->m_token.is(Token::SREG))
+        else if (reg->token().is(Token::SREG))
         {
-            if (reg->m_id == Register::CS && !isPush)
+            if (reg->is(Register::CS) && !isPush)
             {
                 addCSCannotBeModifiedErrorInfo(e);
             }
             else
             {
-                pp->m_codes.append(pp->SREG() | (reg->m_id & 0x18));
+                pp->setCode_sreg(reg->segment());
             }
         }
         else
         {
-            pp->m_codes.append(pp->REG() | (reg->m_id & 0x07));
+            pp->setCode_reg(reg->segment());
         }
     }
     else if (e->is(Node::ADDRESS))
@@ -70,12 +67,7 @@ StmtPointer Parser::parse_push_pop()
             return pp;
         }
 
-        pp->m_codes.append(pp->RM());
-        pp->m_codes.append(e->bytes());
-        if (isPush)
-        {
-            pp->m_codes[1] |= 0x30;
-        }
+        pp->setCode_rm(e->bytes());
     }
     else
     {

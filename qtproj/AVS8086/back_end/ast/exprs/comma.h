@@ -3,17 +3,12 @@
 
 #include "ast/exprs/array.h"
 
-namespace avs8086::parser {
-class Parser;
-} // namespace avs8086::parser
-
 namespace avs8086::ast {
 
 class CommaArray;
 
 class Comma : public Expression
 {
-    friend class avs8086::parser::Parser;
     friend class avs8086::ast::CommaArray;
 public:
     Comma(
@@ -45,6 +40,10 @@ public:
     { return m_exprs.first()->pos() + m_exprs.last()->pos(); }
 
     QList<ExprPointer> expressions() const { return m_exprs; }
+
+    qsizetype exprCount() const { return m_exprs.size(); }
+
+    ExprPointer at(qsizetype i) const { return m_exprs.at(i); }
 
 private:
     QList<ExprPointer> m_exprs;
@@ -89,7 +88,7 @@ inline QJsonObject CommaArray::json() const
 {
     QJsonObject js = Expression::json();
     js["Comma"] = m_comma->json();
-    js["data"] = QString(show_Integer_hex(bytes()));
+    js["data"] = QString(show_integer_hex(bytes()));
     return js;
 }
 

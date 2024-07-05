@@ -3,21 +3,19 @@
 
 #include "ast/node.h"
 
-namespace avs8086::parser {
-class Parser;
-} // namespace avs8086::parser
-
 namespace avs8086::ast {
 
 class Value : public Expression
 {
-    friend class avs8086::parser::Parser; // 用作数据对齐
 public:
+    Value(const token::Token& token) : Expression(ILLEGAL_VALUE, token) { }
+
     Value(const token::Token& token, size_t integer)
         : Expression(VALUE, token)
     {
         do
-        {   m_value.append(static_cast<char>(integer & 0xff));
+        {
+            m_value.append(static_cast<char>(integer & 0xff));
             integer >>= 8;
         } while (integer != 0);
         m_unitDataSize = m_value.size();
@@ -56,6 +54,15 @@ public:
         return v;
     }
 
+    void alignData(int size)
+    {
+        int post = dataSize() % size;
+        if (post != 0)
+        {
+            m_value.append(size - post, 0x00);
+        }
+    }
+
 #if 0
     // QByteArray 和 QString 相互转换可能会改变值, 因此弃用
     Value(const token::Token& token, const QString& string)
@@ -88,12 +95,17 @@ public:
     }
 #endif
 
-protected:
+private:
     int m_unitDataSize = 0;
     QByteArray m_value;
-
-    Value(Type type, const token::Token& token) : Expression(type, token) { }
 };
+
+inline QJsonObject Value::json() const
+{
+    QJsonObject js = Expression::json();
+    js["value"] = "0x" + QString(show_integer_hex(m_value));
+    return js;
+}
 
 /* ========================================================================== */
 
@@ -105,8 +117,6 @@ public:
     { }
 
     ~Float() = default;
-
-    virtual QJsonObject json() const override;
 
 private:
     double m_value;

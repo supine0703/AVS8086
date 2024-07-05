@@ -56,29 +56,28 @@ StmtPointer Parser::parse_allocate()
     else if (e->is(Node::DUP))
     {
     }
-    else
+    else if (e->is(Node::VALUE))
     { // 处理Value
-        auto v = e.dynamicCast<Value>();
-        if (v.isNull())
-        {
-            addExpectExprErrorInfo(e, {Node::COMMA, Node::DUP, Node::VALUE});
-            return d;
-        }
-        if (!expectExprAbleToEvaluate(e))
-        {
-            return d;
-        }
+        auto v = assert_dynamic_cast<Value>(e);
         // 检查数据长度
         if (v->unitDataSize() > m_currUnitSize)
         {
-            addExprVOverflowErrorInfo(v, max);
+            addValueOverflowErrorInfo(v, max);
         }
         // 对齐数据
+        v->alignData(m_currUnitSize);
+#if 0
         auto post = v->dataSize() % m_currUnitSize;
         if (post != 0)
         {
             v->m_value.append(m_currUnitSize - post, 0);
         }
+#endif
+    }
+    else
+    {
+        addExpectExprErrorInfo(e, {Node::COMMA, Node::DUP, Node::VALUE});
+        return d;
     }
 
     m_currOffset += d->m_expr->dataSize();

@@ -203,6 +203,7 @@ public:
         SHORT,
         NEAR,
         FAR,
+        BYTE,
         WORD,
         DWORD,
 
