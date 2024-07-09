@@ -1,3 +1,5 @@
+[开发日志](./docs/development_log.md)
+
 # 更新
 <!-- ## 2024/03/23
 汇编虚拟仿真模拟器(assembler virtual simulator) - Rename: ASMVS -> AVS8086 -->
@@ -19,3 +21,4 @@
 ![](./docs/images/抽象语法树.png)
 
 8086汇编IDE（集成了编译器、反编译器、模拟器等），对标于EMU8086
+
