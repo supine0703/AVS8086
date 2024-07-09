@@ -118,12 +118,12 @@ void emulatorwidget::singleRun()
         break;
     // case 2:
     case 3:
-        vm.m_memory[vm.REG(VM::ES) * 16 + 0x1000] = 0x12;
-        vm.m_memory[vm.REG(VM::ES) * 16 + 0x1001] = 0x34;
+        vm.m_memory[vm.REG(VM::ES) * 16 + 0x2000] = 0x12;
+        vm.m_memory[vm.REG(VM::ES) * 16 + 0x2001] = 0x34;
         break;
     case 4:
-        vm.m_memory[vm.REG(VM::ES) * 16 + 0x1002] = 0x56;
-        vm.m_memory[vm.REG(VM::ES) * 16 + 0x1003] = 0x78;
+        vm.m_memory[vm.REG(VM::ES) * 16 + 0x2002] = 0x56;
+        vm.m_memory[vm.REG(VM::ES) * 16 + 0x2003] = 0x78;
         break;
     case 5:
         vm.REG(VM::BX) = 0x1500;
@@ -132,23 +132,16 @@ void emulatorwidget::singleRun()
         vm.REG(VM::SI) = 0x0b00;
         break;
     case 7:
-        // vm.REG(VM::AX) = vm.m_memory[vm.REG(VM::BX) + vm.REG(VM::SI) + vm.REG(VM::DS) * 16];
-        vm.REG(VM::AX) = 0x4321;
+        vm.REG(VM::AX) = vm.m_memory[vm.REG(VM::BX) + vm.REG(VM::SI) + vm.REG(VM::DS) * 16];
         break;
     case 8:
         vm.m_memory[vm.REG(VM::DS) * 16 + 0x1000] = vm.REG(VM::AX);
-        vm.m_memory[vm.REG(VM::DS) * 16 + 0x1001] = vm.REG(VM::AX) >> 8;
         break;
     case 9:
-        // vm.REG(VM::AX) = vm.m_memory[vm.REG(VM::BX) + vm.REG(VM::SI) + vm.REG(VM::DS) * 16 + 2];
-        vm.REG(VM::AX) = 0x8765;
+        vm.REG(VM::AX) = vm.m_memory[vm.REG(VM::BX) + vm.REG(VM::SI) + vm.REG(VM::DS) * 16 + 2];
         break;
     case 10:
-        // vm.m_memory[vm.REG(VM::DS) * 16 + 0x1000] = vm.REG(VM::AX) + 1;
-        vm.m_memory[0x6000] = 0x99;
-        vm.m_memory[0x6001] = 0x99;
-        vm.m_memory[0x6002] = 0x99;
-        vm.m_memory[0x6003] = 0x99;
+        vm.m_memory[vm.REG(VM::DS) * 16 + 0x1000] = vm.REG(VM::AX) + 1;
         break;
     case 11:
         QMessageBox::information(this, "提示", "虚拟机已暂停");

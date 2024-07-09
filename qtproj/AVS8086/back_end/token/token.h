@@ -1,250 +1,313 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <QMap>
-// #include <QStringList>
+#include "service/position.h"
 
 namespace avs8086::token {
 
 class Token
 {
 public:
-    enum Type {
-        TOKEN_ILLEGAL = 0,      // illegal
-        TOKEN_EOF,              // eof
+    enum Type  {
+        TOKEN_EOL = -2,     // eol: end of line
+        TOKEN_EOF = -1,     // eof: end of file
 
-        TOKEN_MAKE_,            // make_
-        TOKEN_LOAD_,            // load_
+        ILLEGAL = 0,        // illegal
+        ILLEGAL_INTEGER,    // illegal integer
 
-        TOKEN_REGISTER,         // register
-        TOKEN_LABEL,            // label
-        TOKEN_STRING,           // string
-        TOKEN_INTEGER,          // integer
-        TOKEN_FLOAT,            // float
+        MAKE_X,             // make_
+        LOAD_X,             // load_
 
-        TOKEN_BIT_NOT,          // ~
-        TOKEN_ASTERISK,         // *
-        TOKEN_SLASH,            // /
-        TOKEN_MODULO,           // %
-        TOKEN_PLUS,             // +
-        TOKEN_MINUS,            // -
-        TOKEN_LEFT_SHIFT,       // <<
-        TOKEN_RIGHT_SHIFT,      // >>
-        TOKEN_BIT_AND,          // &
-        TOKEN_BIT_XOR,          // ^
-        TOKEN_BIT_OR,           // |
+        // REGISTER,           // register
+        SREG,               // segment register
+        REG8,               // register 8bit
+        REG16,              // register 16bit
 
-        TOKEN_LT,               // <
-        TOKEN_GT,               // >
-        TOKEN_LE,               // <=
-        TOKEN_GE,               // >=
-        TOKEN_EQ,               // ==
-        TOKEN_NE,               // !=
+        IDENTIFIER,         // identifier
+        STRING,             // string
+        INTEGER,            // integer
+        FLOAT,              // float
 
-        TOKEN_ASSIGN,           // =
-        TOKEN_COMMA,            // ,
-        TOKEN_COLON,            // :
-        TOKEN_QUESTION,         // ?
-        TOKEN_DOLLAR,           // $
-        TOKEN_WELL,             // #
-        TOKEN_ANNOTATION,       // ; annotation
+        LINE_BREAK,         // \ line break
+        ANNOTATION,         // ; annotation
 
-        TOKEN_LPAREN,           // (
-        TOKEN_RPAREN,           // )
-        TOKEN_LSQUARE,          // [
-        TOKEN_RSQUARE,          // ]
+        BIT_NOT,            // ~
+        ASTERISK,           // *
+        SLASH,              // /
+        MODULO,             // %
+        PLUS,               // +
+        MINUS,              // -
+        LEFT_SHIFT,         // <<
+        RIGHT_SHIFT,        // >>
+        BIT_AND,            // &
+        BIT_XOR,            // ^
+        BIT_OR,             // |
 
+        LT,                 // <
+        GT,                 // >
+        LE,                 // <=
+        GE,                 // >=
+        EQ,                 // ==
+        NE,                 // !=
 
-        TOKEN_MOV,              // MOV
-        TOKEN_PUSH,             // PUSH
-        TOKEN_POP,              // POP
-        TOKEN_XCHG,             // XCHG
-        TOKEN_XLAT,             // XLAT
-        TOKEN_LEA,              // LEA
-        TOKEN_LDS,              // LDS
-        TOKEN_LES,              // LES
+        ASSIGN,             // =
+        COMMA,              // ,
+        COLON,              // :
+        QUESTION,           // ?
+        DOLLAR,             // $
+        WELL,               // #
 
-        TOKEN_LAHF,             // LAHF
-        TOKEN_SAHF,             // SAHF
-        TOKEN_PUSHF,            // PUSHF
-        TOKEN_POPF,             // POPF
-
-        TOKEN_IN,               // IN
-        TOKEN_OUT,              // OUT
-
-        TOKEN_ADD,              // ADD
-        TOKEN_ADC,              // ADC
-        TOKEN_INC,              // INC
-        TOKEN_SUB,              // SUB
-        TOKEN_SBB,              // SBB
-        TOKEN_DEC,              // DEC
-        TOKEN_NEG,              // NEG
-        TOKEN_CMP,              // CMP
-        TOKEN_MUL,              // MUL
-        TOKEN_IMUL,             // IMUL
-        TOKEN_DIV,              // DIV
-        TOKEN_IDIV,             // IDIV
-        TOKEN_CBW,              // CBW
-        TOKEN_CWD,              // CWD
-        TOKEN_AAA,              // AAA
-        TOKEN_DAA,              // DAA
-        TOKEN_AAS,              // AAS
-        TOKEN_DAS,              // DAS
-        TOKEN_AAM,              // AAM
-        TOKEN_AAD,              // AAD
-
-        TOKEN_AND,              // AND
-        TOKEN_OR,               // OR
-        TOKEN_XOR,              // XOR
-        TOKEN_NOT,              // NOT
-        TOKEN_TEST,             // TEST
-
-        TOKEN_SAL,              // SAL
-        TOKEN_SAR,              // SAR
-        TOKEN_SHL,              // SHL
-        TOKEN_SHR,              // SHR
-        TOKEN_ROL,              // ROL
-        TOKEN_ROR,              // ROR
-        TOKEN_RCL,              // RCL
-        TOKEN_RCR,              // RCR
-
-        TOKEN_MOVSB,            // MOVSB
-        TOKEN_MOVSW,            // MOVSW
-        TOKEN_CMPSB,            // CMPSB
-        TOKEN_CMPSW,            // CMPSW
-        TOKEN_SCASB,            // SCASB
-        TOKEN_SCASW,            // SCASW
-        TOKEN_LODSB,            // LODSB
-        TOKEN_LODSW,            // LODSW
-        TOKEN_STOSB,            // STOSB
-        TOKEN_STOSW,            // STOSW
-
-        TOKEN_REP,              // REP
-        TOKEN_REPE,             // REPE
-        TOKEN_REPZ,             // REPZ
-        TOKEN_REPNE,            // REPNE
-        TOKEN_REPNZ,            // REPNZ
-
-        TOKEN_CALL,             // CALL
-        TOKEN_RET,              // RET
-        TOKEN_JMP,              // any
-        TOKEN_JA,               // CF == 0 && ZF == 0  unsigned >
-        TOKEN_JNBE,             // CF == 0 && ZF == 0
-        TOKEN_JAE,              // CF == 0  unsigned >=
-        TOKEN_JNB,              // CF == 0
-        TOKEN_JB,               // CF == 1  unsigned <
-        TOKEN_JNAE,             // CF == 1
-        TOKEN_JBE,              // CF == 1 || ZF == 1  unsigned <=
-        TOKEN_JNA,              // CF == 1 || ZF == 1
-        TOKEN_JC,               // CF == 1  if carry
-        TOKEN_JNC,              // CF == 0  if !carry
-        TOKEN_JE,               // ZF == 1  if == 0
-        TOKEN_JZ,               // ZF == 1
-        TOKEN_JNE,              // ZF == 0  if != 0
-        TOKEN_JNZ,              // ZF == 0
-        TOKEN_JG,               // ZF == 0 && SF == OF  signed >
-        TOKEN_JNLE,             // ZF == 0 && SF == OF
-        TOKEN_JGE,              // SF == OF  signed >=
-        TOKEN_JNL,              // SF == OF
-        TOKEN_JL,               // SF != OF  signed <
-        TOKEN_JNGE,             // SF != OF
-        TOKEN_JLE,              // ZF == 1 || SF != OF  signed <=
-        TOKEN_JNG,              // ZF == 1 || SF != OF
-        TOKEN_JO,               // OF == 1  if overflow
-        TOKEN_JNO,              // OF == 0  if !overflow
-        TOKEN_JNP,              // PF == 0  if % 2 == 0
-        TOKEN_JPO,              // PF == 0
-        TOKEN_JP,               // PF == 1  if % 2 == 1
-        TOKEN_JPE,              // PF == 1
-        TOKEN_JNS,              // SF == 0  if >= 0
-        TOKEN_JS,               // SF == 1  if <  0
-        TOKEN_LOOP,
-        TOKEN_LOOPE,            // != 0
-        TOKEN_LOOPZ,            // != 0
-        TOKEN_LOOPNE,           // != 0
-        TOKEN_LOOPNZ,           // != 0
-        TOKEN_JCXZ,             // CX == 0
-
-        TOKEN_INT,              // INT
-        TOKEN_INTO,             // INTO
-        TOKEN_IRET,             // IRET
-
-        TOKEN_CLC,              // CLC
-        TOKEN_STC,              // STC
-        TOKEN_CMC,              // CMC
-        TOKEN_CLD,              // CLD
-        TOKEN_STD,              // STD
-        TOKEN_CLI,              // CLI
-        TOKEN_STI,              // STI
-
-        TOKEN_WAIT,             // WAIT
-        TOKEN_ESC,              // ESC
-        TOKEN_LOCK,             // LOCK
-
-        TOKEN_HLT,              // HLT
-        TOKEN_NOP,              // NOP
+        LPAREN,             // (
+        RPAREN,             // )
+        LSQUARE,            // [
+        RSQUARE,            // ]
 
 
-        TOKEN_INCLUDE,          // INCLUDE
-        TOKEN_ORG,              // ORG
-        TOKEN_EQU,              // EQU
-        TOKEN_DB,               // DB
-        TOKEN_DW,               // DW
-        TOKEN_DD,               // DD
-        TOKEN_DQ,               // DQ
-        TOKEN_DT,               // DT
+        MOV,                // MOV
+        PUSH,               // PUSH
+        POP,                // POP
+        XCHG,               // XCHG
+        XLAT,               // XLAT
+        LEA,                // LEA
+        LDS,                // LDS
+        LES,                // LES
+
+        LAHF,               // LAHF
+        SAHF,               // SAHF
+        PUSHF,              // PUSHF
+        POPF,               // POPF
+
+        IN,                 // IN
+        OUT,                // OUT
+
+        ADD,                // ADD
+        ADC,                // ADC
+        INC,                // INC
+        SUB,                // SUB
+        SBB,                // SBB
+        DEC,                // DEC
+        NEG,                // NEG
+        CMP,                // CMP
+        MUL,                // MUL
+        IMUL,               // IMUL
+        DIV,                // DIV
+        IDIV,               // IDIV
+        CBW,                // CBW
+        CWD,                // CWD
+        AAA,                // AAA
+        DAA,                // DAA
+        AAS,                // AAS
+        DAS,                // DAS
+        AAM,                // AAM
+        AAD,                // AAD
+
+        AND,                // AND
+        OR,                 // OR
+        XOR,                // XOR
+        NOT,                // NOT
+        TEST,               // TEST
+
+        SAL,                // SAL
+        SAR,                // SAR
+        SHL,                // SHL
+        SHR,                // SHR
+        ROL,                // ROL
+        ROR,                // ROR
+        RCL,                // RCL
+        RCR,                // RCR
+
+        MOVSB,              // MOVSB
+        MOVSW,              // MOVSW
+        CMPSB,              // CMPSB
+        CMPSW,              // CMPSW
+        SCASB,              // SCASB
+        SCASW,              // SCASW
+        LODSB,              // LODSB
+        LODSW,              // LODSW
+        STOSB,              // STOSB
+        STOSW,              // STOSW
+
+        REP,                // REP
+        REPE,               // REPE
+        REPZ,               // REPZ
+        REPNE,              // REPNE
+        REPNZ,              // REPNZ
+
+        CALL,               // CALL
+        RET,                // RET
+        JMP,                // any
+        JA,                 // CF == 0 && ZF == 0  unsigned >
+        JNBE,               // CF == 0 && ZF == 0
+        JAE,                // CF == 0  unsigned >=
+        JNB,                // CF == 0
+        JB,                 // CF == 1  unsigned <
+        JNAE,               // CF == 1
+        JBE,                // CF == 1 || ZF == 1  unsigned <=
+        JNA,                // CF == 1 || ZF == 1
+        JC,                 // CF == 1  if carry
+        JNC,                // CF == 0  if !carry
+        JE,                 // ZF == 1  if == 0
+        JZ,                 // ZF == 1
+        JNE,                // ZF == 0  if != 0
+        JNZ,                // ZF == 0
+        JG,                 // ZF == 0 && SF == OF  signed >
+        JNLE,               // ZF == 0 && SF == OF
+        JGE,                // SF == OF  signed >=
+        JNL,                // SF == OF
+        JL,                 // SF != OF  signed <
+        JNGE,               // SF != OF
+        JLE,                // ZF == 1 || SF != OF  signed <=
+        JNG,                // ZF == 1 || SF != OF
+        JO,                 // OF == 1  if overflow
+        JNO,                // OF == 0  if !overflow
+        JNP,                // PF == 0  if % 2 == 0
+        JPO,                // PF == 0
+        JP,                 // PF == 1  if % 2 == 1
+        JPE,                // PF == 1
+        JNS,                // SF == 0  if >= 0
+        JS,                 // SF == 1  if <  0
+        LOOP,
+        LOOPE,              // == 0
+        LOOPZ,              // == 0
+        LOOPNE,             // != 0
+        LOOPNZ,             // != 0
+        JCXZ,               // CX == 0
+
+        INT,                // INT
+        INTO,               // INTO
+        IRET,               // IRET
+
+        CLC,                // CLC
+        STC,                // STC
+        CMC,                // CMC
+        CLD,                // CLD
+        STD,                // STD
+        CLI,                // CLI
+        STI,                // STI
+
+        WAIT,               // WAIT
+        ESC,                // ESC
+        LOCK,               // LOCK
+
+        HLT,                // HLT
+        NOP,                // NOP
+
+
+        INCLUDE,            // INCLUDE
+        ALLOCATE,           // DB DW DD DQ DT
+        ORG,                // ORG
+        EQU,                // EQU  
+        DUP,
+
+        PTR,
+        SHORT,
+        NEAR,
+        FAR,
+        BYTE,
+        WORD,
+        DWORD,
+
+        SEGMENT,
+        ENDS,
+        END,
+
+        PROC,
+        PROC_NEAR,
+        PROC_FAR,
     };
 
 public:
-    Token();
-    Token(Type type, const QString& literal, int row, int column);
-    Token(const Token& other);
-    ~Token();
+    Token() : m_type(ILLEGAL) { }
 
-    Token& operator=(const Token& other);
+    Token(Type type, const QString& literal, int row, int column)
+        : m_type(type)
+        , m_literal(literal)
+        , m_pos(row, column, literal.length())
+    { }
 
-    bool is(Type type) const;
-    Type type() const;
-    QString literal() const;
-    int row() const;
-    int column() const;
+    ~Token() = default;
 
-    void resetType(Type type);
+    void resetType(Type type) { m_type = type; }
 
-    QString typeName() const;
-    static QString tokenTypeName(Type type);
-    static Type tokenType(const QChar& literal);
-    static Type tokenType(const QChar& l1, const QChar& l2);
-    static Type tokenType(const QString& literal);
+    bool is(Type type) const { return m_type == type; }
 
-    static int textToInt(const QString& numStr);
-    static int lastTextToInt();
+    Type type() const { return m_type; }
+
+    QString literal() const { return m_literal; }
+
+    Position pos() const { return m_pos; }
+
+    Position::Value posValue() const { return m_pos.value(); }
+
+    int row() const { return m_pos.row(); }
+
+    int column() const { return m_pos.column(); }
+
+    int length() const { return m_pos.length(); }
+
+    int endColumn() const { return m_pos.endColumn(); }
+
+    QString typeName() const { return typeName(m_type); }
+
+    QString operator*() const { return m_literal; }
+
+    QString content() const;
+
+    static QString typeName(Type type);
+    static Type type(const QChar& literal);
+    static Type type(const QChar& literal1, const QChar& literal2);
+    static Type type(const QString& literal);
 
     static bool textIsFloat(const QString& numStr);
-    
-    static int findRegisters(const QString& reg);
+
+    // 0: 不是数字, -1: 数字不合法, 1: 可;
+    static int textIsInteger(const QString& numStr, size_t* num = nullptr);
+
+    size_t toInt(bool* ok = nullptr) const
+    {
+        size_t n = 0;
+        if (ok != nullptr)
+            *ok = (textIsInteger(m_literal, &n) == 1);
+        else
+            textIsInteger(m_literal, &n);
+        return n;
+    }
+
 
 private:
     Type m_type;
     QString m_literal;
+    Position m_pos;
+
+#if 0
+    /**
+     * @m_row, @m_column
+     * QPlainTextEdit 的行列号返回 int, 所以这里存储用 int
+    */
     int m_row;
     int m_column;
+#endif
 
-    static int sm_lastTextToInt;
+    static const QString sm_illegalName;
+    static const QHash<Type, QString> sm_contents;
+    static const QHash<Type, QString> sm_typeNames;
+    static const QHash<QString, Type> sm_singleSymbols;
+    static const QHash<QString, Type> sm_doubleSymbols;
+    static const QHash<QString, Type> sm_mnemonics;
 
-    static const QMap<Type, QString> sm_typeNames;
-
-    static const QStringList sm_registers;
-    static const QMap<Type, QString> sm_mnemonics_A;
-    static const QMap<QString, Type> sm_mnemonics_B;
-
-    static const QMap<Type, QString> sm_symbols_A;
-    static const QMap<QString, Type> sm_symbols_B;
-    static const QMap<QString, Type> sm_symbols_C;
-
-    static const QStringList sm_makeNames;
-    static const QStringList sm_loadNames;
+#if 0
+    // 多对一 放在 set+hash 中
+    static const QSet<QString> sm_makes;
+    static const QSet<QString> sm_loads;
+    static const QSet<QString> sm_sregs;
+    static const QSet<QString> sm_reg8s;
+    static const QSet<QString> sm_reg16s;
+    static const QSet<QString> sm_defs;
+    static const QHash<const QSet<QString>*, Type> sm_setTypes;
+#endif
 };
+
+using TokenList = QList<Token>;
 
 } // namespace avs8086::token
 

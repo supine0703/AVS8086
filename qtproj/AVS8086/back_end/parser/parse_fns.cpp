@@ -1,97 +1,190 @@
-#include "parser/parser.h"
+#include "parser.h"
+#include "ast/expr_headers.h"
 
+using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
-const QMap<Token::Type, Parser::stmt_parse_fn> Parser::sm_stmt_parse_fns = {
-    { Token::TOKEN_WELL,        &Parser::parse_well },      // #
-    { Token::TOKEN_MOV,         &Parser::parse_mov },       // mov
-    { Token::TOKEN_ADD,         &Parser::parse_mov },       // mov
-    { Token::TOKEN_ADC,         &Parser::parse_mov },       // mov
+/* ========================================================================== */
 
-    { Token::TOKEN_XLAT,        &Parser::parse_single },    // XLAT
-    { Token::TOKEN_LAHF,        &Parser::parse_single },    // LAHF
-    { Token::TOKEN_SAHF,        &Parser::parse_single },    // SAHF
-    { Token::TOKEN_PUSHF,       &Parser::parse_single },    // PUSHF
-    { Token::TOKEN_POPF,        &Parser::parse_single },    // POPF
-    { Token::TOKEN_CBW,         &Parser::parse_single },    // CBW
-    { Token::TOKEN_CWD,         &Parser::parse_single },    // CWD
-    { Token::TOKEN_AAA,         &Parser::parse_single },    // AAA
-    { Token::TOKEN_DAA,         &Parser::parse_single },    // DAA
-    { Token::TOKEN_AAS,         &Parser::parse_single },    // AAS
-    { Token::TOKEN_DAS,         &Parser::parse_single },    // DAS
-    { Token::TOKEN_AAM,         &Parser::parse_single },    // AAM
-    { Token::TOKEN_AAD,         &Parser::parse_single },    // AAD
-    { Token::TOKEN_AND,         &Parser::parse_single },    // AND
-    { Token::TOKEN_INTO,        &Parser::parse_single },    // INTO
-    { Token::TOKEN_IRET,        &Parser::parse_single },    // IRET
-    { Token::TOKEN_REP,         &Parser::parse_single },    // REP
-    { Token::TOKEN_REPE,        &Parser::parse_single },    // REPE
-    { Token::TOKEN_REPZ,        &Parser::parse_single },    // REPZ
-    { Token::TOKEN_REPNE,       &Parser::parse_single },    // REPNE
-    { Token::TOKEN_REPNZ,       &Parser::parse_single },    // REPNZ
-    { Token::TOKEN_MOVSB,       &Parser::parse_single },    // MOVSB
-    { Token::TOKEN_MOVSW,       &Parser::parse_single },    // MOVSW
-    { Token::TOKEN_CMPSB,       &Parser::parse_single },    // CMPSB
-    { Token::TOKEN_CMPSW,       &Parser::parse_single },    // CMPSW
-    { Token::TOKEN_SCASB,       &Parser::parse_single },    // SCASB
-    { Token::TOKEN_SCASW,       &Parser::parse_single },    // SCASW
-    { Token::TOKEN_LODSB,       &Parser::parse_single },    // LODSB
-    { Token::TOKEN_LODSW,       &Parser::parse_single },    // LODSW
-    { Token::TOKEN_STOSB,       &Parser::parse_single },    // STOSB
-    { Token::TOKEN_STOSW,       &Parser::parse_single },    // STOSW
-    { Token::TOKEN_CLC,         &Parser::parse_single },    // CLC
-    { Token::TOKEN_STC,         &Parser::parse_single },    // STC
-    { Token::TOKEN_CMC,         &Parser::parse_single },    // CMC
-    { Token::TOKEN_CLD,         &Parser::parse_single },    // CLD
-    { Token::TOKEN_STD,         &Parser::parse_single },    // STD
-    { Token::TOKEN_CLI,         &Parser::parse_single },    // CLI
-    { Token::TOKEN_STI,         &Parser::parse_single },    // STI
-    { Token::TOKEN_WAIT,        &Parser::parse_single },    // WAIT
-    { Token::TOKEN_LOCK,        &Parser::parse_single },    // LOCK
-    { Token::TOKEN_HLT,         &Parser::parse_single },    // HLT
-    { Token::TOKEN_NOP,         &Parser::parse_single },    // NOP
+const QHash<Token::Type, Parser::stmt_parseFn> Parser::sm_stmt_parseFns = {
+    { Token::WELL,          &Parser::parse_well },          // #...#
+    { Token::ALLOCATE,      &Parser::parse_allocate },      // allocate
 
+    { Token::MOV,           &Parser::parse_mov },           // MOV
+    { Token::PUSH,          &Parser::parse_push_pop },      // PUSH
+    { Token::POP,           &Parser::parse_push_pop },      // POP
+    { Token::XCHG,          &Parser::parse_xchg },          // XCHG
+    { Token::LEA,           &Parser::parse_lxx },           // LEA
+    { Token::LDS,           &Parser::parse_lxx },           // LDS
+    { Token::LES,           &Parser::parse_lxx },           // LES
+
+    // { Token::IN,            &Parser::parse_reserved_word }, // IN
+    // { Token::OUT,           &Parser::parse_reserved_word }, // OUT
+
+    { Token::NOT,           &Parser::parse_logical_not },   // NOT
+    { Token::AND,           &Parser::parse_logical_bit },   // AND
+    { Token::OR,            &Parser::parse_logical_bit },   // OR
+    { Token::XOR,           &Parser::parse_logical_bit },   // XOR
+    { Token::TEST,          &Parser::parse_logical_bit },   // TEST
+    { Token::SAL,           &Parser::parse_shift }, // SAL
+    { Token::SAR,           &Parser::parse_shift }, // SAR
+    { Token::SHL,           &Parser::parse_shift }, // SHL
+    { Token::SHR,           &Parser::parse_shift }, // SHR
+    { Token::ROL,           &Parser::parse_shift }, // ROL
+    { Token::ROR,           &Parser::parse_shift }, // ROR
+    { Token::RCL,           &Parser::parse_shift }, // RCL
+    { Token::RCR,           &Parser::parse_shift }, // RCR
+
+    { Token::JMP,           &Parser::parse_jmp },           // JMP
+    { Token::JNBE,          &Parser::parse_jx },            // JNBE
+    { Token::JA,            &Parser::parse_jx },            // JA
+    { Token::JAE,           &Parser::parse_jx },            // JAE
+    { Token::JNB,           &Parser::parse_jx },            // JNB
+    { Token::JB,            &Parser::parse_jx },            // JB
+    { Token::JNAE,          &Parser::parse_jx },            // JNAE
+    { Token::JBE,           &Parser::parse_jx },            // JBE
+    { Token::JNA,           &Parser::parse_jx },            // JNA
+    { Token::JC,            &Parser::parse_jx },            // JC
+    { Token::JNC,           &Parser::parse_jx },            // JNC
+    { Token::JE,            &Parser::parse_jx },            // JE
+    { Token::JZ,            &Parser::parse_jx },            // JZ
+    { Token::JNE,           &Parser::parse_jx },            // JNE
+    { Token::JNZ,           &Parser::parse_jx },            // JNZ
+    { Token::JG,            &Parser::parse_jx },            // JG
+    { Token::JNLE,          &Parser::parse_jx },            // JNLE
+    { Token::JGE,           &Parser::parse_jx },            // JGE
+    { Token::JNL,           &Parser::parse_jx },            // JNL
+    { Token::JL,            &Parser::parse_jx },            // JL
+    { Token::JNGE,          &Parser::parse_jx },            // JNGE
+    { Token::JLE,           &Parser::parse_jx },            // JLE
+    { Token::JNG,           &Parser::parse_jx },            // JNG
+    { Token::JO,            &Parser::parse_jx },            // JO
+    { Token::JNO,           &Parser::parse_jx },            // JNO
+    { Token::JNP,           &Parser::parse_jx },            // JNP
+    { Token::JPO,           &Parser::parse_jx },            // JPO
+    { Token::JP,            &Parser::parse_jx },            // JP
+    { Token::JPE,           &Parser::parse_jx },            // JPE
+    { Token::JNS,           &Parser::parse_jx },            // JNS
+    { Token::JS,            &Parser::parse_jx },            // JS
+    { Token::JCXZ,          &Parser::parse_jx },            // JCXZ
+    { Token::LOOP,          &Parser::parse_jx },            // LOOP
+    { Token::LOOPZ,         &Parser::parse_jx },            // LOOPZ
+    { Token::LOOPE,         &Parser::parse_jx },            // LOOPE
+    { Token::LOOPNZ,        &Parser::parse_jx },            // LOOPNZ
+    { Token::LOOPNE,        &Parser::parse_jx },            // LOOPNE
+
+    { Token::XLAT,          &Parser::parse_single },        // XLAT
+    { Token::LAHF,          &Parser::parse_single },        // LAHF
+    { Token::SAHF,          &Parser::parse_single },        // SAHF
+    { Token::PUSHF,         &Parser::parse_single },        // PUSHF
+    { Token::POPF,          &Parser::parse_single },        // POPF
+    { Token::CBW,           &Parser::parse_single },        // CBW
+    { Token::CWD,           &Parser::parse_single },        // CWD
+    { Token::AAA,           &Parser::parse_single },        // AAA
+    { Token::DAA,           &Parser::parse_single },        // DAA
+    { Token::AAS,           &Parser::parse_single },        // AAS
+    { Token::DAS,           &Parser::parse_single },        // DAS
+    { Token::AAM,           &Parser::parse_single },        // AAM
+    { Token::AAD,           &Parser::parse_single },        // AAD
+    { Token::INTO,          &Parser::parse_single },        // INTO
+    { Token::IRET,          &Parser::parse_single },        // IRET
+    { Token::REP,           &Parser::parse_single },        // REP
+    { Token::REPE,          &Parser::parse_single },        // REPE
+    { Token::REPZ,          &Parser::parse_single },        // REPZ
+    { Token::REPNE,         &Parser::parse_single },        // REPNE
+    { Token::REPNZ,         &Parser::parse_single },        // REPNZ
+    { Token::MOVSB,         &Parser::parse_single },        // MOVSB
+    { Token::MOVSW,         &Parser::parse_single },        // MOVSW
+    { Token::CMPSB,         &Parser::parse_single },        // CMPSB
+    { Token::CMPSW,         &Parser::parse_single },        // CMPSW
+    { Token::SCASB,         &Parser::parse_single },        // SCASB
+    { Token::SCASW,         &Parser::parse_single },        // SCASW
+    { Token::LODSB,         &Parser::parse_single },        // LODSB
+    { Token::LODSW,         &Parser::parse_single },        // LODSW
+    { Token::STOSB,         &Parser::parse_single },        // STOSB
+    { Token::STOSW,         &Parser::parse_single },        // STOSW
+    { Token::CLC,           &Parser::parse_single },        // CLC
+    { Token::STC,           &Parser::parse_single },        // STC
+    { Token::CMC,           &Parser::parse_single },        // CMC
+    { Token::CLD,           &Parser::parse_single },        // CLD
+    { Token::STD,           &Parser::parse_single },        // STD
+    { Token::CLI,           &Parser::parse_single },        // CLI
+    { Token::STI,           &Parser::parse_single },        // STI
+    { Token::WAIT,          &Parser::parse_single },        // WAIT
+    { Token::LOCK,          &Parser::parse_single },        // LOCK
+    { Token::HLT,           &Parser::parse_single },        // HLT
+    { Token::NOP,           &Parser::parse_single },        // NOP
 };
 
-const QMap<Token::Type, Parser::prefix_parse_fn> Parser::sm_prefix_parse_fns = {
-    { Token::TOKEN_ILLEGAL,     &Parser::parse_illegal },       // illegal
-    { Token::TOKEN_EOF,         &Parser::parse_not_end },       // eof
-    { Token::TOKEN_ANNOTATION,  &Parser::parse_not_end },       // ;
-    { Token::TOKEN_BIT_NOT,     &Parser::parse_prefix },        // ~x
-    { Token::TOKEN_PLUS,        &Parser::parse_prefix },        // +x
-    { Token::TOKEN_MINUS,       &Parser::parse_prefix },        // -x
-    { Token::TOKEN_FLOAT,       &Parser::parse_float },         // float
-    { Token::TOKEN_INTEGER,     &Parser::parse_integer },       // integer
-    { Token::TOKEN_STRING,      &Parser::parse_string },        // string
-    { Token::TOKEN_LPAREN,      &Parser::parse_group },         // (
+/* ========================================================================== */
 
-    { Token::TOKEN_REGISTER,    &Parser::parse_register },      // reg
-    { Token::TOKEN_LSQUARE,     &Parser::parse_address },       // [
-
-    { Token::TOKEN_LOCK,        &Parser::parse_reserved_word }, // lock
+const QHash<Token::Type, Parser::post_parseFn> Parser::sm_post_parseFns = {
+    { Token::COLON,         &Parser::parse_define },
+    { Token::SEGMENT,       &Parser::parse_define },
+    { Token::ALLOCATE,      &Parser::parse_define },
 };
 
-const QMap<Token::Type, Parser::infix_parse_fn> Parser::sm_infix_parse_fns = {
-    { Token::TOKEN_BIT_NOT,         &Parser::parse_infix },     // ~
-    { Token::TOKEN_ASTERISK,        &Parser::parse_infix },     // *
-    { Token::TOKEN_SLASH,           &Parser::parse_infix },     // /
-    { Token::TOKEN_MODULO,          &Parser::parse_infix },     // %
-    { Token::TOKEN_PLUS,            &Parser::parse_infix },     // +
-    { Token::TOKEN_MINUS,           &Parser::parse_infix },     // -
-    { Token::TOKEN_LEFT_SHIFT,      &Parser::parse_infix },     // <<
-    { Token::TOKEN_RIGHT_SHIFT,     &Parser::parse_infix },     // >>
-    { Token::TOKEN_BIT_AND,         &Parser::parse_infix },     // &
-    { Token::TOKEN_BIT_XOR,         &Parser::parse_infix },     // ^
-    { Token::TOKEN_BIT_OR,          &Parser::parse_infix },     // |
-    { Token::TOKEN_LT,              &Parser::parse_infix },     // <
-    { Token::TOKEN_GT,              &Parser::parse_infix },     // >
-    { Token::TOKEN_LE,              &Parser::parse_infix },     // <=
-    { Token::TOKEN_GE,              &Parser::parse_infix },     // >=
-    { Token::TOKEN_EQ,              &Parser::parse_infix },     // ==
-    { Token::TOKEN_NE,              &Parser::parse_infix },     // !=
+/* ========================================================================== */
 
-    { Token::TOKEN_COMMA,           &Parser::parse_comma },     // ,
-    { Token::TOKEN_COLON,           &Parser::parse_colon },     // :
+const QHash<Token::Type, Parser::prefix_parseFn> Parser::sm_prefix_parseFns = {
+    { Token::ILLEGAL,       &Parser::parse_T<Illegal> },    // illegal
+
+    { Token::INTEGER,       &Parser::parse_value },         // integer
+    { Token::STRING,        &Parser::parse_value },         // string
+    { Token::FLOAT,         &Parser::parse_value },         // float
+
+    { Token::SREG,          &Parser::parse_T<Register> },   // sreg
+    { Token::REG8,          &Parser::parse_T<Register> },   // reg8
+    { Token::REG16,         &Parser::parse_T<Register> },   // reg16
+    { Token::MAKE_X,        &Parser::parse_T<Make_X> },     // make_x
+    { Token::LOAD_X,        &Parser::parse_T<Load_X> },     // load_x
+    { Token::BIT_NOT,       &Parser::parse_operator },      // ~x
+    { Token::PLUS,          &Parser::parse_operator },      // +x
+    { Token::MINUS,         &Parser::parse_operator },      // -x
+
+    { Token::LPAREN,        &Parser::parse_group },         // (
+    { Token::LSQUARE,       &Parser::parse_address },       // [
+
+    // { Token::TOKEN_EOF,   &Parser::parse_not_end },       // eof
+    // { Token::ANNOTATION,  &Parser::parse_not_end },       // ;
+    // { Token::BIT_NOT,     &Parser::parse_prefix },        // ~x
+    // { Token::PLUS,        &Parser::parse_prefix },        // +x
+    // { Token::MINUS,       &Parser::parse_prefix },        // -x
+    // { Token::FLOAT,       &Parser::parse_float },         // float
+    // { Token::INTEGER,     &Parser::parse_integer },       // integer
+    // { Token::STRING,      &Parser::parse_string },        // string
+
+    // { Token::REGISTER,    &Parser::parse_register },      // reg
+    // { Token::LSQUARE,     &Parser::parse_address },       // [
+
+    // { Token::LOCK,        &Parser::parse_reserved_word }, // lock
 };
 
+/* ========================================================================== */
+
+const QHash<Token::Type, Parser::infix_parseFn> Parser::sm_infix_parseFns = {
+    { Token::ASSIGN,        &Parser::parse_T<Assign> },     // =
+    { Token::COMMA,         &Parser::parse_T<Comma> },      // ,
+    { Token::COLON,         &Parser::parse_colon },         // :
+    { Token::DUP,           &Parser::parse_dup },           // dup
+
+    { Token::ASTERISK,      &Parser::parse_operator },      // *
+    { Token::SLASH,         &Parser::parse_operator },      // /
+    { Token::MODULO,        &Parser::parse_operator },      // %
+    { Token::PLUS,          &Parser::parse_operator },      // +
+    { Token::MINUS,         &Parser::parse_operator },      // -
+    { Token::LEFT_SHIFT,    &Parser::parse_operator },      // <<
+    { Token::RIGHT_SHIFT,   &Parser::parse_operator },      // >>
+    { Token::BIT_AND,       &Parser::parse_operator },      // &
+    { Token::BIT_XOR,       &Parser::parse_operator },      // ^
+    { Token::BIT_OR,        &Parser::parse_operator },      // |
+    { Token::LT,            &Parser::parse_operator },      // <
+    { Token::GT,            &Parser::parse_operator },      // >
+    { Token::LE,            &Parser::parse_operator },      // <=
+    { Token::GE,            &Parser::parse_operator },      // >=
+    { Token::EQ,            &Parser::parse_operator },      // ==
+    { Token::NE,            &Parser::parse_operator },      // !=
+};
+
+/* ========================================================================== */

@@ -1,44 +1,46 @@
 #include "parser/parser.h"
-#include "ast/nodes/program.hpp"
-#include "ast/nodes/multiple_statement.hpp"
 
 using namespace avs8086::ast;
 using namespace avs8086::token;
 using namespace avs8086::parser;
 
+/* ========================================================================== */
+
 QSharedPointer<Program> Parser::parse_program()
 {
-    QSharedPointer<Program> s(new Program(m_lexer->fileName()));
-    while (!currToken().is(Token::TOKEN_EOF))
+    QSharedPointer<Program> p(new Program(m_lexer->file()));
+    while (expectPeekToken(false, Token::TOKEN_EOF))
     {
         auto stmt = parse_statement();
+
+        if (!expectPeekToken(true, Token::TOKEN_EOL))
+            ;
+
         if (!stmt.isNull())
         {
-            if (stmt->is(Node::NODE_MULTIPLE_STATEMENT))
+            int i = p->m_stmts.size();
+            stmt->addIn(stmt, p->m_stmts);
+            while (i < p->m_stmts.size())
             {
-                s->m_statements.append(
-                    qSharedPointerDynamicCast<MultipleStatement>
-                    (stmt)->m_statements
-                );
+                m_currOffset += p->m_stmts.at(i++)->codeSize();
             }
-            else
+#if 0
+            int row = currToken().row();
+            auto it = m_infos.lowerBound({Info::ERROR, {row, 0, 0}, ""});
+            bool err = ((it != m_infos.end()) && (it->pos().row() == row));
+            if (!lineEnd && !err)
             {
-                s->m_statements.append(stmt);
+                // TODO: translate
+                addInfo(Info::WARNING, peekToken().pos(),
+                        "should only one statement on one line");
             }
+#endif
         }
-        nextToken();
-        if (currToken().is(Token::TOKEN_EOF))
-        {
-            nextToken();
-        }
-        else if (!isError())
-        {
-            const auto& t = currToken();
-            addWarningInfo(
-                t.row(), t.column(), t.literal().length(),
-                "should only one statement on one line"
-            );
-        }
+        m_currUnitSize = 0;
     }
-    return s;
+    parse_idTable();
+    p->m_err = isError();
+    return p;
 }
+
+/* ========================================================================== */

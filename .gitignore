@@ -52,7 +52,8 @@ Mkfile.old
 dkms.conf
 
 # my own setting
-/qtproj/build*/
+build/
+build*/
 /qtproj/version
+/qtproj/version-*
 Release
-*.zip

@@ -2,27 +2,39 @@
 
 using namespace avs8086::ast;
 
-const QMap<Node::Type, QString> Node::sm_typeNames = {
-    { NODE_ILLEGAL,                 "Illegal" },
-    { NODE_INTEGER,                 "Integer" },
-    { NODE_STRING,                  "String" },
+/* ========================================================================== */
 
-    { NODE_PREFIX,                  "Prefix" },
-    { NODE_INFIX,                   "Infix" },
+const QHash<Node::Type, QString> Node::sm_typeNames = {
+    { NODE_EOL,         "EOL" },
 
-    { NODE_COMMA,                   "',' comma"},
-    { NODE_COLON,                   "':'label or reg"},
+    // value
+    { DUP,              "DUP" },
+    { VALUE,            "Value" },
+    { FLOAT,            "Float" },
+    { OPERATOR,         "Operator" },
+    { IDENTIFIER,       "Identifier" },
 
-    { NODE_LABEL,                   "Label" },
-    { NODE_REGISTER,                "Register" },
-    { NODE_ADDRESS,                 "[Address]"},
+    { PROGRAM,          "Program" },
+    { DEFINE,           "Define" },
+    { WELL,             "'#'Instruction" },
 
-    { NODE_PROGRAM,                 "Program" },
-    { NODE_EXPRESSION_STATEMENT,    "Expression Statement" },
-    { NODE_MULTIPLE_STATEMENT,      "Multiple statement" },
+    // expression
+    { COMMA,            "Comma" },
+    { COMMA_ARRAY,      "Comma Array" },
 
+    { REGISTER,         "Register" },
+    { REG_UNION,        "Register Union" },
+    { ADDRESS,          "Address" },
 
-    { NODE_SINGLE,                  "Single Instruction" },
-    { NODE_WELL,                    "'#' Instruction" },
-    { NODE_MOV,                     "MOV" },
+    { MAKE_X,           "MAKE_X" },
+    { ASSIGN,           "Assign" },
+
+    { EXPR_STMT,        "Expression Statement" },
+
+    { INSTRUCTION,      "Instruction" },
+
+    { SINGLE,           "Single Instruction" },
+
 };
+
+/* ========================================================================== */

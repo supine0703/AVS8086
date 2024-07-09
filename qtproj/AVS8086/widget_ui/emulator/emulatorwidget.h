@@ -47,7 +47,7 @@ private:
     int csip();
     bool hlt;
 
-    QList<int> m_bs = {};
+    QList<int> m_bs = {2};
     int runCount;
 
     Ui::emulatorwidget *ui;
@@ -70,7 +70,7 @@ private:
         QByteArray("\x26").toHex(),
         "c70600102143",
         "c70602106587",
-        "bb0015",
+        "bb0025",
         "be000b",
         "8b00",
         "01060010",
@@ -84,9 +84,9 @@ private:
         "MOV [01000H], 05678H",
         "MOV [01002H], 01234H",
         "ES:",
-        "MOV [01000H], 04321H",
-        "MOV [01002H], 08765H",
-        "MOV BX, 01500H",
+        "MOV [02000H], 04321H",
+        "MOV [02002H], 08765H",
+        "MOV BX, 02500H",
         "MOV SI, 00B00H",
         "MOV AX, [BX+SI]",
         "ADD [01000H], AX",

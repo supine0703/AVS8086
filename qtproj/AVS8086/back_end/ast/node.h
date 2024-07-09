@@ -1,104 +1,175 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "ast/value.h"
 #include "token/token.h"
-#include <QSharedPointer>
+#include <QJsonArray>
 #include <QJsonObject>
-#include <QMap>
-// #include <QStringList>
+#include <QSharedPointer>
 
 namespace avs8086::ast {
 
+template <class X, class T>
+inline QSharedPointer<X> assert_dynamic_cast(const QSharedPointer<T>& src)
+{
+    auto ptr = src.template dynamicCast<X>();
+    return (Q_ASSERT(!ptr.isNull()), ptr);
+}
+
+template <class X, class T>
+inline bool can_dynamic_cast(const QSharedPointer<T>& src)
+{
+    auto ptr = src.template dynamicCast<X>();
+    return !ptr.isNull();
+}
+
+inline QByteArray show_integer_hex(const QByteArray& bytes)
+{
+    auto tmp = bytes;
+    std::reverse(tmp.begin(), tmp.end()); // 小端存储, 要颠倒
+    return tmp.toHex();
+}
+
+/* ========================================================================== */
+
 class Node
 {
-public:
-    enum Type {
-        NODE_ILLEGAL = 0,
-
-        NODE_FLOAT,     // float
-        NODE_INTEGER,   // integer
-        NODE_STRING,    // string
-        NODE_PREFIX,    // ~x +x -x
-        NODE_INFIX,     // * / % + - & ^ | << >> = > >= < <= == !=
-        NODE_COMMA,     // ,
-        NODE_COLON,     // :
-        NODE_LABEL,     // label
-        NODE_REGISTER,  // reg
-        NODE_ADDRESS,   // []
-
-        NODE_PROGRAM,
-        NODE_EXPRESSION_STATEMENT,
-        NODE_MULTIPLE_STATEMENT,
-
-        NODE_SINGLE,
-        NODE_WELL,      // #
-        NODE_MOV,
-    };
-
-public:
+    Node(Node&&) = delete;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
-    Node(Type type);
-    virtual ~Node();
+public:
+    /**
+     * 表达式分为可求值和不可求值
+     * 可求值: VALUE, DUP, OPERATOR, REGISTER, ADDRESS, COMMA_ARRAY
+     * 不可求值: FLOAT(不支持), IDENTIFIER, REG_UNION, COMMA, ILLEGAL
+    */
+    enum Type {
+        NODE_EOL = -2,
+        ILLEGAL = 0,
 
-    bool is(Type type) const;
-    Type type() const;
+        ILLEGAL_VALUE,
+        DUP,
+        VALUE,      // integer, string
+        OPERATOR,   // * / % + - & ^ | << >> = > >= < <= == !=; ~x +x -x
+        FLOAT,      // float
+        IDENTIFIER,
 
-    QString typeName() const;
-    static QString nodeTypeName(Type type);
+        REGISTER,   // reg
+        REG_UNION,  // reg union : reg(s) + value
+        ADDRESS,    // []
 
-    virtual QStringList traversal(int depth) const { return {}; };
-    virtual QJsonObject json() const = 0;
+        COMMA_ARRAY,
+        COMMA,      // ,
+        COLON,      // :
 
-    bool isError() const { return m_isError; }
-    void goError() { m_isError = true; }
+        PROGRAM,
+        EXPR_STMT,
 
+        ASSIGN,
+        MAKE_X,
+        LOAD_X,
+
+        WELL,       // #...#
+        DEFINE,
+        SINGLE,
+
+        INSTRUCTION,
+    };
+
+protected:
+    Node(Type type) : m_type(type) { }
 
 public:
-    token::Token m_token;
+    virtual ~Node() = default;
+
+    bool is(Type type) const { return m_type == type; }
+
+    Type type() const { return m_type; }
+
+    QString typeName() const { return typeName(m_type); }
+
+    static QString typeName(Type type);
+
+    virtual QJsonObject json() const = 0;
 
 
 private:
-    bool m_isError = false;
     Type m_type;
-    static const QMap<Type, QString> sm_typeNames;
+    static const QHash<Type, QString> sm_typeNames;
 };
+
+// 定义智能指针原型
+using StmtPointer = QSharedPointer<class Statement>;
+using ExprPointer = QSharedPointer<class Expression>;
 
 /* ========================================================================== */
 
 class Expression : public Node
 {
-public:
-    enum ValueType {
-        ERROR = 0,
-        REGISTER,
-        FLOAT,
-        STRING,
-        INTEGER,
-    };
-
-public:
-    Expression(Type type) : Node(type) { }
-    virtual ~Expression() { }
-    bool valueIs(ValueType type) const { return m_valueType == type;}
-    ValueType valueType() const { return m_valueType; }
-    Value value() const { return m_value; }
-
 protected:
-    ValueType m_valueType;
-    Value m_value;
+    Expression(Type type, const token::Token& token)
+        : Node(type), m_token(token)
+    { }
+
+    token::Token m_token;
+
+public:
+    virtual ~Expression() = default;
+
+    virtual QJsonObject json() const override;
+
+    token::Token token() const { return m_token; }
+
+    virtual QByteArray bytes() const { return QByteArray(); }
+
+    virtual int dataSize() const { return 0; } // 不可以用来判断是否可求值
+
+    virtual int unitDataSize() const { return 0; } // 可以用来判断是否可求值
+
+    virtual Position pos() const { return m_token.pos(); }
+
+    virtual void addIn(const ExprPointer& e, QList<ExprPointer>& exprs)
+    { exprs.append(e); }
 };
+
+inline QJsonObject Expression::json() const
+{
+    QJsonObject js;
+    js["type(expr)"] = typeName();
+    js["token"] = m_token.content();
+    return js;
+}
 
 /* ========================================================================== */
 
 class Statement : public Node
 {
-public:
+protected:
     Statement(Type type) : Node(type) { }
-    virtual ~Statement() { }
+
+public:
+    virtual ~Statement() = default;
+
+    virtual QJsonObject json() const override;
+
+    virtual void addIn(const StmtPointer& s, QList<StmtPointer>& stmts)
+    { stmts.append(s); }
+
+    virtual QByteArray code() const { return QByteArray(); }
+
+    virtual qsizetype codeSize() const { return 0; }
 };
+
+inline QJsonObject Statement::json() const
+{
+    QJsonObject js;
+    js["type(stmt)"] = typeName();
+    if (codeSize() != 0)
+    {
+        js["code"] = QString::fromUtf8(code().toHex());
+    }
+    return js;
+}
 
 } // namespace avs8086::ast
 
