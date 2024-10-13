@@ -34,6 +34,8 @@ set(UI_PATH      ${CMAKE_CURRENT_SOURCE_DIR}/ui)
 set(BACK_END_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/back_end)
 set(WIDGET_UI_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/widget_ui)
 
+set(LZL_ASM_MODEL ${CMAKE_CURRENT_SOURCE_DIR}/lzl_asm)
+
 recurse_directories(INCLUDE_ALL_DIR ${INCLUDE_PATH})
 recurse_directories(UI_ALL_DIR      ${UI_PATH})
 
@@ -49,11 +51,14 @@ include_directories(
     ${BACK_END_MODEL}
     # ${BACK_END_MODEL}_2
     ${WIDGET_UI_ALL_DIR}
+    ${LZL_ASM_MODEL}
     settings
 )
 
 file(GLOB_RECURSE PROJECT_SOURCES
     settings/*.h settings/*.cpp
+
+    ${LZL_ASM_MODEL}/*.h ${LZL_ASM_MODEL}/*.cpp
 
     ${BACK_END_MODEL}/*.h ${BACK_END_MODEL}/*.hpp
     ${BACK_END_MODEL}/*.cpp ${BACK_END_MODEL}/*.ui
