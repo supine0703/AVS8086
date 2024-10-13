@@ -54,6 +54,4 @@ dkms.conf
 # my own setting
 build/
 build*/
-/qtproj/version
-/qtproj/version-*
 Release
