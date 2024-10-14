@@ -60,11 +60,14 @@ set(RES_SOURCES
 
 set(GUI_PROJ_SOURCES
     ${SRC_PATH}/main_gui.cpp
-    ${UI_PATH}/texteditwidget.ui
-    ${SRC_PATH}/widget/texteditwidget.h
-    ${SRC_PATH}/widget/texteditwidget.cpp
+    ${UI_PATH}/mainwidget.ui
+    ${SRC_PATH}/widget/mainwidget.h
+    ${SRC_PATH}/widget/mainwidget.cpp
     ${SRC_PATH}/settings/settings.h
     ${SRC_PATH}/settings/settings.cpp
+
+    ${SRC_PATH}/widget/codeedit.h
+    ${SRC_PATH}/widget/codeedit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -1,17 +1,18 @@
-#include "texteditwidget.h"
-
-#include "ui_texteditwidget.h"
+#include "mainwidget.h"
 
 #include "../settings/settings.h"
+#include "codeedit.h"
+#include "ui_mainwidget.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStatusBar>
 
-TextEditWidget::TextEditWidget(QWidget* parent)
-    : QWidget(parent), ui(new Ui::TextEditWidget), status(new QStatusBar(this))
+MainWidget::MainWidget(QWidget* parent)
+    : QWidget(parent), ui(new Ui::MainWidget), status(new QStatusBar(this))
 {
     ui->setupUi(this);
+    useCodeEdit();
     ui->lineEdit_file->setText(SETTINGS().value(_TEXT_EDIT_FILE_).toString());
 
     this->setWindowTitle(
@@ -31,14 +32,35 @@ TextEditWidget::TextEditWidget(QWidget* parent)
         }
     }
     ui->layout_widget->addWidget(status);
+    status->showMessage(QString("row:    1  col:   1"));
+    ui->codeLine->setText("1");
 }
 
-TextEditWidget::~TextEditWidget()
+MainWidget::~MainWidget()
 {
     delete ui;
 }
 
-void TextEditWidget::on_btn_choose_clicked()
+void MainWidget::useCodeEdit()
+{
+    ui->layout_code->removeWidget(ui->textEdit);
+    ui->textEdit->deleteLater();
+    ui->textEdit = new CodeEdit;
+    ui->layout_code->addWidget(ui->textEdit);
+    connect(
+        ui->textEdit,
+        &CodeEdit::cursorPositionChanged,
+        this,
+        &MainWidget::on_textEdit_cursorPositionChanged
+    );
+    connect(ui->textEdit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
+    connect(
+        ui->textEdit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged
+    );
+}
+
+
+void MainWidget::on_btn_choose_clicked()
 {
     QFileInfo fi(ui->lineEdit_file->text());
     auto fp = QFileDialog::getOpenFileName(this, "选择文件", fi.filePath());
@@ -50,7 +72,7 @@ void TextEditWidget::on_btn_choose_clicked()
 }
 
 
-void TextEditWidget::on_btn_open_clicked()
+void MainWidget::on_btn_open_clicked()
 {
     if (QMessageBox::question(this, "询问", "是否打开此文件:\n" + ui->lineEdit_file->text()) ==
         QMessageBox::Yes)
@@ -76,7 +98,7 @@ void TextEditWidget::on_btn_open_clicked()
 }
 
 
-void TextEditWidget::on_btn_save_clicked()
+void MainWidget::on_btn_save_clicked()
 {
     if (QMessageBox::question(this, "询问", "是否保存文件至:\n" + ui->lineEdit_file->text()) ==
         QMessageBox::Yes)
@@ -124,7 +146,7 @@ void TextEditWidget::on_btn_save_clicked()
 // // #include "assembler/assembler.h"
 // // #include "vm/vm.h"
 
-void TextEditWidget::on_btn_compile_clicked()
+void MainWidget::on_btn_compile_clicked()
 {
     // using namespace avs8086;
     // using namespace avs8086::token;
@@ -189,10 +211,25 @@ void TextEditWidget::on_btn_compile_clicked()
 }
 
 
-void TextEditWidget::on_textEdit_cursorPositionChanged()
+void MainWidget::on_textEdit_cursorPositionChanged()
 {
-    auto pos = ui->textEdit->textCursor();
-    status->showMessage(QString("row: %1  col %2")
-                            .arg(pos.blockNumber() + 1, 4, 10, QChar(' '))
-                            .arg(pos.columnNumber() + 1, 4, 10, QChar(' ')));
+    auto cursor = ui->textEdit->textCursor();
+    status->showMessage(QString("row: %1  col: %2")
+                            .arg(cursor.blockNumber() + 1, 4, 10, QChar(' '))
+                            .arg(cursor.columnNumber() + 1, 4, 10, QChar(' ')));
+}
+
+void MainWidget::on_textEdit_textChanged()
+{
+    qDebug() << ui->textEdit->toPlainText();
+}
+
+void MainWidget::on_textEdit_blockCountChanged(int blockCount)
+{
+    QString line("1");
+    for (int i = 2; i <= blockCount; i++)
+    {
+        line.append(QString("\n%1").arg(i));
+    }
+    ui->codeLine->setText(line);
 }

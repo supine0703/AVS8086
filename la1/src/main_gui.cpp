@@ -18,7 +18,7 @@
  */
 
 
-#include "./widget/texteditwidget.h"
+#include "./widget/mainwidget.h"
 #include "./settings/settings.h"
 
 #include <QApplication>
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     appInit();
 
-    TextEditWidget w;
+    MainWidget w;
     w.show();
 
     return a.exec();

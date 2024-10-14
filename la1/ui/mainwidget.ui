@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TextEditWidget</class>
- <widget class="QWidget" name="TextEditWidget">
+ <class>MainWidget</class>
+ <widget class="QWidget" name="MainWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -103,7 +103,52 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="textEdit"/>
+    <layout class="QHBoxLayout" name="layout_code">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTextBrowser" name="codeLine">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="textEdit">
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QPlainTextEdit::NoWrap</enum>
+       </property>
+       <property name="cursorWidth">
+        <number>2</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
