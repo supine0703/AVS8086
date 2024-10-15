@@ -14,21 +14,30 @@ class Settings
 public:
     static QSettings& getSettings();
 
+    static QSettings& getUISettings();
+
+    static QSettings& getSettings(const QString& file);
+
     static void checkSettings(
         QAnyStringView key, int defaultValue, int min = INT32_MIN, int max = INT32_MAX
     );
 
-    static void checkSettings(QAnyStringView key, QString defaultValue, QStringList values = {});
+    static void checkSettings(
+        QAnyStringView key,
+        const QString& defaultValue,
+        const QStringList& values,
+        const char* split = nullptr
+    );
 
-    static QSettings& getUISettings();
-
-    static QSettings& getSettings(const QString& file);
+private:
+    static bool checkSettings(const QStringList& values, const QStringList& allValues);
 };
 
 #define SETTINGS       Settings::getSettings
 #define CHECK_SETTINGS Settings::checkSettings
 
 #define _APP_SCALE_ "/app/scale"
+#define _APP_FONTS_ "/app/fonts"
 
 #define _TEXT_EDIT_FILE_ "/text_edit/file"
 
