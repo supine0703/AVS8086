@@ -94,18 +94,18 @@ void MainWidget::initCodeEdit()
     );
 
 
-    connect(
-        ui->textEdit->verticalScrollBar(),
-        &QScrollBar::valueChanged,
-        ui->codeLine->verticalScrollBar(),
-        &QScrollBar::setValue
-    );
-    connect(
-        ui->codeLine->verticalScrollBar(),
-        &QScrollBar::valueChanged,
-        ui->textEdit->verticalScrollBar(),
-        &QScrollBar::setValue
-    );
+    // connect(
+    //     ui->textEdit->verticalScrollBar(),
+    //     &QScrollBar::valueChanged,
+    //     ui->codeLine->verticalScrollBar(),
+    //     &QScrollBar::setValue
+    // );
+    // connect(
+    //     ui->codeLine->verticalScrollBar(),
+    //     &QScrollBar::valueChanged,
+    //     ui->textEdit->verticalScrollBar(),
+    //     &QScrollBar::setValue
+    // );
 }
 
 

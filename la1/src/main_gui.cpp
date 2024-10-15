@@ -58,7 +58,6 @@ inline void appInit()
         return s;
     };
     auto fontName = getFontName({
-        ":/font/d_font/JetBrainsMono-Space.ttf",
         ":/font/iconfont/iconfont.ttf",
         ":/font/d_font/JetBrainsMono[wght].ttf",
         ":/font/d_font/JetBrainsMono-Italic[wght].ttf",
@@ -80,19 +79,19 @@ inline void appInit()
     // font.setItalic(true);
     QApplication::setFont(font);
 
-    auto f1 = QFont(family[1], fontSize);
-    auto f2 = QFont(family[2], fontSize);
-    qDebug() << family;
+    // auto f1 = QFont(family[1], fontSize);
+    // auto f2 = QFont(family[2], fontSize);
+    // qDebug() << family;
 
-    QFontMetrics fm0(QFont(family[0], fontSize));
-    QFontMetrics fm1(f1);
-    QFontMetrics fm2(f2);
-    QFontMetrics fm3(font);
+    // QFontMetrics fm0(QFont(family[0], fontSize));
+    // QFontMetrics fm1(f1);
+    // QFontMetrics fm2(f2);
+    // QFontMetrics fm3(font);
 
-    qDebug() << fm0.height() << fm0.xHeight() << fm0.capHeight();
-    qDebug() << fm1.height() << fm1.xHeight() << fm1.capHeight();
-    qDebug() << fm2.height() << fm2.xHeight() << fm2.capHeight();
-    qDebug() << fm3.height() << fm3.xHeight() << fm3.capHeight();
+    // qDebug() << fm0.height() << fm0.xHeight() << fm0.capHeight();
+    // qDebug() << fm1.height() << fm1.xHeight() << fm1.capHeight();
+    // qDebug() << fm2.height() << fm2.xHeight() << fm2.capHeight();
+    // qDebug() << fm3.height() << fm3.xHeight() << fm3.capHeight();
 
     // ...
 }
