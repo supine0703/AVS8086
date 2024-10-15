@@ -27,6 +27,7 @@ namespace Ui {
 class MainWidget;
 }
 
+class CodeEdit;
 class QStatusBar;
 
 class MainWidget : public QWidget
@@ -52,14 +53,18 @@ private slots:
 
     void on_textEdit_blockCountChanged(int blockCount);
 
+    void connect_codeLineChanged_with_edit();
+
+    void disconnect_codeLineChanged_with_edit();
+
 private:
     void initCodeEdit();
 
     Ui::MainWidget* ui;
     QStatusBar* status;
+    CodeEdit* edit;
 
     int m_charWidth;
-    int m_charHeight;
 };
 
 #endif // MAIN_WIDGET_H

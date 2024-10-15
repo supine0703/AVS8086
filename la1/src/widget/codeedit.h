@@ -28,14 +28,27 @@ class CodeEdit : public QPlainTextEdit
     Q_OBJECT
 
 public:
+    enum TabType {
+        TAB_USE_TABLE = 0,
+        TAB_USE_SPACE,
+    };
+
     explicit CodeEdit(QWidget* parent = nullptr);
+
     ~CodeEdit();
 
+    void setEditTabSize(int charWidth, int tabSize = 4);
 
-    // QTC_TEMP
-    // QWidget interface
+    void setEditTab(TabType type, int tabSize);
+
+    void setEditTab(TabType type, int tabSize, int charWidth);
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
+
+private:
+    TabType m_tab = TAB_USE_TABLE;
+    int m_tabSize = 4;
 };
 
 #endif // CODE_EDIT_H

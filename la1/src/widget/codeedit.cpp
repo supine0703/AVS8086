@@ -29,24 +29,90 @@ CodeEdit::CodeEdit(QWidget* parent) : QPlainTextEdit(parent)
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
     this->setCursorWidth(2);
 
-    QTextDocument *doc = this->document();
-    QTextCursor cursor(doc);
-    cursor.select(QTextCursor::Document); // 选择整个文档
-
-    QTextBlockFormat blockFormat;
-    blockFormat.setLineHeight(40, QTextBlockFormat::SingleHeight); // 设置固定行高
-    cursor.setBlockFormat(blockFormat);
+    setEditTabSize(13, 4);  // default
 }
 
 CodeEdit::~CodeEdit() {}
+
+void CodeEdit::setEditTabSize(int charWidth, int tabSize)
+{
+    auto textOption = this->document()->defaultTextOption();
+    textOption.setTabStopDistance(charWidth * tabSize);
+    this->document()->setDefaultTextOption(textOption);
+}
+
+void CodeEdit::setEditTab(TabType type, int tabSize)
+{
+    Q_ASSERT(type == TAB_USE_TABLE || TAB_USE_SPACE);
+    Q_ASSERT(tabSize > 0);
+    m_tab = type;
+    m_tabSize = tabSize;
+}
+
+void CodeEdit::setEditTab(TabType type, int tabSize, int charWidth)
+{
+    Q_ASSERT(charWidth > 0);
+    setEditTab(type, tabSize);
+    setEditTabSize(charWidth, tabSize);
+}
 
 void CodeEdit::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Return && (event->modifiers() & Qt::ShiftModifier))
     { // 取消 shift+enter 只空行不创建新 block
         // 在光标位置插入新段落
-        QTextCursor cursor = this->textCursor();
+        auto cursor = this->textCursor();
         cursor.insertBlock();
+    }
+    else if (event->key() == Qt::Key_Tab /*&& !(event->modifiers() & Qt::ShiftModifier)*/)
+    { // tab
+        if (m_tab == TAB_USE_SPACE)
+        {
+            auto cursor = this->textCursor();
+            cursor.insertText(QString(m_tabSize - cursor.columnNumber() % m_tabSize, ' '));
+        }
+        else
+        {
+            QPlainTextEdit::keyPressEvent(event);
+        }
+    }
+    else if (event->key() == Qt::Key_Backtab)
+    { // shift + tab
+        auto cursor = this->textCursor();
+        cursor.beginEditBlock();
+        {
+            auto cursorCol = cursor.columnNumber();
+            cursor.movePosition(QTextCursor::StartOfLine);
+            auto startPos = cursor.position();
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            auto lineText = cursor.selectedText();
+
+            if (m_tab == TAB_USE_SPACE)
+            { // 使用空格缩进时的处理
+                int space = 0;
+                while (space < cursorCol && lineText[space] == ' ')
+                {
+                    ++space;
+                }
+                if (space > 0)
+                {
+                    cursor.setPosition(startPos);
+                    for (space %= m_tabSize, space += (!space) ? 4 : 0; space > 0; space--)
+                    {
+                        cursor.deleteChar();
+                    }
+                }
+            }
+            else
+            { // 使用 Tab 缩进时的处理
+                if (cursorCol > 0 && lineText.startsWith("\t"))
+                {
+                    cursor.setPosition(startPos);
+                    cursor.deleteChar();
+                }
+            }
+        }
+        cursor.endEditBlock();
     }
 
     else

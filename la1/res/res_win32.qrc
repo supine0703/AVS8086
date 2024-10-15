@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/font">
         <file>iconfont/iconfont.ttf</file>
+        <file>d_font/Space.ttf</file>
         <file>d_font/JetBrainsMono[wght].ttf</file>
         <file>d_font/JetBrainsMono-Italic[wght].ttf</file>
         <file>d_font/YouSheShaYuFeiTeJianKangTi.ttf</file>

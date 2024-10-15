@@ -47,27 +47,34 @@ inline void appInit()
     Q_ASSERT(QCoreApplication::instance() != nullptr);
 
     // 设置字体
-    auto getFontName = [](QStringList res) -> QStringList {
-        QStringList s;
+    auto getFontList = [](QStringList res) -> QStringList {
+        QStringList fs;
         for (const auto& r : res)
         {
-            s << QFontDatabase::applicationFontFamilies(QFontDatabase::addApplicationFont(r)).at(0);
+            auto f =
+                QFontDatabase::applicationFontFamilies(QFontDatabase::addApplicationFont(r)).at(0);
+            if (!fs.contains(f))
+            {
+                fs << f;
+            }
         }
-        qDebug() << s;
-        s.removeDuplicates();
-        return s;
+        return fs;
     };
-    auto fontName = getFontName({
+    auto fontList = getFontList({
         ":/font/iconfont/iconfont.ttf",
+        ":/font/d_font/Space.ttf",
         ":/font/d_font/JetBrainsMono[wght].ttf",
         ":/font/d_font/JetBrainsMono-Italic[wght].ttf",
         ":/font/d_font/YouSheShaYuFeiTeJianKangTi.ttf",
     });
-    fontName.removeAll("iconfont"); // 不应该作为通用字体 会导致空白行和文字行高度不一致
+    fontList.removeAll("iconfont"); // 不应该作为通用字体 会导致空白行和文字行高度不一致
+    fontList.removeAll("Space"); // Space: 在 0x1fdc 创建了一个空格 行间距 `200`
+                                 // 主要用作抵消 Qt因不同字体差异带来的不良影响
 
     // 检测字体是否有效 没效则用默认字体
-    CHECK_SETTINGS(_APP_FONTS_, fontName.join(","), QFontDatabase::families(), ",");
-    QString family = SETTINGS().value(_APP_FONTS_).toString();
+    CHECK_SETTINGS(_APP_FONTS_, fontList.join(","), QFontDatabase::families(), ",");
+    QString family("Space,");
+    family.append(SETTINGS().value(_APP_FONTS_).toString());
 
     // 设置字体倍率 但是这似乎不是一个好的方案
     CHECK_SETTINGS(
@@ -75,23 +82,5 @@ inline void appInit()
     );
     int fontSize = 8 * SETTINGS().value(_APP_SCALE_).toDouble();
 
-    auto font = QFont(family, fontSize);
-    // font.setItalic(true);
-    QApplication::setFont(font);
-
-    // auto f1 = QFont(family[1], fontSize);
-    // auto f2 = QFont(family[2], fontSize);
-    // qDebug() << family;
-
-    // QFontMetrics fm0(QFont(family[0], fontSize));
-    // QFontMetrics fm1(f1);
-    // QFontMetrics fm2(f2);
-    // QFontMetrics fm3(font);
-
-    // qDebug() << fm0.height() << fm0.xHeight() << fm0.capHeight();
-    // qDebug() << fm1.height() << fm1.xHeight() << fm1.capHeight();
-    // qDebug() << fm2.height() << fm2.xHeight() << fm2.capHeight();
-    // qDebug() << fm3.height() << fm3.xHeight() << fm3.capHeight();
-
-    // ...
+    QApplication::setFont(QFont(family, fontSize));
 }

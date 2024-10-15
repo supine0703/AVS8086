@@ -25,25 +25,28 @@
 #include "ui_mainwidget.h"
 
 #include <QFileDialog>
+#include <QFontMetrics>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QStatusBar>
-#include <QFontMetrics>
 
 MainWidget::MainWidget(QWidget* parent)
-    : QWidget(parent), ui(new Ui::MainWidget), status(new QStatusBar(this))
+    : QWidget(parent), ui(new Ui::MainWidget), status(new QStatusBar(this)), edit(nullptr)
 {
+    this->setWindowTitle(
+        QString("AVS8086 v%1 - assembler virtual simulator for 8086").arg(THE_VESION)
+    );
+
     auto fm = QFontMetrics(QApplication::font());
     m_charWidth = fm.horizontalAdvance('0');
-    // m_charHeight = fm.height()
 
     ui->setupUi(this);
     initCodeEdit();
     ui->lineEdit_file->setText(SETTINGS().value(_TEXT_EDIT_FILE_).toString());
+    ui->layout_widget->addWidget(status);
+    status->showMessage(QString("row:    1  col:   1"));
 
-    this->setWindowTitle(
-        QString("AVS8086 v%1 - assembler virtual simulator for 8086").arg(THE_VESION)
-    );
+
     QFile f(ui->lineEdit_file->text());
     if (f.exists())
     {
@@ -57,8 +60,6 @@ MainWidget::MainWidget(QWidget* parent)
             QMessageBox::warning(this, "警告", "文件打开失败!\n" + f.errorString());
         }
     }
-    ui->layout_widget->addWidget(status);
-    status->showMessage(QString("row:    1  col:   1"));
 }
 
 MainWidget::~MainWidget()
@@ -73,39 +74,28 @@ void MainWidget::initCodeEdit()
     ui->codeLine->viewport()->setCursor(Qt::ArrowCursor);                        // 箭头光标
     ui->codeLine->appendPlainText("1");                                          // 默认值
     ui->codeLine->setMaximumWidth(m_charWidth * 3);
-    ui->textEdit->setStyleSheet(QString("QPlainTextEdit { line-height: 48px; }"));
 
     // code edit
     // 改用 code edit 并重新绑定信号槽
     ui->layout_code->removeWidget(ui->textEdit);
     ui->textEdit->disconnect();
     ui->textEdit->deleteLater();
-    ui->textEdit = new CodeEdit;
-    ui->layout_code->addWidget(ui->textEdit);
-    connect(ui->textEdit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
+    ui->textEdit = edit = new CodeEdit;
+    ui->layout_code->addWidget(edit);
+    edit->setEditTabSize(m_charWidth, 4);
+    connect(edit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
+    connect(edit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged);
     connect(
-        ui->textEdit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged
-    );
-    connect(
-        ui->textEdit,
-        &CodeEdit::cursorPositionChanged,
-        this,
-        &MainWidget::on_textEdit_cursorPositionChanged
+        edit, &CodeEdit::cursorPositionChanged, this, &MainWidget::on_textEdit_cursorPositionChanged
     );
 
-
-    // connect(
-    //     ui->textEdit->verticalScrollBar(),
-    //     &QScrollBar::valueChanged,
-    //     ui->codeLine->verticalScrollBar(),
-    //     &QScrollBar::setValue
-    // );
-    // connect(
-    //     ui->codeLine->verticalScrollBar(),
-    //     &QScrollBar::valueChanged,
-    //     ui->textEdit->verticalScrollBar(),
-    //     &QScrollBar::setValue
-    // );
+    connect(
+        edit->verticalScrollBar(),
+        &QScrollBar::valueChanged,
+        ui->codeLine->verticalScrollBar(),
+        &QScrollBar::setValue
+    );
+    connect_codeLineChanged_with_edit();
 }
 
 
@@ -262,15 +252,13 @@ void MainWidget::on_btn_compile_clicked()
 
 void MainWidget::on_textEdit_cursorPositionChanged()
 {
-    auto tc = ui->textEdit->textCursor();
+    auto tc = edit->textCursor();
     status->showMessage(QString("row: %1  col: %2")
                             .arg(tc.blockNumber() + 1, 4, 10, QChar(' '))
                             .arg(tc.columnNumber() + 1, 4, 10, QChar(' ')));
 }
 
-void MainWidget::on_textEdit_textChanged()
-{
-}
+void MainWidget::on_textEdit_textChanged() {}
 
 #include <QTextBlock>
 
@@ -286,6 +274,7 @@ void MainWidget::on_textEdit_blockCountChanged(int blockCount)
         ui->codeLine->setMaximumWidth(m_charWidth * (width + 2));
     }
 
+    disconnect_codeLineChanged_with_edit();
     if (line < blockCount)
     { // 增加  <
         for (int i = line + 1; i <= blockCount; i++)
@@ -295,50 +284,33 @@ void MainWidget::on_textEdit_blockCountChanged(int blockCount)
     }
     else
     { // 减少  >
-        auto tc = ui->codeLine->textCursor(); // blockNumber 比 blockCount 小 1
+        auto tc = ui->codeLine->textCursor();
         while (tc.blockNumber() >= blockCount)
-        {
+        { // blockNumber 比 blockCount 小 1
             // tc.movePosition(QTextCursor::End); // 将光标移动到文本末尾 (应该一直保持在末尾)
             tc.select(QTextCursor::BlockUnderCursor); // 选择当前块
             tc.removeSelectedText();
         }
     }
+    connect_codeLineChanged_with_edit();
+}
 
-    // int uniformHeight = 40;
-    // auto cursor = ui->textEdit->textCursor();
-    // cursor.select(QTextCursor::Document); // 选择整个文档
+void MainWidget::connect_codeLineChanged_with_edit()
+{
+    connect(
+        ui->codeLine->verticalScrollBar(),
+        &QScrollBar::valueChanged,
+        edit->verticalScrollBar(),
+        [this](int lineV) {
+            if (int v = edit->verticalScrollBar()->value(); v != lineV)
+            {
+                edit->verticalScrollBar()->setValue(lineV);
+            }
+        }
+    );
+}
 
-    // QTextBlockFormat blockFormat;
-    // QTextCharFormat charFormat;
-
-    // blockFormat.setLineHeight(uniformHeight, QTextBlockFormat::FixedHeight); // 设置固定行高
-    // cursor.setBlockFormat(blockFormat);
-
-    // QTextCharFormat format = cursor.charFormat();
-    // // format.setFontPointSize(uniformHeight);
-    // cursor.setCharFormat(format);
-
-    // QTextCursor cursor = ui->textEdit->textCursor();
-    // cursor.select(QTextCursor::LineUnderCursor);
-    // QTextBlock block = cursor.block();
-    // QFontMetrics metrics(ui->textEdit->font());
-
-    // while (block.isValid()) {
-    //     cursor = QTextCursor(block);
-    //     QTextCharFormat charFormat = cursor.charFormat();
-    //     QFont font = charFormat.font();
-
-    //     // 获取当前字体的 x-height 和 cap-height
-    //     QFontMetrics fontMetrics(font);
-    //     int currentHeight = fontMetrics.height();
-    //     double scaleFactor = static_cast<double>(uniformHeight) / currentHeight;
-
-    //     // 根据比例缩放字体大小
-    //     font.setPointSizeF(font.pointSizeF() * scaleFactor);
-    //     charFormat.setFont(font);
-    //     cursor.setCharFormat(charFormat);
-
-    //     block = block.next();
-    // }
-
+void MainWidget::disconnect_codeLineChanged_with_edit()
+{
+    ui->codeLine->verticalScrollBar()->disconnect(edit->verticalScrollBar());
 }
