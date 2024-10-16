@@ -89,25 +89,25 @@ void MainWidget::initCodeEdit()
     // setFocusLine(0);                    // 设置第一行为焦点
     setCodeLineWidth(1);                // 初始化 codeLine 的宽度
 
-    { // 设置初始颜色
-        // 从配置文件中读取颜色
-        if (m_clColor_1 = QColor(SETTINGS().value(_APP_CLC_1_).toString()); !m_clColor_1.isValid())
-        {
-            m_clColor_1 = CODE_LINE_DEFAULT_COLOR_1;
-            SETTINGS().setValue(_APP_CLC_1_, m_clColor_1.name());
-        }
-        if (m_clColor_2 = QColor(SETTINGS().value(_APP_CLC_2_).toString()); !m_clColor_2.isValid())
-        {
-            m_clColor_2 = CODE_LINE_DEFAULT_COLOR_2;
-            SETTINGS().setValue(_APP_CLC_2_, m_clColor_2.name());
-        }
-        // 设置行号的初始颜色
-        QTextCursor cursor(ui->codeLine->document());
-        QTextCharFormat format;
-        format.setForeground(m_clColor_1);
-        cursor.select(QTextCursor::Document);
-        cursor.setCharFormat(format);
-    }
+    // { // 设置初始颜色
+    //     // 从配置文件中读取颜色
+    //     if (m_clColor_1 = QColor(SETTINGS().value(_APP_CLC_1_).toString()); !m_clColor_1.isValid())
+    //     {
+    //         m_clColor_1 = CODE_LINE_DEFAULT_COLOR_1;
+    //         SETTINGS().setValue(_APP_CLC_1_, m_clColor_1.name());
+    //     }
+    //     if (m_clColor_2 = QColor(SETTINGS().value(_APP_CLC_2_).toString()); !m_clColor_2.isValid())
+    //     {
+    //         m_clColor_2 = CODE_LINE_DEFAULT_COLOR_2;
+    //         SETTINGS().setValue(_APP_CLC_2_, m_clColor_2.name());
+    //     }
+    //     // 设置行号的初始颜色
+    //     QTextCursor cursor(ui->codeLine->document());
+    //     QTextCharFormat format;
+    //     format.setForeground(m_clColor_1);
+    //     cursor.select(QTextCursor::Document);
+    //     cursor.setCharFormat(format);
+    // }
 
     // code edit
     // 改用 CodeEdit 并重新绑定信号槽
@@ -136,24 +136,24 @@ void MainWidget::initCodeEdit()
 
 void MainWidget::setFocusLine(int lineNum)
 {
-    QTextCharFormat format1;
-    format1.setForeground(m_clColor_1);
-    QTextCharFormat format2;
-    format2.setForeground(m_clColor_2);
+    // QTextCharFormat format1;
+    // format1.setForeground(m_clColor_1);
+    // QTextCharFormat format2;
+    // format2.setForeground(m_clColor_2);
 
-    if (!m_focusLine.isNull())
-    { // 如果存在则恢复 Color1
-        qDebug() << 2;
-        m_focusLine.select(QTextCursor::BlockUnderCursor);
-        m_focusLine.mergeCharFormat(format1);
-    }
-    qDebug() << 3;
-    // 设置 lineNum 的颜色为 Color2
-    m_focusLine = QTextCursor(ui->codeLine->document()->findBlockByNumber(lineNum));
-    m_focusLine.select(QTextCursor::BlockUnderCursor);
-    m_focusLine.mergeCharFormat(format2);
-    m_focusLine.clearSelection();
-    m_focusLine.mergeCharFormat(format1);
+    // if (!m_focusLine.isNull())
+    // { // 如果存在则恢复 Color1
+    //     qDebug() << 2;
+    //     m_focusLine.select(QTextCursor::BlockUnderCursor);
+    //     m_focusLine.mergeCharFormat(format1);
+    // }
+    // qDebug() << 3;
+    // // 设置 lineNum 的颜色为 Color2
+    // m_focusLine = QTextCursor(ui->codeLine->document()->findBlockByNumber(lineNum));
+    // m_focusLine.select(QTextCursor::BlockUnderCursor);
+    // m_focusLine.mergeCharFormat(format2);
+    // m_focusLine.clearSelection();
+    // m_focusLine.mergeCharFormat(format1);
 }
 
 void MainWidget::setCodeLineWidth(int bitNum)
