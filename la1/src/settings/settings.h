@@ -59,7 +59,9 @@ private:
 #define _APP_SCALE_ "/app/scale"
 #define _APP_FONTS_ "/app/fonts"
 
-#define _TEXT_EDIT_FILE_ "/text_edit/file"
+#define _APP_OPEN_FILE_ "/app/open_file"
+#define _APP_CLC_1_ "/app/code_line_color_1"
+#define _APP_CLC_2_ "/app/code_line_color_2"
 
 
 #define SETTINGS_UI Settings::getUISettings

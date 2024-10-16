@@ -56,7 +56,7 @@ void Settings::checkSettings(QAnyStringView key, int defaultValue, int min, int 
 
 void Settings::checkSettings(
     QAnyStringView key, const QString& defaultValue, const QStringList& values, const char* split
-    )
+)
 {
     auto& s(Settings::getSettings());
     if (s.contains(key))

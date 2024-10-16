@@ -102,7 +102,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL Release)
 endif()
 
 target_compile_definitions(a1 PRIVATE
-    THE_VESION="${PROJECT_VERSION}"
+    THE_VERSION="${PROJECT_VERSION}"
     # HELP_PATH="${FILES_PATH}/help"
     # EXAMPLE_PATH="${FILES_PATH}/example"
     # TEMPLATE_PATH="${FILES_PATH}/template"

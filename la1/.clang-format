@@ -1,0 +1,38 @@
+---
+Language: Cpp
+BasedOnStyle: Microsoft
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Right
+# AlignEscapedNewlines: Left
+PointerAlignment: Left
+
+ColumnLimit: 100
+MaxEmptyLinesToKeep: 2
+
+BinPackArguments: false
+BinPackParameters: false
+BreakConstructorInitializers: BeforeComma
+PackConstructorInitializers: NextLine
+
+ReflowComments: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortLambdasOnASingleLine: Inline
+AlwaysBreakTemplateDeclarations: Yes
+
+Cpp11BracedListStyle: false
+IncludeBlocks: Regroup
+IndentGotoLabels: false
+IndentPPDirectives: BeforeHash
+InsertBraces: true
+
+# AlignConsecutiveAssignments:
+#   Enabled: true
+AlignConsecutiveMacros:
+  Enabled: true
+BraceWrapping:
+  AfterEnum: false
+  AfterNamespace: false
+  SplitEmptyFunction: false
+

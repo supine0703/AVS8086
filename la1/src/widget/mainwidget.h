@@ -21,6 +21,7 @@
 #ifndef MAIN_WIDGET_H
 #define MAIN_WIDGET_H
 
+#include <QTextCursor>
 #include <QWidget>
 
 namespace Ui {
@@ -53,17 +54,29 @@ private slots:
 
     void on_textEdit_blockCountChanged(int blockCount);
 
+    void sync_codeLine_to_edit(int lineV);
+
+private:
+    void initCodeEdit();
+
+    void setFocusLine(int lineNum);
+
+    void setCodeLineWidth(int bitNum);
+
     void connect_codeLineChanged_with_edit();
 
     void disconnect_codeLineChanged_with_edit();
 
 private:
-    void initCodeEdit();
-
+    // 组件
     Ui::MainWidget* ui;
     QStatusBar* status;
     CodeEdit* edit;
 
+    // 成员
+    QTextCursor m_focusLine;
+    QColor m_clColor_1;
+    QColor m_clColor_2;
     int m_charWidth;
 };
 

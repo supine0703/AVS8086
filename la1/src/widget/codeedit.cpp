@@ -29,7 +29,7 @@ CodeEdit::CodeEdit(QWidget* parent) : QPlainTextEdit(parent)
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
     this->setCursorWidth(2);
 
-    setEditTabSize(13, 4);  // default
+    setEditTabSize(13, 4); // default
 }
 
 CodeEdit::~CodeEdit() {}
@@ -80,7 +80,7 @@ void CodeEdit::keyPressEvent(QKeyEvent* event)
     { // shift + tab
         auto cursor = this->textCursor();
         cursor.beginEditBlock();
-        {
+        { // 确保这一组操作的原子性
             auto cursorCol = cursor.columnNumber();
             cursor.movePosition(QTextCursor::StartOfLine);
             auto startPos = cursor.position();

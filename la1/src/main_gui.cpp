@@ -1,5 +1,5 @@
 /**
- *  AVS8086 - See <https://github.com/supine0703/AVS8086> to know more. 
+ *  AVS8086 - See <https://github.com/supine0703/AVS8086> to know more.
  *
  *  Copyright (C) <2024>  <李宗霖>  github <https://github.com/supine0703>.
  *
