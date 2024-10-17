@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,9 +47,9 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="layout_file">
+    <layout class="QHBoxLayout" name="layout_path">
      <item>
-      <widget class="QLineEdit" name="lineEdit_file">
+      <widget class="QLineEdit" name="lineEdit_path">
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
@@ -62,7 +62,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_choose">
+      <widget class="QPushButton" name="btn_choose_path">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -75,26 +75,39 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_open">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QPushButton" name="btn_clear_path">
+       <property name="text">
+        <string>清空</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layout_file">
+     <item>
+      <widget class="QLabel" name="label_file">
+       <property name="text">
+        <string>文件操作: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_clear_file">
+       <property name="text">
+        <string>清空</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_open_file">
        <property name="text">
         <string>打开</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_save">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QPushButton" name="btn_save_file">
        <property name="text">
         <string>保存</string>
        </property>

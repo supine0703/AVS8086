@@ -2,11 +2,6 @@
     "cmake.buildDirectory": "${workspaceFolder}/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.clang_format_style": "file:${workspaceFolder}/.clang-format",
-    "files.associations": {
-        "qtextblock": "cpp",
-        "chrono": "cpp",
-        "optional": "cpp",
-        "system_error": "cpp",
-        "format": "cpp"
-    },
+    "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
+    "editor.formatOnSave": true,
 }

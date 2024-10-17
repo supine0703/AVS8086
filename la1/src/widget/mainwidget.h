@@ -21,7 +21,7 @@
 #ifndef MAIN_WIDGET_H
 #define MAIN_WIDGET_H
 
-#include <QTextCursor>
+#include <QTextCharFormat>
 #include <QWidget>
 
 namespace Ui {
@@ -40,24 +40,32 @@ public:
     ~MainWidget();
 
 private slots:
-    void on_btn_choose_clicked();
+    void on_lineEdit_path_textChanged(const QString& path);
 
-    void on_btn_open_clicked();
+    void on_btn_choose_path_clicked();
 
-    void on_btn_save_clicked();
+    void on_btn_open_file_clicked();
+
+    void on_btn_clear_file_clicked();
+
+    void on_btn_save_file_clicked();
 
     void on_btn_compile_clicked();
 
     void on_textEdit_cursorPositionChanged();
 
-    void on_textEdit_textChanged();
-
     void on_textEdit_blockCountChanged(int blockCount);
+
+    void on_textEdit_textChanged();
 
     void sync_codeLine_to_edit(int lineV);
 
+    void on_btn_clear_path_clicked();
+
 private:
     void initCodeEdit();
+
+    void loadCodeLineColor();
 
     void setFocusLine(int lineNum);
 
@@ -74,10 +82,10 @@ private:
     CodeEdit* edit;
 
     // 成员
-    QTextCursor m_focusLine;
-    QColor m_clColor_1;
-    QColor m_clColor_2;
+    QTextCharFormat m_colorF_1;
+    QTextCharFormat m_colorF_2;
     int m_charWidth;
+    int m_focusLine;
 };
 
 #endif // MAIN_WIDGET_H

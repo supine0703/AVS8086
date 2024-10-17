@@ -26,19 +26,6 @@ QSettings& Settings::getSettings()
     return s;
 }
 
-QSettings& Settings::getUISettings()
-{
-    static QSettings s(CONFIG_UI_INI, QSettings::IniFormat);
-    return s;
-}
-
-QSettings& Settings::getSettings(const QString& file)
-{
-    static QSettings s;
-    s.setPath(QSettings::IniFormat, QSettings::UserScope, file);
-    return s;
-}
-
 void Settings::checkSettings(QAnyStringView key, int defaultValue, int min, int max)
 {
     auto& s(Settings::getSettings());
@@ -62,11 +49,12 @@ void Settings::checkSettings(
     if (s.contains(key))
     {
         auto str = s.value(key).toString();
-        if (!checkSettings(split == nullptr ? (QStringList() << str) : str.split(split), values))
+        if (checkSettings(split == nullptr ? (QStringList() << str) : str.split(split), values))
         {
-            s.setValue(key, defaultValue);
+            return;
         }
     }
+    s.setValue(key, defaultValue);
 }
 
 bool Settings::checkSettings(const QStringList& values, const QStringList& allValues)

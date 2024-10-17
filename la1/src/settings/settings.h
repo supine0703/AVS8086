@@ -34,10 +34,6 @@ class Settings
 public:
     static QSettings& getSettings();
 
-    static QSettings& getUISettings();
-
-    static QSettings& getSettings(const QString& file);
-
     static void checkSettings(
         QAnyStringView key, int defaultValue, int min = INT32_MIN, int max = INT32_MAX
     );
@@ -59,16 +55,8 @@ private:
 #define _APP_SCALE_ "/app/scale"
 #define _APP_FONTS_ "/app/fonts"
 
-#define _APP_OPEN_FILE_ "/app/open_file"
-#define _APP_CLC_1_ "/app/code_line_color_1"
-#define _APP_CLC_2_ "/app/code_line_color_2"
-
-
-#define SETTINGS_UI Settings::getUISettings
-
-#define _WINDOW_SIZE_ "/window/size"
-#define _WINDOW_POS_  "/window/pos"
-
-#define _NEW_DEFAULT_PATH "/new/default_path"
+#define _APP_OPEN_FILE_  "/app/open_file"
+#define _APP_CL_COLOR_1_ "/app/code_line_color_1"
+#define _APP_CL_COLOR_2_ "/app/code_line_color_2"
 
 #endif // SETTINGS_H

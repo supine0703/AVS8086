@@ -35,4 +35,3 @@ BraceWrapping:
   AfterEnum: false
   AfterNamespace: false
   SplitEmptyFunction: false
-

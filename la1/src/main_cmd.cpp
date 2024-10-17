@@ -17,6 +17,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 int main(int argc, char* argv[])
 {
+    return 0;
 }
