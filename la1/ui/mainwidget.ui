@@ -76,6 +76,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_clear_path">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>清空</string>
        </property>
@@ -86,30 +92,44 @@
    <item>
     <layout class="QHBoxLayout" name="layout_file">
      <item>
-      <widget class="QLabel" name="label_file">
+      <widget class="QPushButton" name="btn_clear_file">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>文件操作: </string>
+        <string>清空编辑器</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_clear_file">
-       <property name="text">
-        <string>清空</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lineEdit_search"/>
      </item>
      <item>
       <widget class="QPushButton" name="btn_open_file">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>打开</string>
+        <string>打开文件</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_save_file">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>保存</string>
+        <string>保存文件</string>
        </property>
       </widget>
      </item>

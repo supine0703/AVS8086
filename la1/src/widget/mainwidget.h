@@ -29,6 +29,7 @@ class MainWidget;
 }
 
 class CodeEdit;
+class SearchEdit;
 class QStatusBar;
 
 class MainWidget : public QWidget
@@ -43,6 +44,8 @@ private slots:
     void on_lineEdit_path_textChanged(const QString& path);
 
     void on_btn_choose_path_clicked();
+
+    void on_btn_clear_path_clicked();
 
     void on_btn_open_file_clicked();
 
@@ -60,10 +63,12 @@ private slots:
 
     void sync_codeLine_to_edit(int lineV);
 
-    void on_btn_clear_path_clicked();
-
 private:
     void initCodeEdit();
+
+    void initLineSearch();
+
+    void initStatusBar();
 
     void loadCodeLineColor();
 
@@ -76,12 +81,12 @@ private:
     void disconnect_codeLineChanged_with_edit();
 
 private:
-    // 组件
     Ui::MainWidget* ui;
-    QStatusBar* status;
-    CodeEdit* edit;
 
-    // 成员
+    QStatusBar* m_status;
+    SearchEdit* m_search;
+    CodeEdit* m_edit;
+
     QTextCharFormat m_colorF_1;
     QTextCharFormat m_colorF_2;
     int m_charWidth;

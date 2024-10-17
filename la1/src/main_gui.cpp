@@ -24,6 +24,8 @@
 #include <QApplication>
 #include <QFontDatabase>
 
+#define _APP_SCALE_ "/app/scale"
+#define _APP_FONTS_ "/app/fonts"
 
 void appInit(); // 必须在 QApplication 创建之后使用
 

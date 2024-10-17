@@ -52,11 +52,5 @@ private:
 #define SETTINGS       Settings::getSettings
 #define CHECK_SETTINGS Settings::checkSettings
 
-#define _APP_SCALE_ "/app/scale"
-#define _APP_FONTS_ "/app/fonts"
-
-#define _APP_OPEN_FILE_  "/app/open_file"
-#define _APP_CL_COLOR_1_ "/app/code_line_color_1"
-#define _APP_CL_COLOR_2_ "/app/code_line_color_2"
 
 #endif // SETTINGS_H

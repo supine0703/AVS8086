@@ -22,25 +22,34 @@
 
 #include "../settings/settings.h"
 #include "codeedit.h"
+#include "searchedit.h"
 #include "ui_mainwidget.h"
 
+#include <QCompleter>
 #include <QFileDialog>
 #include <QFontMetrics>
+#include <QMenu>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QTextBlock>
 
+
+#define _APP_OPEN_FILE_  "/app/open_file"
+#define _APP_CL_COLOR_1_ "/app/code_line_color_1"
+#define _APP_CL_COLOR_2_ "/app/code_line_color_2"
+
 #define CODE_LINE_SPACE_WIDTH     2
 #define CODE_LINE_DEFAULT_COLOR_1 QColor(165, 165, 165)
 #define CODE_LINE_DEFAULT_COLOR_2 QColor(225, 15, 15); // QColor(15, 15, 15)
 
+
 MainWidget::MainWidget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget)
-    , status(new QStatusBar(this))
-    , edit(nullptr)
+    , m_status(new QStatusBar(this))
+    , m_edit(nullptr)
     , m_focusLine(-1)
 {
 
@@ -56,7 +65,8 @@ MainWidget::MainWidget(QWidget* parent)
     // 初始化 UI 以及各个组件
     ui->setupUi(this);
     initCodeEdit();
-    ui->layout_widget->addWidget(status);
+    initLineSearch();
+    initStatusBar();
     on_textEdit_cursorPositionChanged(); // 状态栏显示行列、突出焦点
 
     // 读取配置文件中的文件路径，并试图打开
@@ -103,24 +113,97 @@ void MainWidget::initCodeEdit()
     ui->layout_code->removeWidget(ui->textEdit);
     ui->textEdit->disconnect();
     ui->textEdit->deleteLater();
-    ui->textEdit = edit = new CodeEdit;
-    ui->layout_code->addWidget(edit);
-    edit->appendPlainText("");
-    edit->setEditTabSize(m_charWidth, 4);
-    connect(edit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
-    connect(edit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged);
+    ui->textEdit = m_edit = new CodeEdit;
+    ui->layout_code->addWidget(m_edit);
+    m_edit->appendPlainText("");
+    m_edit->setEditTabSize(m_charWidth, 4);
+    connect(m_edit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
+    connect(m_edit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged);
     connect(
-        edit, &CodeEdit::cursorPositionChanged, this, &MainWidget::on_textEdit_cursorPositionChanged
+        m_edit, &CodeEdit::cursorPositionChanged, this, &MainWidget::on_textEdit_cursorPositionChanged
     );
 
     // 通过信号槽将行号与编辑器同步
     connect(
-        edit->verticalScrollBar(),
+        m_edit->verticalScrollBar(),
         &QScrollBar::valueChanged,
         ui->codeLine->verticalScrollBar(),
         &QScrollBar::setValue
     );
     connect_codeLineChanged_with_edit();
+}
+
+#include <QCompleter>
+#include <QLineEdit>
+#include <QPainter>
+#include <QStringListModel>
+#include <QStyledItemDelegate>
+#include <QAbstractItemView>
+
+class CustomCompleterDelegate : public QStyledItemDelegate
+{
+public:
+    CustomCompleterDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
+
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
+        const override
+    {
+        if (index.data().toString() == "LF")
+        { // 为特定选项设置背景颜色
+            painter->fillRect(option.rect, Qt::yellow);
+        }
+
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+};
+
+void MainWidget::initLineSearch()
+{
+    // 改用 SearchEdit
+    ui->layout_file->removeWidget(ui->lineEdit_search);
+    ui->lineEdit_search->deleteLater();
+    ui->lineEdit_search = m_search = new SearchEdit;
+    ui->layout_file->insertWidget(1, m_search);
+
+
+
+    // 创建输入框和补全器
+    QStringList items = { "LF", "CRLF"};
+    auto completer = new QCompleter(items, this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+
+    // 设置自定义委托
+    QAbstractItemView *popup = completer->popup();
+    popup->setItemDelegate(new CustomCompleterDelegate(popup));
+
+    m_search->setCompleter(completer);
+}
+
+void MainWidget::initStatusBar()
+{
+    ui->layout_widget->addWidget(m_status);
+
+    // 将按钮添加到状态栏的最右侧
+    QPushButton* button = new QPushButton("Click Me");
+    m_status->addPermanentWidget(button);
+    connect(button, &QPushButton::clicked, this, [this]() {
+        ui->lineEdit_search->setFocus();
+    });
+
+    //     QAction* action = new QAction("Click me", this);
+    //     QToolButton* button = new QToolButton;
+    //     button->setDefaultAction(action);
+
+    //     // 如果想添加下拉菜单
+    //     QMenu* menu = new QMenu(button);
+    //     menu->addAction("Option 1");
+    //     menu->addAction("Option 2");
+    //     button->setMenu(menu);
+    //     button->setPopupMode(QToolButton::InstantPopup);
+
+    //     // 添加按钮到状态栏的最右侧
+    //     status->addPermanentWidget(button);
 }
 
 void MainWidget::loadCodeLineColor()
@@ -282,8 +365,8 @@ void MainWidget::on_btn_save_file_clicked()
         if (QFile f(path); f.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             // 删除行尾空白
-            auto cursor = edit->textCursor();
-            auto doc = edit->document();
+            auto cursor = m_edit->textCursor();
+            auto doc = m_edit->document();
             cursor.beginEditBlock();
             for (auto block = doc->firstBlock(); block != doc->end(); block = block.next())
             {
@@ -302,7 +385,7 @@ void MainWidget::on_btn_save_file_clicked()
 
             // ...
 
-            f.write(edit->toPlainText().toStdString().c_str());
+            f.write(m_edit->toPlainText().toStdString().c_str());
             f.close();
         }
         else
@@ -315,8 +398,8 @@ void MainWidget::on_btn_save_file_clicked()
 void MainWidget::on_textEdit_cursorPositionChanged()
 {
     // 在状态栏显示行列
-    auto ec = edit->textCursor();
-    status->showMessage(
+    auto ec = m_edit->textCursor();
+    m_status->showMessage(
         QString("[ row: %1, col: %2 ]").arg(ec.blockNumber() + 1).arg(ec.columnNumber() + 1)
     );
 
@@ -377,9 +460,9 @@ void MainWidget::on_textEdit_textChanged() {}
 
 void MainWidget::sync_codeLine_to_edit(int lineV)
 { // 同步行号与编辑器的滚动条
-    if (int editV = edit->verticalScrollBar()->value(); editV != lineV)
+    if (int editV = m_edit->verticalScrollBar()->value(); editV != lineV)
     {
-        edit->verticalScrollBar()->setValue(lineV);
+        m_edit->verticalScrollBar()->setValue(lineV);
     }
 }
 
@@ -455,3 +538,4 @@ void MainWidget::on_btn_compile_clicked()
 
     // // qDebug() << a.wellInitInfos();
 }
+

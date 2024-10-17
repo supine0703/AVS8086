@@ -68,6 +68,8 @@ set(GUI_PROJ_SOURCES
 
     ${SRC_PATH}/widget/codeedit.h
     ${SRC_PATH}/widget/codeedit.cpp
+    ${SRC_PATH}/widget/searchedit.h
+    ${SRC_PATH}/widget/searchedit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
