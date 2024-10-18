@@ -7,7 +7,7 @@ class SearchEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    SearchEdit();
+    explicit  SearchEdit(QWidget* parent = nullptr);
 
     // QWidget interface
 protected:

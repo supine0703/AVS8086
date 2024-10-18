@@ -41,7 +41,7 @@ public:
     ~MainWidget();
 
 private slots:
-    void on_lineEdit_path_textChanged(const QString& path);
+    void on_edit_path_textChanged(const QString& path);
 
     void on_btn_choose_path_clicked();
 
@@ -55,13 +55,13 @@ private slots:
 
     void on_btn_compile_clicked();
 
-    void on_textEdit_cursorPositionChanged();
+    void on_edit_code_cursorPositionChanged();
 
-    void on_textEdit_blockCountChanged(int blockCount);
+    void on_edit_code_blockCountChanged(int blockCount);
 
-    void on_textEdit_textChanged();
+    void on_edit_code_textChanged();
 
-    void sync_codeLine_to_edit(int lineV);
+    void syncLineNumToEdit(int lineV);
 
 private:
     void initCodeEdit();
@@ -76,9 +76,9 @@ private:
 
     void setCodeLineWidth(int bitNum);
 
-    void connect_codeLineChanged_with_edit();
+    void connectCodeLineChangedWithEdit();
 
-    void disconnect_codeLineChanged_with_edit();
+    void disconnectCodeLineChangedWithEdit();
 
 private:
     Ui::MainWidget* ui;
@@ -87,10 +87,15 @@ private:
     SearchEdit* m_search;
     CodeEdit* m_edit;
 
-    QTextCharFormat m_colorF_1;
+    QTextCharFormat m_color_f_1;
     QTextCharFormat m_colorF_2;
-    int m_charWidth;
-    int m_focusLine;
+    int m_focus_line;
+    int m_char_width;
+
+    // QWidget interface
+protected:
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    double scaleFactor = 16;
 };
 
 #endif // MAIN_WIDGET_H

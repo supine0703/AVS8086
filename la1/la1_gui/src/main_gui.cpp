@@ -18,8 +18,8 @@
  */
 
 
-#include "./settings/settings.h"
-#include "./widget/mainwidget.h"
+#include "mainwidget.h"
+#include "settings.h"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -49,7 +49,7 @@ inline void appInit()
     Q_ASSERT(QCoreApplication::instance() != nullptr);
 
     // 设置字体
-    auto getFontList = [](QStringList res) -> QStringList {
+    auto getFontList = [](QStringList res) {
         QStringList fs;
         for (const auto& r : res)
         {
@@ -62,19 +62,19 @@ inline void appInit()
         }
         return fs;
     };
-    auto fontList = getFontList({
+    auto font_list = getFontList({
         ":/font/iconfont/iconfont.ttf",
         ":/font/d_font/Space.ttf",
         ":/font/d_font/JetBrainsMono[wght].ttf",
         ":/font/d_font/JetBrainsMono-Italic[wght].ttf",
         ":/font/d_font/YouSheShaYuFeiTeJianKangTi.ttf",
     });
-    fontList.removeAll("iconfont"); // 不应该作为通用字体 会导致空白行和文字行高度不一致
-    fontList.removeAll("Space"); // Space: 在 0x1fdc 创建了一个空格 行间距 `200`
-                                 // 主要用作抵消 Qt因不同字体差异带来的不良影响
+    font_list.removeAll("iconfont"); // 不应该作为通用字体 会导致空白行和文字行高度不一致
+    font_list.removeAll("Space"); // Space: 在 0x1fdc 创建了一个空格 行间距 `200`
+                                  // 主要用作抵消 Qt因不同字体差异带来的不良影响
 
     // 检测字体是否有效 没效则用默认字体
-    CHECK_SETTINGS(_APP_FONTS_, fontList.join(","), QFontDatabase::families(), ",");
+    CHECK_SETTINGS(_APP_FONTS_, font_list.join(","), QFontDatabase::families(), ",");
     QString family("Space,");
     family.append(SETTINGS().value(_APP_FONTS_).toString());
 
@@ -82,7 +82,7 @@ inline void appInit()
     CHECK_SETTINGS(
         _APP_SCALE_, "1", { "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.25", "2.5" }
     );
-    int fontSize = 8 * SETTINGS().value(_APP_SCALE_).toDouble();
+    int font_size = 8 * SETTINGS().value(_APP_SCALE_).toDouble();
 
-    QApplication::setFont(QFont(family, fontSize));
+    QApplication::setFont(QFont(family, font_size));
 }

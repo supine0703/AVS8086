@@ -2,7 +2,11 @@
 
 #include <QCompleter>
 
-SearchEdit::SearchEdit() {}
+SearchEdit::SearchEdit(QWidget* parent)
+    : QLineEdit(parent)
+{
+
+}
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
 {

@@ -50,32 +50,31 @@ MainWidget::MainWidget(QWidget* parent)
     , ui(new Ui::MainWidget)
     , m_status(new QStatusBar(this))
     , m_edit(nullptr)
-    , m_focusLine(-1)
+    , m_focus_line(-1)
+    /* 计算字符宽度 (默认使用等宽字符，非等宽字符可能会造成不可预知的问题) */
+    , m_char_width(QFontMetrics(QApplication::font()).horizontalAdvance('0'))
 {
-
-    // 设置窗口标题
+    ui->setupUi(this);
+    // 设置窗口标题 (得在 ui 初始化之后)
     this->setWindowTitle(
         QString("AVS8086 v%1 - assembler virtual simulator for 8086").arg(THE_VERSION)
     );
 
-    // 计算字符宽度 (默认使用等宽字符，非等宽字符可能会造成不可预知的问题)
-    auto fm = QFontMetrics(QApplication::font());
-    m_charWidth = fm.horizontalAdvance('0');
 
     // 初始化 UI 以及各个组件
-    ui->setupUi(this);
+
     initCodeEdit();
     initLineSearch();
     initStatusBar();
-    on_textEdit_cursorPositionChanged(); // 状态栏显示行列、突出焦点
+    on_edit_code_cursorPositionChanged(); // 状态栏显示行列、突出焦点
 
     // 读取配置文件中的文件路径，并试图打开
     if (QFile f(SETTINGS().value(_APP_OPEN_FILE_).toString()); f.exists())
     { // 文件存在
-        ui->lineEdit_path->setText(f.fileName());
+        ui->edit_path->setText(f.fileName());
         if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            ui->textEdit->setPlainText(f.readAll());
+            ui->edit_code->setPlainText(f.readAll());
             f.close();
         }
         else
@@ -85,7 +84,7 @@ MainWidget::MainWidget(QWidget* parent)
     }
     else
     { // 文件不存在
-        on_lineEdit_path_textChanged("");
+        on_edit_path_textChanged("");
         SETTINGS().setValue(_APP_OPEN_FILE_, "");
     }
 }
@@ -100,45 +99,51 @@ void MainWidget::initCodeEdit()
     // code line
     loadCodeLineColor();
     setCodeLineWidth(1); // 初始化 codeLine 的宽度
-    ui->codeLine->document()->setDefaultTextOption(QTextOption(Qt::AlignRight)); // 右对齐
-    ui->codeLine->viewport()->setCursor(Qt::ArrowCursor);                        // 箭头光标
-    ui->codeLine->setCurrentCharFormat(m_colorF_1); // 设置行号的初始颜色
-    ui->codeLine->appendPlainText("1");             // 默认值，不能用 set
+    ui->edit_line->document()->setDefaultTextOption(QTextOption(Qt::AlignRight)); // 右对齐
+    ui->edit_line->viewport()->setCursor(Qt::ArrowCursor);                        // 箭头光标
+    ui->edit_line->setCurrentCharFormat(m_color_f_1); // 设置行号的初始颜色
+    ui->edit_line->appendPlainText("1");              // 默认值，不能用 set
     // setFocusLine(0);                                // 初始化焦点为第一行
 
     // ...
 
     // code edit
     // 改用 CodeEdit 并重新绑定信号槽
-    ui->layout_code->removeWidget(ui->textEdit);
-    ui->textEdit->disconnect();
-    ui->textEdit->deleteLater();
-    ui->textEdit = m_edit = new CodeEdit;
-    ui->layout_code->addWidget(m_edit);
+    auto i = ui->layout_code->indexOf(ui->edit_code);
+    ui->layout_code->removeWidget(ui->edit_code);
+    ui->edit_code->disconnect();
+    ui->edit_code->deleteLater();
+    ui->edit_code = m_edit = new CodeEdit;
+    ui->layout_code->insertWidget(i, m_edit);
     m_edit->appendPlainText("");
-    m_edit->setEditTabSize(m_charWidth, 4);
-    connect(m_edit, &CodeEdit::textChanged, this, &MainWidget::on_textEdit_textChanged);
-    connect(m_edit, &CodeEdit::blockCountChanged, this, &MainWidget::on_textEdit_blockCountChanged);
+    m_edit->setEditTabSize(m_char_width, 4);
+    connect(m_edit, &CodeEdit::textChanged, this, &MainWidget::on_edit_code_textChanged);
     connect(
-        m_edit, &CodeEdit::cursorPositionChanged, this, &MainWidget::on_textEdit_cursorPositionChanged
+        m_edit, &CodeEdit::blockCountChanged, this, &MainWidget::on_edit_code_blockCountChanged
+    );
+    connect(
+        m_edit,
+        &CodeEdit::cursorPositionChanged,
+        this,
+        &MainWidget::on_edit_code_cursorPositionChanged
     );
 
     // 通过信号槽将行号与编辑器同步
     connect(
         m_edit->verticalScrollBar(),
         &QScrollBar::valueChanged,
-        ui->codeLine->verticalScrollBar(),
+        ui->edit_line->verticalScrollBar(),
         &QScrollBar::setValue
     );
-    connect_codeLineChanged_with_edit();
+    connectCodeLineChangedWithEdit();
 }
 
+#include <QAbstractItemView>
 #include <QCompleter>
 #include <QLineEdit>
 #include <QPainter>
 #include <QStringListModel>
 #include <QStyledItemDelegate>
-#include <QAbstractItemView>
 
 class CustomCompleterDelegate : public QStyledItemDelegate
 {
@@ -160,21 +165,23 @@ public:
 void MainWidget::initLineSearch()
 {
     // 改用 SearchEdit
-    ui->layout_file->removeWidget(ui->lineEdit_search);
-    ui->lineEdit_search->deleteLater();
-    ui->lineEdit_search = m_search = new SearchEdit;
-    ui->layout_file->insertWidget(1, m_search);
-
+    m_search = new SearchEdit;
+    m_search->setStyleSheet(ui->edit_search->styleSheet());
+    auto i = ui->layout_top_3->indexOf(ui->edit_search);
+    ui->layout_top_3->removeWidget(ui->edit_search);
+    ui->edit_search->deleteLater();
+    ui->edit_search = m_search;
+    ui->layout_top_3->insertWidget(i, m_search);
 
 
     // 创建输入框和补全器
-    QStringList items = { "LF", "CRLF"};
+    QStringList items = { "LF", "CRLF", "a", "b", "c", "d", "e", "f", "g", "h" };
     auto completer = new QCompleter(items, this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setFilterMode(Qt::MatchContains);
 
     // 设置自定义委托
-    QAbstractItemView *popup = completer->popup();
+    QAbstractItemView* popup = completer->popup();
     popup->setItemDelegate(new CustomCompleterDelegate(popup));
 
     m_search->setCompleter(completer);
@@ -187,9 +194,7 @@ void MainWidget::initStatusBar()
     // 将按钮添加到状态栏的最右侧
     QPushButton* button = new QPushButton("Click Me");
     m_status->addPermanentWidget(button);
-    connect(button, &QPushButton::clicked, this, [this]() {
-        ui->lineEdit_search->setFocus();
-    });
+    connect(button, &QPushButton::clicked, this, [this]() { ui->edit_search->setFocus(); });
 
     //     QAction* action = new QAction("Click me", this);
     //     QToolButton* button = new QToolButton;
@@ -215,7 +220,7 @@ void MainWidget::loadCodeLineColor()
         color = CODE_LINE_DEFAULT_COLOR_1;
         SETTINGS().setValue(_APP_CL_COLOR_1_, color.name());
     }
-    m_colorF_1.setForeground(color);
+    m_color_f_1.setForeground(color);
     if (color = QColor(SETTINGS().value(_APP_CL_COLOR_2_).toString()); !color.isValid())
     {
         color = CODE_LINE_DEFAULT_COLOR_2;
@@ -226,54 +231,54 @@ void MainWidget::loadCodeLineColor()
 
 void MainWidget::setFocusLine(int lineNum)
 {
-    Q_ASSERT(lineNum >= -1 && lineNum != m_focusLine);
+    Q_ASSERT(lineNum >= -1 && lineNum != m_focus_line);
 
-    if (m_focusLine != -1)
+    if (m_focus_line != -1)
     { // 不可采用存储 QTextCursor 的方式，它内部是共享指针，可能会发生改变，产生不可预知的问题
-        auto prev = QTextCursor(ui->codeLine->document()->findBlockByNumber(m_focusLine));
+        auto prev = QTextCursor(ui->edit_line->document()->findBlockByNumber(m_focus_line));
         prev.select(QTextCursor::BlockUnderCursor);
-        prev.mergeCharFormat(m_colorF_1);
+        prev.mergeCharFormat(m_color_f_1);
         prev.clearSelection();
     }
 
-    auto curr = QTextCursor(ui->codeLine->document()->findBlockByNumber(lineNum));
+    auto curr = QTextCursor(ui->edit_line->document()->findBlockByNumber(lineNum));
     if (lineNum != 0 && curr.blockNumber() == 0)
-    {                     // 当前行还未被构造，暂时放弃
-        m_focusLine = -1; // 标记为 -1 交给后面主动调用
+    {                      // 当前行还未被构造，暂时放弃
+        m_focus_line = -1; // 标记为 -1 交给后面主动调用
     }
     else
     {
         curr.select(QTextCursor::BlockUnderCursor);
         curr.mergeCharFormat(m_colorF_2);
         curr.clearSelection();
-        m_focusLine = lineNum;
+        m_focus_line = lineNum;
     }
 }
 
 void MainWidget::setCodeLineWidth(int bitNum)
 { // 设置 codeLine 的宽度
-    ui->codeLine->setMaximumWidth(m_charWidth * (bitNum + CODE_LINE_SPACE_WIDTH));
+    ui->edit_line->setMaximumWidth(m_char_width * (bitNum + CODE_LINE_SPACE_WIDTH));
 }
 
 // 以下为信号槽部分
 /* ========================================================================= */
 
-void MainWidget::connect_codeLineChanged_with_edit()
+void MainWidget::connectCodeLineChangedWithEdit()
 { // 连接行号与编辑器的滚动条
     connect(
-        ui->codeLine->verticalScrollBar(),
+        ui->edit_line->verticalScrollBar(),
         &QScrollBar::valueChanged,
         this,
-        &MainWidget::sync_codeLine_to_edit
+        &MainWidget::syncLineNumToEdit
     );
 }
 
-void MainWidget::disconnect_codeLineChanged_with_edit()
+void MainWidget::disconnectCodeLineChangedWithEdit()
 { // 断开行号与编辑器的滚动条的同步
-    ui->codeLine->verticalScrollBar()->disconnect(this);
+    ui->edit_line->verticalScrollBar()->disconnect(this);
 }
 
-void MainWidget::on_lineEdit_path_textChanged(const QString& path)
+void MainWidget::on_edit_path_textChanged(const QString& path)
 {
     bool valid = !path.isEmpty();
     ui->btn_open_file->setEnabled(valid);
@@ -283,12 +288,11 @@ void MainWidget::on_lineEdit_path_textChanged(const QString& path)
 
 void MainWidget::on_btn_choose_path_clicked()
 {
-    auto fp = QFileDialog::getOpenFileName(
-        this, "选择文件", QFileInfo(ui->lineEdit_path->text()).filePath()
-    );
+    auto fp =
+        QFileDialog::getOpenFileName(this, "选择文件", QFileInfo(ui->edit_path->text()).filePath());
     if (!fp.isEmpty())
     { // 只判断字符串不为空，是否存在交给打开时判断
-        ui->lineEdit_path->setText(fp);
+        ui->edit_path->setText(fp);
         SETTINGS().setValue(_APP_OPEN_FILE_, fp);
     }
 }
@@ -297,14 +301,14 @@ void MainWidget::on_btn_clear_path_clicked()
 {
     if (QMessageBox::question(this, "询问", "是否确认要清空文件路径") == QMessageBox::Yes)
     {
-        ui->lineEdit_path->clear();
+        ui->edit_path->clear();
         SETTINGS().setValue(_APP_OPEN_FILE_, "");
     }
 }
 
 void MainWidget::on_btn_open_file_clicked()
 {
-    const auto& path = ui->lineEdit_path->text();
+    const auto& path = ui->edit_path->text();
     if (path.isEmpty())
     {
         QMessageBox::warning(this, "警告", "路径为空或者无法访问");
@@ -317,7 +321,7 @@ void MainWidget::on_btn_open_file_clicked()
         { // 文件存在
             if (f.open(QIODevice::ReadOnly | QIODevice::Text))
             { // 文件打开成功
-                ui->textEdit->setPlainText(f.readAll());
+                ui->edit_code->setPlainText(f.readAll());
                 f.close();
             }
             else
@@ -334,16 +338,16 @@ void MainWidget::on_btn_open_file_clicked()
 
 void MainWidget::on_btn_clear_file_clicked()
 {
-    const auto& path = ui->lineEdit_path->text();
+    const auto& path = ui->edit_path->text();
     if (QMessageBox::question(this, "询问", "是否确认要清空编辑器") == QMessageBox::Yes)
     {
-        ui->textEdit->clear();
+        ui->edit_code->clear();
     }
 }
 
 void MainWidget::on_btn_save_file_clicked()
 {
-    const auto& path = ui->lineEdit_path->text();
+    const auto& path = ui->edit_path->text();
     if (path.isEmpty())
     {
         QMessageBox::warning(this, "警告", "路径为空或者无法访问");
@@ -395,7 +399,7 @@ void MainWidget::on_btn_save_file_clicked()
     }
 }
 
-void MainWidget::on_textEdit_cursorPositionChanged()
+void MainWidget::on_edit_code_cursorPositionChanged()
 {
     // 在状态栏显示行列
     auto ec = m_edit->textCursor();
@@ -406,15 +410,15 @@ void MainWidget::on_textEdit_cursorPositionChanged()
     // 设置焦点行突出
     // 注意：cursorPositionChanged 早于 blockCountChanged
     // 如果时在最后一行，得先创建 Block 再设置，交给 on_textEdit_blockCountChanged
-    if (ec.blockNumber() != m_focusLine)
+    if (ec.blockNumber() != m_focus_line)
     {
         setFocusLine(ec.blockNumber());
     }
 }
 
-void MainWidget::on_textEdit_blockCountChanged(int blockCount)
+void MainWidget::on_edit_code_blockCountChanged(int blockCount)
 { // 显示行号 (增加 or 减少)
-    auto line = ui->codeLine->blockCount();
+    auto line = ui->edit_line->blockCount();
     // if (line == blockCount)
     //     return;
     Q_ASSERT(line != blockCount);
@@ -425,18 +429,18 @@ void MainWidget::on_textEdit_blockCountChanged(int blockCount)
         setCodeLineWidth(bitNum);
     }
 
-    disconnect_codeLineChanged_with_edit();
+    disconnectCodeLineChangedWithEdit();
     { // 为避免同步滚动条的频繁操作，消耗资源，暂时屏蔽 line change with edit 的信号槽
         if (line < blockCount)
         { // 增加  <
             for (int i = line + 1; i <= blockCount; i++)
             {
-                ui->codeLine->appendPlainText(QString::number(i));
+                ui->edit_line->appendPlainText(QString::number(i));
             }
         }
         else
         { // 减少  >
-            auto tc = ui->codeLine->textCursor();
+            auto tc = ui->edit_line->textCursor();
             while (tc.blockNumber() >= blockCount)
             { // blockNumber 比 blockCount 小 1
                 // tc.movePosition(QTextCursor::End); // 将光标移动到文本末尾 (应该一直保持在末尾)
@@ -445,20 +449,20 @@ void MainWidget::on_textEdit_blockCountChanged(int blockCount)
             }
         }
     }
-    connect_codeLineChanged_with_edit();
-    sync_codeLine_to_edit(ui->codeLine->verticalScrollBar()->value());
+    connectCodeLineChangedWithEdit();
+    syncLineNumToEdit(ui->edit_line->verticalScrollBar()->value());
 
     // 如果光标在最后一行，得由此设置焦点 (m_focusLine 的 -1 由 setFocusLine 主动标记)
-    if (m_focusLine == -1)
+    if (m_focus_line == -1)
     {
         setFocusLine(blockCount - 1);
     }
 }
 
 // TODO: ...
-void MainWidget::on_textEdit_textChanged() {}
+void MainWidget::on_edit_code_textChanged() {}
 
-void MainWidget::sync_codeLine_to_edit(int lineV)
+void MainWidget::syncLineNumToEdit(int lineV)
 { // 同步行号与编辑器的滚动条
     if (int editV = m_edit->verticalScrollBar()->value(); editV != lineV)
     {
@@ -539,3 +543,23 @@ void MainWidget::on_btn_compile_clicked()
     // // qDebug() << a.wellInitInfos();
 }
 
+
+void MainWidget::keyPressEvent(QKeyEvent* event)
+{
+    if (event->modifiers() == Qt::ControlModifier)
+    {
+        if (event->key() == Qt::Key_Equal)
+        {
+            scaleFactor *= 1.1;
+            update();
+        }
+        else if (event->key() == Qt::Key_Minus)
+        {
+            scaleFactor /= 1.1;
+            update();
+        }
+    }
+    auto font = QApplication::font();
+    font.setPointSizeF(scaleFactor);
+    QApplication::setFont(font);
+}
