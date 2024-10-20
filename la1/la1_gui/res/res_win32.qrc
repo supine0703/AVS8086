@@ -1,10 +1,17 @@
 <RCC>
     <qresource prefix="/font">
         <file>iconfont/iconfont.ttf</file>
-        <file>d_font/Space.ttf</file>
         <file>d_font/JetBrainsMono[wght].ttf</file>
         <file>d_font/JetBrainsMono-Italic[wght].ttf</file>
         <file>d_font/YouSheShaYuFeiTeJianKangTi.ttf</file>
+        <file>d_font/space/Space_200.ttf</file>
+        <file>d_font/space/Space_400.ttf</file>
+        <file>d_font/space/Space_600.ttf</file>
+        <file>d_font/space/Space_800.ttf</file>
+        <file>d_font/space/Space_1000.ttf</file>
+        <file>d_font/space/Space_1200.ttf</file>
+        <file>d_font/space/Space_1400.ttf</file>
+        <file>d_font/space/Space_1600.ttf</file>
     </qresource>
     <qresource prefix="/ico">
         <file>img/AppIcon.ico</file>

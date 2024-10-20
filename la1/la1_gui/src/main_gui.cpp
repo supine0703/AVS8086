@@ -19,8 +19,8 @@
 
 
 #include "mainwidget.h"
-#include "settings.h"
 #include "new_settings/configs.h"
+#include "settings.h"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -42,16 +42,11 @@ public:
         // void (Obj::*signalFunction)(int) = &Obj::test;
         // // 使用 emit 关键字发射信号
 
-        Configs::registerSignal("1123", [this](int v) {
-            emit test(v);
-        });
+        Configs::registerSignal("1123", [this](int v) { emit test(v); });
         Configs::registerSignal("123", this, &Obj::ttt);
     }
 
-    void ttt(int)
-    {
-        qDebug() << "112";
-    }
+    void ttt(int) { qDebug() << "112"; }
 
 signals:
     void test(int);
@@ -97,20 +92,31 @@ inline void appInit()
         }
         return fs;
     };
+
+    // Space: 在 0xf8ff 创建了一个空格 行间距 `200`
+    // 主要用作抵消 Qt因不同字体差异带来的不良影响
+    auto space_font_list = getFontList({
+        ":/font/d_font/space/Space_200.ttf",
+        ":/font/d_font/space/Space_400.ttf",
+        ":/font/d_font/space/Space_600.ttf",
+        ":/font/d_font/space/Space_800.ttf",
+        ":/font/d_font/space/Space_1000.ttf",
+        ":/font/d_font/space/Space_1200.ttf",
+        ":/font/d_font/space/Space_1400.ttf",
+        ":/font/d_font/space/Space_1600.ttf",
+    });
+
     auto font_list = getFontList({
         ":/font/iconfont/iconfont.ttf",
-        ":/font/d_font/Space.ttf",
         ":/font/d_font/JetBrainsMono[wght].ttf",
         ":/font/d_font/JetBrainsMono-Italic[wght].ttf",
         ":/font/d_font/YouSheShaYuFeiTeJianKangTi.ttf",
     });
     font_list.removeAll("iconfont"); // 不应该作为通用字体 会导致空白行和文字行高度不一致
-    font_list.removeAll("Space"); // Space: 在 0x1fdc 创建了一个空格 行间距 `200`
-                                  // 主要用作抵消 Qt因不同字体差异带来的不良影响
 
     // 检测字体是否有效 没效则用默认字体
     CHECK_SETTINGS(_APP_FONTS_, font_list.join(","), QFontDatabase::families(), ",");
-    QString family("Space,");
+    auto family = space_font_list.at(1) + ",";
     family.append(SETTINGS().value(_APP_FONTS_).toString());
 
     // 设置字体倍率 但是这似乎不是一个好的方案

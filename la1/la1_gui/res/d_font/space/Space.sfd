@@ -4,7 +4,7 @@ FullName: Space
 FamilyName: Space
 Weight: Book
 Copyright: Copyright (c) 2024, Leisure
-Version: 1;200;0x1fdc
+Version: 1;0xf8ff;h200
 ItalicAngle: 0
 UnderlinePosition: -180
 UnderlineWidth: 50
@@ -22,7 +22,7 @@ OS2Version: 4
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1673704953
-ModificationTime: 1729013818
+ModificationTime: 1729442863
 PfmFamily: 17
 TTFWeight: 400
 TTFWidth: 5
@@ -4512,20 +4512,20 @@ ShortTable: maxp 16
 EndShort
 LangName: 1033 "" "" "" "" "" "Version 1"
 GaspTable: 1 65535 15 1
-Encoding: UnicodeBmp
+Encoding: UnicodeFull
 UnicodeInterp: none
 NameList: AGL For New Fonts
 DisplaySize: -48
 AntiAlias: 1
 FitToEm: 0
-WinInfo: 8112 16 4
+WinInfo: 63712 16 4
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 629145 314572 209715 0 1048576 209715 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 65536 1
+BeginChars: 1114112 1
 
-StartChar: uni1FDC
-Encoding: 8156 8156 0
+StartChar: uniF8FF
+Encoding: 63743 63743 0
 Width: 600
 Flags: W
 LayerCount: 2
