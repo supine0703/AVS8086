@@ -165,17 +165,10 @@
        <item>
         <widget class="QLineEdit" name="edit_search">
          <property name="styleSheet">
-          <string notr="true">QLineEdit {
-	border: 2px solid #8f8f91;
-	border-radius: 16px;
-	padding: 0 8px;
-}</string>
-         </property>
-         <property name="text">
-          <string>搜索</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <string notr="true">border: 2px solid #8f8f91;
+border-radius: 10px;
+padding: 0 8px;
+</string>
          </property>
         </widget>
        </item>

@@ -36,12 +36,15 @@ set(GUI_PROJ_SOURCES
     ${SRC_PATH}/widget/codeedit.h ${SRC_PATH}/widget/codeedit.cpp
     ${SRC_PATH}/widget/searchedit.h ${SRC_PATH}/widget/searchedit.cpp
     ${UI_PATH}/mainwidget.ui
+
+    ${SRC_PATH}/new_settings/configs.h ${SRC_PATH}/new_settings/configs.cpp
 )
 
 qt_add_executable(${PROJECT_NAME}
     MANUAL_FINALIZATION
     ${RES_SOURCES}
     ${GUI_PROJ_SOURCES}
+    src/new_settings/convert_qvariant.h
 )
 
 # ...

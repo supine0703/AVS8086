@@ -1,0 +1,5 @@
+#ifndef LA1_GUI_SETTINGS_H
+#define LA1_GUI_SETTINGS_H
+
+
+#endif // LA1_GUI_SETTINGS_H

@@ -20,6 +20,7 @@
 
 #include "mainwidget.h"
 #include "settings.h"
+#include "new_settings/configs.h"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -29,11 +30,45 @@
 
 void appInit(); // 必须在 QApplication 创建之后使用
 
+using namespace la1::gui;
+class Obj : public QObject
+{
+    Q_OBJECT
+
+public:
+    Obj() : QObject()
+    {
+        int* a;
+        // void (Obj::*signalFunction)(int) = &Obj::test;
+        // // 使用 emit 关键字发射信号
+
+        Configs::registerSignal("1123", [this](int v) {
+            emit test(v);
+        });
+        Configs::registerSignal("123", this, &Obj::ttt);
+    }
+
+    void ttt(int)
+    {
+        qDebug() << "112";
+    }
+
+signals:
+    void test(int);
+};
+
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     appInit();
 
+    // Obj o;
+    // QObject::connect(&o, &Obj::test, [](int v) {
+    //     qDebug() << "sss: " << v;
+    // });
+    // Configs::run();
+
+    // exit(1);
     MainWidget w;
     w.show();
 
@@ -86,3 +121,5 @@ inline void appInit()
 
     QApplication::setFont(QFont(family, font_size));
 }
+
+#include "main_gui.moc"
