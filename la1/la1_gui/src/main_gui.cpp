@@ -38,32 +38,47 @@ class Obj : public QObject
 public:
     Obj() : QObject()
     {
-        int* a;
-        // void (Obj::*signalFunction)(int) = &Obj::test;
-        // // 使用 emit 关键字发射信号
-
-        Configs::registerSignal("1123", [this](int v) { emit test(v); });
-        Configs::registerSignal("123", this, &Obj::ttt);
+        Configs::registerSignal("1123", [](double v) {
+            qDebug() << v;
+        });
+        // Configs::registerSignal("1123", std::function<void(double)>(tt));
+        // Configs::registerSignal("123", this, &Obj::ttt);
     }
 
-    void ttt(int) { qDebug() << "112"; }
+    void ttt(double) { qDebug() << "112"; }
 
 signals:
     void test(int);
 };
+
+template <class ...T>
+struct SSS
+{
+    std::function<void(T...)> f;
+
+    SSS& fn(std::function<void(T...)> f)
+    {
+        this->f = f; return *this;
+    }
+
+    void e(T... t) { f(t...);}
+};
+
 
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     appInit();
 
-    // Obj o;
-    // QObject::connect(&o, &Obj::test, [](int v) {
-    //     qDebug() << "sss: " << v;
-    // });
-    // Configs::run();
+    SSS<double>().fn([](double v){qDebug() << "ddd:" << v;}).e(1.23);
 
-    // exit(1);
+    Obj o;
+    QObject::connect(&o, &Obj::test, [](int v) {
+        qDebug() << "sss: " << v;
+    });
+    Configs::run();
+
+    exit(1);
     MainWidget w;
     w.show();
 

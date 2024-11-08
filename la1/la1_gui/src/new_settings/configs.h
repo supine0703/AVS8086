@@ -27,6 +27,57 @@
 
 namespace la1::gui {
 
+
+// function_traits模板
+template <typename T>
+struct function_traits;
+
+template <typename R, typename... Args>
+struct function_traits<std::function<R(Args...)>>
+{
+    using args_type = std::tuple<Args...>;
+};
+
+// lambda_traits模板
+template <typename F> // 使用递归可以包解 std::function<R(Args...)>([](Args...){ ... })
+struct lambda_traits : public lambda_traits<decltype(&F::operator())>
+{
+};
+
+template <typename C, typename R, typename... Args>
+struct lambda_traits<R (C::*)(Args...) const>
+{
+    using args_type = std::tuple<Args...>;
+};
+
+// 辅助类型，检测F是否是Lambda表达式
+template <typename T>
+struct is_lambda : std::false_type
+{
+};
+
+template <typename C, typename R, typename... Args>
+struct is_lambda<R (C::*)(Args...) const> : std::true_type
+{
+};
+
+// 定义 Lambda 概念，用于检查 Lambda 表达式并提取参数类型
+template <typename T>
+concept IsLambda = requires(T t) {
+    { &T::operator() };
+};
+
+// 提取 Lambda 参数类型的模板
+template <typename F>
+struct LambdaTraits;
+
+template <typename C, typename R, typename... Args>
+struct LambdaTraits<R (C::*)(Args...) const>
+{
+    using args_type = std::tuple<Args...>;
+};
+
+
 class Configs : public QObject
 {
     Configs(const Configs&) = delete;
@@ -41,65 +92,46 @@ public:
 
     static QVariant value(QAnyStringView key);
 
-    // function_traits模板
-    template <typename T>
-    struct function_traits;
-
-    template <typename R, typename... Args>
-    struct function_traits<std::function<R(Args...)>>
+    template <typename Arg>
+    static void registerSignal(const QString& key, std::function<void(Arg)> emitFn)
     {
-        using args_type = std::tuple<Args...>;
-    };
-
-    // lambda_traits模板
-    template <typename F>
-    struct lambda_traits : public lambda_traits<decltype(&F::operator())>
-    {
-    };
-
-    template <typename C, typename R, typename... Args>
-    struct lambda_traits<R (C::*)(Args...) const>
-    {
-        using args_type = std::tuple<Args...>;
-    };
-
-    // 辅助类型，检测F是否是Lambda表达式
-    template <typename T>
-    struct is_lambda : std::false_type
-    {
-    };
-
-    template <typename C, typename R, typename... Args>
-    struct is_lambda<R (C::*)(Args...) const> : std::true_type
-    {
-    };
-
-    // registerSignal函数模板，只接受Lambda表达式
-    template <typename F>
-    // static void registerSignal(const QString& key, F&& emitFn)
-    static auto registerSignal(const QString& key, F&& emitFn) ->
-        typename std::enable_if<is_lambda<decltype(&F::operator())>::value>::type
-    { // auto 启用条件编译。通过std::enable_if<is_lambda<...>>来判断模板是否实例化
-        using args_type = typename lambda_traits<F>::args_type;
-        static_assert(
-            std::tuple_size<args_type>::value == 1, "Lambda must take exactly one argument."
-        );
-        using ArgType = typename std::tuple_element<0, args_type>::type;
+        using ArgType = Arg;
         Q_ASSERT(!instance().m_map.contains(key));
         instance().m_map.insert(key, [emitFn](const QVariant& value) {
             emitFn(ConvertQVariant<ArgType>::convert(value));
         });
     }
 
-    template <typename OBJ, typename Arg>
-    static void registerSignal(const QString& key, OBJ* obj, void (OBJ::*method)(Arg))
+    // registerSignal 函数模板，只接受 Lambda 表达式
+    // template <IsLambda F>
+    // static void registerSignal(const QString& key, F&& emitFn)
+    // {
+    //     using args_type = typename LambdaTraits<decltype(&F::operator())>::args_type;
+    //     static_assert(std::tuple_size<args_type>::value == 1, "Lambda must take exactly one argument.");
+    //     using ArgType = typename std::tuple_element<0, args_type>::type;
+    //     Q_ASSERT(!instance().m_map.contains(key));
+    //     instance().m_map.insert(key, [emitFn](const QVariant& value) {
+    //         emitFn(ConvertQVariant<ArgType>::convert(value));
+    //     });
+    // }
+
+    template <typename Obj, typename MemFn>
+    static void registerSignal(const QString& key, Obj* obj, MemFn fn)
     {
-        using ArgType = Arg;
-        Q_ASSERT(!instance().m_map.contains(key));
-        instance().m_map.insert(key, [=](const QVariant& value) {
-            (obj->*method)(ConvertQVariant<ArgType>::convert(value));
+        registerSignal(key, [obj, fn] (auto arg) {
+            (obj->*fn)(arg);
         });
     }
+
+    // template <typename Obj, typename Arg>
+    // static void registerSignal(const QString& key, Obj* obj, void (Obj::*memFn)(Arg))
+    // {
+    //     using ArgType = Arg;
+    //     Q_ASSERT(!instance().m_map.contains(key));
+    //     instance().m_map.insert(key, [=](const QVariant& value) {
+    //         (obj->*memFn)(ConvertQVariant<ArgType>::convert(value));
+    //     });
+    // }
 
     static void run()
     {
