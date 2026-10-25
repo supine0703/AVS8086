@@ -31,6 +31,9 @@ class MainWidget;
 class CodeEdit;
 class SearchEdit;
 class QStatusBar;
+class QPushButton;
+class QTabWidget;
+class QTextBrowser;
 
 class MainWidget : public QWidget
 {
@@ -42,42 +45,33 @@ public:
 
 private slots:
     void on_edit_path_textChanged(const QString& path);
-
     void on_btn_choose_path_clicked();
-
     void on_btn_clear_path_clicked();
-
     void on_btn_open_file_clicked();
-
     void on_btn_clear_file_clicked();
-
     void on_btn_save_file_clicked();
-
-    void on_btn_compile_clicked();
-
+    void on_btn_save_file_as_clicked();
     void on_edit_code_cursorPositionChanged();
-
     void on_edit_code_blockCountChanged(int blockCount);
-
     void on_edit_code_textChanged();
-
     void syncLineNumToEdit(int lineV);
+    void editEndOfLineChanged(const QString& text);
+    void onAnchorClicked(const QUrl& link);
+
+    void on_btn_lexer_clicked();
+    void on_btn_parser_clicked();
+    void on_btn_to_bin_clicked();
 
 private:
+    void initResultTab();
     void initCodeEdit();
-
     void initLineSearch();
-
     void initStatusBar();
-
     void loadCodeLineColor();
-
     void setFocusLine(int lineNum);
-
     void setCodeLineWidth(int bitNum);
-
+    void saveEditTextTo(const QString& path);
     void connectCodeLineChangedWithEdit();
-
     void disconnectCodeLineChangedWithEdit();
 
 private:
@@ -86,16 +80,21 @@ private:
     QStatusBar* m_status;
     SearchEdit* m_search;
     CodeEdit* m_edit;
+    QPushButton* m_btn_end_of_line;
+    QTabWidget* m_result_tab;
+
+    QTextBrowser* m_result_1;
+    QTextBrowser* m_result_2;
+    QTextBrowser* m_result_3;
 
     QTextCharFormat m_color_f_1;
-    QTextCharFormat m_colorF_2;
+    QTextCharFormat m_color_f_2;
     int m_focus_line;
     int m_char_width;
 
     // QWidget interface
 protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
-    double scaleFactor = 16;
 };
 
 #endif // MAIN_WIDGET_H

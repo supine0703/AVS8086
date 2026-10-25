@@ -19,7 +19,6 @@
 
 
 #include "mainwidget.h"
-#include "new_settings/configs.h"
 #include "settings.h"
 
 #include <QApplication>
@@ -30,63 +29,18 @@
 
 void appInit(); // 必须在 QApplication 创建之后使用
 
-using namespace la1::gui;
-class Obj : public QObject
-{
-    Q_OBJECT
-
-public:
-    Obj() : QObject()
-    {
-        Configs::registerSignal("1123", [](double v) {
-            qDebug() << v;
-        });
-        // Configs::registerSignal("1123", std::function<void(double)>(tt));
-        // Configs::registerSignal("123", this, &Obj::ttt);
-    }
-
-    void ttt(double) { qDebug() << "112"; }
-
-signals:
-    void test(int);
-};
-
-template <class ...T>
-struct SSS
-{
-    std::function<void(T...)> f;
-
-    SSS& fn(std::function<void(T...)> f)
-    {
-        this->f = f; return *this;
-    }
-
-    void e(T... t) { f(t...);}
-};
-
-
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     appInit();
 
-    SSS<double>().fn([](double v){qDebug() << "ddd:" << v;}).e(1.23);
-
-    Obj o;
-    QObject::connect(&o, &Obj::test, [](int v) {
-        qDebug() << "sss: " << v;
-    });
-    Configs::run();
-
-    exit(1);
     MainWidget w;
     w.show();
 
     return a.exec();
 }
 
-
-/* ========================================================================= */
+/* ========================================================================== */
 
 // 初始化应用程序的一些设置
 inline void appInit()
@@ -98,8 +52,7 @@ inline void appInit()
         QStringList fs;
         for (const auto& r : res)
         {
-            auto f =
-                QFontDatabase::applicationFontFamilies(QFontDatabase::addApplicationFont(r)).at(0);
+            auto f = QFontDatabase::applicationFontFamilies(QFontDatabase::addApplicationFont(r)).at(0);
             if (!fs.contains(f))
             {
                 fs << f;
@@ -135,12 +88,8 @@ inline void appInit()
     family.append(SETTINGS().value(_APP_FONTS_).toString());
 
     // 设置字体倍率 但是这似乎不是一个好的方案
-    CHECK_SETTINGS(
-        _APP_SCALE_, "1", { "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.25", "2.5" }
-    );
+    CHECK_SETTINGS(_APP_SCALE_, "1", { "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.25", "2.5" });
     int font_size = 8 * SETTINGS().value(_APP_SCALE_).toDouble();
 
     QApplication::setFont(QFont(family, font_size));
 }
-
-#include "main_gui.moc"

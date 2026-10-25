@@ -34,9 +34,7 @@ class Settings
 public:
     static QSettings& getSettings();
 
-    static void checkSettings(
-        QAnyStringView key, int defaultValue, int min = INT32_MIN, int max = INT32_MAX
-    );
+    static void checkSettings(QAnyStringView key, int defaultValue, int min = INT32_MIN, int max = INT32_MAX);
 
     static void checkSettings(
         QAnyStringView key,

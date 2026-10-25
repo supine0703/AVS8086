@@ -118,9 +118,7 @@ public:
     template <typename Obj, typename MemFn>
     static void registerSignal(const QString& key, Obj* obj, MemFn fn)
     {
-        registerSignal(key, [obj, fn] (auto arg) {
-            (obj->*fn)(arg);
-        });
+        registerSignal(key, [obj, fn](auto arg) { (obj->*fn)(arg); });
     }
 
     // template <typename Obj, typename Arg>

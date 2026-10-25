@@ -7,12 +7,11 @@ class SearchEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    explicit  SearchEdit(QWidget* parent = nullptr);
+    explicit SearchEdit(QWidget* parent = nullptr);
 
     // QWidget interface
 protected:
     virtual void focusOutEvent(QFocusEvent* event) override;
-
     virtual void focusInEvent(QFocusEvent* event) override;
 };
 

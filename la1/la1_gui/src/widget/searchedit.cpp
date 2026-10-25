@@ -2,21 +2,18 @@
 
 #include <QCompleter>
 
-SearchEdit::SearchEdit(QWidget* parent)
-    : QLineEdit(parent)
-{
-
-}
+SearchEdit::SearchEdit(QWidget* parent) : QLineEdit(parent) {}
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
 {
-    QLineEdit::focusOutEvent(event);
     this->clear();
+    QLineEdit::focusOutEvent(event);
 }
 
 void SearchEdit::focusInEvent(QFocusEvent* event)
 {
     QLineEdit::focusInEvent(event);
-    completer()->complete(); // 显示下拉选项
+    this->completer()->setCompletionPrefix("");
+    this->completer()->complete(); // 显示下拉选项
 }
 

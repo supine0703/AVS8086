@@ -37,18 +37,18 @@ public:
 
     ~CodeEdit();
 
-    void setEditTabSize(int charWidth, int tabSize = 4);
+    void setEditTabSize(int char_width, int tab_size = 4);
 
-    void setEditTab(TabType type, int tabSize);
-
-    void setEditTab(TabType type, int tabSize, int charWidth);
+    void setEditTab(TabType type, int tab_size);
+    void setEditTab(TabType type, int tab_size, int char_width);
 
 protected:
+    virtual void wheelEvent(QWheelEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;
 
 private:
-    TabType m_tab = TAB_USE_TABLE;
-    int m_tabSize = 4;
+    TabType m_tab = TAB_USE_SPACE;
+    int m_tab_size = 4;
 };
 
 #endif // CODE_EDIT_H
